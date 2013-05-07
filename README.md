@@ -1,7 +1,7 @@
 Live
-====
+-----
 
-Lua interface vivid engine
+Lua user interface engine
 
 Bio
 ====
