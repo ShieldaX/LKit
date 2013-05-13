@@ -1,4 +1,4 @@
-Live
+LKit
 -----
 
 Lua user interface engine
