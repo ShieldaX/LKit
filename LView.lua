@@ -1,5 +1,5 @@
 -- LView.lua
--- Key component in GUI system.
+-- Base component in GUI system.
 --
 -- ========================================
 
