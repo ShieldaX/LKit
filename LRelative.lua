@@ -1,0 +1,5 @@
+-- LRelative.lua
+-- Relative layout component, absolute view container.
+-- Subviews relative to each other | this superView.
+--
+-- ========================================
