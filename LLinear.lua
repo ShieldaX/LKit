@@ -1,0 +1,5 @@
+-- LLinear.lua
+-- Linear layout component, absolute view container.
+-- Switch between 2 directions: horizontal & vertical.
+--
+-- ========================================
