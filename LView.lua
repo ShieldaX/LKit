@@ -13,6 +13,7 @@ local _id = 0  -- ID for each view.
 -- @frame Init view with frame.
 function LView.new(frame)
     --assert frame is a display rect
+    assert(type(frame) == "table", "frame should be a table.")
     local width, height = frame.width or 100, frame.height or 100
     -- background is used for stretching frame( group object ).
     local background = display.newRect(0, 0, width, height)
@@ -41,7 +42,8 @@ end
 function LView:addView(view, zIndex)
     local bounds = self._bounds
     -- assert.isA(LView)
-    -- zIndex should be a nil or integer value。
+    if not type(self[view.name]) == "nil" then return false end
+    -- zIndex should be a nil or integer value.
     bounds:insert(zIndex, view)
     self[view.name] = view
 end
