@@ -1,7 +1,7 @@
 LKit
 -----
 
-Lua user interface engine [lɔːkɪt]
+Lua user interface engine [lʊkɪt]
 
 ###Bio
 
