@@ -38,19 +38,19 @@ function LView:initialize(opt)
   
   local width, height = opt.width or 100, opt.height or 100
   -- background is used for stretching frame( group object ).
-  local background = display.newRect(0, 0, width, height)
+  self._frame = display.newGroup()
+  self._bounds = display.newGroup()
+  local background = display.newRect(self._frame, 0, 0, width, height) -- make background **rect** as frame skeleton and
   local backgroundColor = opt.backgroundColor or {255, 255, 255, 255}
   background:setFillColor(unpack(backgroundColor))
   
   self.subviews = {}
-  self.background = background
-  self.backgroundColor = backgroundColor
-  self.frame = display.newGroup()
-  self.bounds = display.newGroup()
+  self._background = background
+  self._backgroundColor = backgroundColor
+  
   --self._gestureRecognizers = {}
   
-  self.frame:insert(background) -- make background **rect** as frame skeleton and
-  self.frame:insert(self.bounds) -- lay bounds **group** above background.
+  self._frame:insert(self._bounds) -- lay bounds **group** above background.
 end
 
 --[[
@@ -62,10 +62,10 @@ function LView:addView(view, zIndex)
     --assert(view and isView(view), "Subview must be a LView")
     --assert(type(view.name) == "string", "")
     assert(view.superview ~= self, "subview already exists, use 'moveViewToIndex' to change display order")
-    assert(getmetatable(view.frame) == getmetatable(display.getCurrentStage()), "try to insert an invalid view")
-    
-    local bounds = self.bounds
-    bounds:insert(zIndex or bounds.numChildren + 1, view.frame)
+    assert(getmetatable(view._frame) == getmetatable(display.getCurrentStage()), "try to insert an invalid view")
+    assert(string.find(view.name, "_", 1) ~= 1, "can't resolve '_' prefixed named subview." )
+    local bounds = self._bounds
+    bounds:insert(zIndex or bounds.numChildren + 1, view._frame)
     view.superview = self
     if type(view.name) == "string" then self.subviews[view.name] = view end
 end
@@ -76,13 +76,13 @@ end
 -- @subview Name or zIndex of subView to remove.
 ]]
 function LView:removeView(subview)
-    local bounds= self.bounds
+    local bounds= self._bounds
     local object = self.subviews[subview]
     if not object then
         object = bounds[subview]
         subview = self:nameOfView(subview)
     else
-        object = object.frame
+        object = object._frame
     end
     if object then
         local ref = self.subviews[subview]
@@ -92,7 +92,6 @@ function LView:removeView(subview)
         object = nil
         --print_r(ref)
     end
-    return false
 end
 --
 
@@ -109,13 +108,13 @@ end
 -- @
 ]]
 function LView:moveViewToIndex(subview, toIndex)
-    local bounds = self.bounds
+    local bounds = self._bounds
     if toIndex < 1 then toIndex = 1 elseif toIndex > bounds.numChildren then toIndex = bounds.numChildren end
     local object = self.subviews[subview]
     if not object then
         object = bounds[subview]
     else
-        object = object.frame
+        object = object._frame
     end
     display.getCurrentStage():insert(object) -- take object out to shared stage
     bounds:insert(toIndex, object) -- re-insert object at new index
@@ -127,14 +126,24 @@ end
 -- ------
 
 --[[
+-- Retrive reference of a subview
+-- @param name The name of the subview.
+-- @return The subview reference or nil if none found.
+]]
+function LView:findViewByName( name )
+  local founded = self.subviews[name]
+  return nil
+end
+
+--[[
 -- Get view's name at the index.
 -- @index Subview's index.
 ]]
 function LView:nameOfView(index)
-    local object = self.bounds[index]
+    local object = self._bounds[index]
     if object then    
         for name, view in pairs(self.subviews) do
-            if object == view.frame then return name end
+            if object == view._frame then return name end
         end
     end
     return false
@@ -184,9 +193,9 @@ end
 ]]
 function LView:setBackgroundColor(colorTable, transparent)
     --local ori_color = self._bgc
-    self.background:setFillColor(unpack(colorTable))
-    if not transparent then self.background.alpha = 1 end
-    self.backgroundColor = colorTable
+    self._background:setFillColor(unpack(colorTable))
+    if not transparent then self._background.alpha = 1 end
+    self._backgroundColor = colorTable
 end
 --
 

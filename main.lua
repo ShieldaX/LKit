@@ -44,7 +44,10 @@ function print_r ( t )
 end
 
 local View = require("LView")
+local Window = require("LWindow")
 local Linear = require("LLinear")
+
+local win = Window {name = "window"}
 
 local box = Linear {name = "h-box", width = 200, direction = "vertical"}
 box:setBackgroundColor({255, 0, 255})
@@ -53,6 +56,7 @@ local v = View {height = 50, backgroundColor = {255, 255, 0}}
 
 local vv = View {name = "double-kill", height = 25, backgroundColor = {0, 255, 255}}
 
+win:addView(box)
 box:addView(v)
 box:addView(vv)
 
@@ -63,6 +67,7 @@ print(box.name)
 
 --print_r(foobar)
 timer.performWithDelay(2600, function()
+  box:removeView("double-kill")
     --foobar:removeView(1)
     --print_r(foobar)
     --foobar:moveViewToIndex(1, 2)
@@ -71,3 +76,33 @@ timer.performWithDelay(2600, function()
     --print(foobar:nameOfView(5))
     --foobar:removeView('bar')
 end)
+
+--[[
+local win = Window {
+  linear {
+    name = "linear",
+    width = "match",
+    height = "match",
+    direction = "horizontal",
+    View {
+      name = "rootView",
+      width = "match",
+      height = "wrap",
+      Button = {
+        name = "print",
+        width =  "wrap",
+        height = "wrap",
+      }
+    },
+    ScrollView {
+      name = "scroll",
+      width = "match",
+      height = "match",
+    }
+  }
+}
+
+win.linear.rootview.print._frame
+win.subviews.linear.subviews.rootview.subviews.print
+
+]]
