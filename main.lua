@@ -46,24 +46,32 @@ function print_r ( t )
 end
 
 local View = require("LView")
-
-local foobar = View.new({width = 200, height = 400})
+local Linear = require("LLinear")
+local foobar = Linear.new({width = 200, height = 400})
 local foo = View.new({name = "foo", width = 50, backgroundColor = {255, 255, 0}})
 local bar = View.new({name = "bar", height = 50, backgroundColor = {0, 255, 255}})
 
-print("internal ids: ", foobar._id, foo._id, bar._id)
+--print("internal ids: ", foobar._id, foo._id, bar._id)
 
 foobar:addView(foo)
-foobar:addView(bar)
+foobar:addView(bar, 2)
 
 foobar.frame.x = display.contentCenterX
-foobar:setBackgroundColor({255, 0, 255})
+--foobar:setBackgroundColor({255, 0, 255})
 
 --print_r(foobar)
 timer.performWithDelay(2600, function()
     --foobar:removeView(1)
     --print_r(foobar)
-    foobar:moveViewToIndex(1, 2)
-    print(foo:getWindow()._id)
-    print_r(bar:isDescendantOfView(foo))
+    --foobar:moveViewToIndex(1, 2)
+    --print(foo:getWindow()._id)
+    --print_r(bar:isDescendantOfView(foobar))
+    --print(foobar:nameOfView(5))
+    --foobar:removeView('bar')
+end)
+
+timer.performWithDelay(2600 + 100, function()
+  --print_r(bar)
+  --foobar:addView(bar)
+  print('force')
 end)

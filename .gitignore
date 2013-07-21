@@ -1,3 +1,4 @@
 # General
 *.ini
 
+.DS_Store

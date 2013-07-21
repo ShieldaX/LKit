@@ -49,7 +49,8 @@ end
 function LView:addView(view, zIndex)
     --assert(view and isView(view), "Subview must be a LView")
     --assert(type(view.name) == "string", "")
-    assert(view.superview ~= self, "Subview already exists, use 'moveViewToIndex' to change display order")
+    assert(view.superview ~= self, "subview already exists, use 'moveViewToIndex' to change display order")
+    assert(getmetatable(view.frame) == getmetatable(display.getCurrentStage()), "try to insert an invalid view")
     
     local bounds = self.bounds
     bounds:insert(zIndex or bounds.numChildren + 1, view.frame)
@@ -71,11 +72,21 @@ function LView:removeView(subview)
     end
     if object then
         local ref = self.subviews[subview]
+        ref.superview = nil
         self.subviews[subview] = nil
         object:removeSelf()
-        return ref
+        object = nil
+        --print_r(ref)
     end
     return false
+end
+--
+
+--[[
+-- Clear all subviews in this view.
+]]  
+function LView:clear()
+  local subviews = self.subviews
 end
 --
 
@@ -115,7 +126,8 @@ function LView:nameOfView(index)
         for name, view in pairs(self.subviews) do
             if object == view.frame then return name end
         end
-    end       
+    end
+    return false       
 end
 --
 
