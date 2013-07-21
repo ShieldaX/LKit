@@ -1,9 +1,7 @@
--- main.lua
+---- main.lua ----
 
 print() 
 print("LKit Lib")
-
-DEBUG = true
 
 -- ---
 -- dump arbitrary variables include table
@@ -47,17 +45,21 @@ end
 
 local View = require("LView")
 local Linear = require("LLinear")
-local foobar = Linear.new({width = 200, height = 400})
-local foo = View.new({name = "foo", width = 50, backgroundColor = {255, 255, 0}})
-local bar = View.new({name = "bar", height = 50, backgroundColor = {0, 255, 255}})
 
---print("internal ids: ", foobar._id, foo._id, bar._id)
+local box = Linear {name = "h-box", width = 200, direction = "vertical"}
+box:setBackgroundColor({255, 0, 255})
 
-foobar:addView(foo)
-foobar:addView(bar, 2)
+local v = View {height = 50, backgroundColor = {255, 255, 0}}
 
-foobar.frame.x = display.contentCenterX
---foobar:setBackgroundColor({255, 0, 255})
+local vv = View {name = "double-kill", height = 25, backgroundColor = {0, 255, 255}}
+
+box:addView(v)
+box:addView(vv)
+
+print(box:nameOfView(2))
+print(vv:isDescendantOfView(box))
+print("window level :", v:getWindow().name)
+print(box.name)
 
 --print_r(foobar)
 timer.performWithDelay(2600, function()
@@ -68,10 +70,4 @@ timer.performWithDelay(2600, function()
     --print_r(bar:isDescendantOfView(foobar))
     --print(foobar:nameOfView(5))
     --foobar:removeView('bar')
-end)
-
-timer.performWithDelay(2600 + 100, function()
-  --print_r(bar)
-  --foobar:addView(bar)
-  print('force')
 end)

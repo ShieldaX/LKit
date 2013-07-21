@@ -6,8 +6,8 @@ List
 
 r_0.01
   Core: responder, view, linear layout, button, etc.
-  Cluster: basic hierarchy, both of layout and respond.
-  Layout: padding, margin, align.
+  Layout: size, position,padding, margin, align.
+  Chain: basic hierarchy, both of layout and respond.
 
 r_0.1
   DSL: struct views via nested params( dig-dig mode ).
