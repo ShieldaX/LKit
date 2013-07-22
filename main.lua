@@ -52,9 +52,9 @@ local win = Window {name = "window"}
 local box = Linear {name = "h-box", width = 200, direction = "vertical"}
 box:setBackgroundColor({255, 0, 255})
 
-local v = View {height = 50, backgroundColor = {255, 255, 0}}
+local v = View {name = "kill", height = 50, backgroundColor = {255, 255, 0}}
 
-local vv = View {name = "double-kill", height = 25, backgroundColor = {0, 255, 255}}
+local vv = View {name = "double_kill", height = 25, backgroundColor = {0, 255, 255}}
 
 win:addView(box)
 box:addView(v)
@@ -67,7 +67,9 @@ print(box.name)
 
 --print_r(foobar)
 timer.performWithDelay(2600, function()
-  box:removeView("double-kill")
+  --box:removeView(1)
+  print(box.double_kill.name)
+  print(box.kill.name)
     --foobar:removeView(1)
     --print_r(foobar)
     --foobar:moveViewToIndex(1, 2)
