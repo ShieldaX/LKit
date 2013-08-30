@@ -11,3 +11,4 @@ Inspired by both iOS and Android UI library. Uses within cross-platform mobile a
 
 Merge platform divergence on user interface, so it looks much vivid.
 Recognise Gesture most based on touch, multi-touch and so on.
+Render engine works like Webkit and Gecko.
