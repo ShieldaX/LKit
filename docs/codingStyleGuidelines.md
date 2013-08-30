@@ -1,4 +1,4 @@
-Code Guide
+Coding Style Guidelines
 ======
 
 Table
