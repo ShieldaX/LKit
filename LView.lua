@@ -63,8 +63,8 @@ function LView:addView(view, zIndex)
     assert(view.superview ~= self, "subview already exists, use 'moveViewToIndex' to change display order")
     assert(getmetatable(view._frame) == getmetatable(display.getCurrentStage()), "try to insert an invalid view")
     assert(string.find(view.name, "_", 1) ~= 1, "can't resolve '_' prefixed subview." )
-    --TODO: view name can't contain "-", or it will hurt nested reference.
-    --assert(string.find(view.name, "-", 1) ~= 1, "can't resolve '-' contained subview." )
+    -- ensure view name doesn't contain "-", or it will hurt nested reference.
+    assert(not string.find(view.name, "-", 1), "can't resolve '-' contained subview." )
     local bounds = self._bounds
     bounds:insert(zIndex or bounds.numChildren + 1, view._frame)
     view.superview = self
