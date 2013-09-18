@@ -37,26 +37,25 @@ function LView:initialize(opt)
   self.name = opt.name or tostring(id)
   
   local width, height = opt.width or 100, opt.height or 100
-  -- background is used for stretching frame( group object ).
+  --frame is, a group object, used for define position and size in superview.
   self._frame = display.newGroup()
+  --bounds is, also a display group, used for define self content position and size in frame.
   self._bounds = display.newGroup()
-  local background = display.newRect(self._frame, 0, 0, width, height) -- make background **rect** as frame skeleton and
-  local backgroundColor = opt.backgroundColor or {255, 255, 255, 255}
-  background:setFillColor(unpack(backgroundColor))
+  -- background is, a rect, used for touch handle
+  self.background = display.newRect(self._frame, 0, 0, width, height) -- make background **rect** as frame skeleton and
+  self.backgroundColor = opt.backgroundColor or {255, 255, 255, 255} -- color table
+  self.background:setFillColor(unpack(backgroundColor))
   
   self.subviews = {}
-  self._background = background
-  self._backgroundColor = backgroundColor
-  
-  --self._gestureRecognizers = {}
+  self.gestureRecognizers = {}
   
   self._frame:insert(self._bounds) -- lay bounds **group** above background.
 end
 
 --[[
--- Insert view as new subview.
--- @view Subview to be insert.
--- *zIndex Display order of new subview.
+-- Insert view as new a subview.
+-- @param view Subview to be insert.
+-- @param *zIndex Display order of new subview.
 ]]
 function LView:addView(view, zIndex)
     --assert(view and isView(view), "Subview must be a LView")
@@ -78,7 +77,7 @@ end
 
 --[[
 -- Remove subView from self.
--- @subview Name or zIndex of subView to remove.
+-- @param subview Name or zIndex of subView to remove.
 ]]
 function LView:removeView(subview)
     local bounds= self._bounds
@@ -142,7 +141,7 @@ end
 
 --[[
 -- Get view's name at the index.
--- @index Subview's index.
+-- @param index Subview's index.
 ]]
 function LView:nameOfView(index)
     local object = self._bounds[index]
@@ -171,7 +170,7 @@ end
 
 --[[
 -- Check if the view's descendant.
--- @targetView The view to check.
+-- @param targetView The view to check.
 ]]
 function LView:isDescendantOfView(targetView)
     local view = self
@@ -193,8 +192,8 @@ end
 
 --[[
 -- Set background color
--- @colorTable Table of color to set to.
--- @transparent:boolean Keep background be transparent or not.
+-- @param colorTable Table of color to set to.
+-- @param transparent:boolean Keep background be transparent or not.
 ]]
 function LView:setBackgroundColor(colorTable, transparent)
     --local ori_color = self._bgc
