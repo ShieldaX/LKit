@@ -44,7 +44,7 @@ end
 
 function LLinear:addView(view, zIndex)
   LView.addView(self, view, zIndex) -- super call
-  local bounds = self._bounds
+  local bounds = self.bounds
   if self.direction == LLinear.LayoutParams.Directions.VERTICAL then
     --print("vertical")
     arrange(bounds)

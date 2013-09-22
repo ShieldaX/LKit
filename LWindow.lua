@@ -48,8 +48,8 @@ function LWindow:initialize(opt)
   opt.width = display.viewableContentWidth
   opt.height = display.viewableContentHeight
   LView.initialize(self, opt)
-  self._frame.x = display.screenOriginX
-  self._frame.y = display.screenOriginY
+  self.frame.x = display.screenOriginX
+  self.frame.y = display.screenOriginY
 end
 
 function LWindow:window()
