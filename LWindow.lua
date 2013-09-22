@@ -30,7 +30,7 @@ contentCenterX = display.contentCenterX,
 contentCenterY = display.contentCenterY
 }
 
-print_r(stage)
+--print_r(stage)
 
 -- ------
 -- VARIABLES
