@@ -41,7 +41,6 @@ print(vv:isDescendantOfView(box))
 print("window is :", vv:getWindow().name)
 print(box.name)
 
---print_r(foobar)
 timer.performWithDelay(2600, function()
   --box:removeView(1)
   print(box.blue.name)
@@ -55,33 +54,3 @@ timer.performWithDelay(2600, function()
   --foobar:removeView('bar')
   --print_r(box.gray)
 end)
-
---[[
-local win = Window {
-  linear {
-    name = "linear",
-    width = "match",
-    height = "match",
-    direction = "horizontal",
-    View {
-      name = "rootView",
-      width = "match",
-      height = "wrap",
-      Button = {
-        name = "print",
-        width =  "wrap",
-        height = "wrap",
-      }
-    },
-    ScrollView {
-      name = "scroll",
-      width = "match",
-      height = "match",
-    }
-  }
-}
-
-win.linear.rootview.print._frame
-win.subviews.linear.subviews.rootview.subviews.print
-
-]]
