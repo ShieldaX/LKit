@@ -20,7 +20,7 @@ end
 
 --- Dump arbitrary variables include table
 -- @param t Table or string
-function self.print(t)
+function self.printObject(t)
 --{{{
   local print_r_cache={}
   local function sub_print_r(t,indent)

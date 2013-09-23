@@ -20,7 +20,7 @@ local LButton = LView:subclass("LButton")
 -- CONSTANTS
 -- ------
 
-LButton.controlEvent = LEnum {
+LButton.static.controlEvent = LEnum {
     "touchDown",
     "touchDownRepeat",
     "touchDragInside",
@@ -43,10 +43,6 @@ local isPointInBounds = LUtil.isPointInBounds
 -- FUNCTIONS
 -- ------
 
--- ------
--- CLASS METHOD
--- ------
-
 function LButton:initialize(opt)
   LView.initialize(self, opt)
   
@@ -62,13 +58,11 @@ function LButton:initialize(opt)
   
   self.targets = {}
   -- begin to tracking touch
-  print("           opt", opt.trackingTouch)
   if type(opt.trackingTouch) ~= "nil" then
     self.trackingTouch = opt.trackingTouch
   else
     self.trackingTouch = true
   end
-  print("           self", self.trackingTouch)
   self.bounds:addEventListener("touch", self)
 end
 
@@ -82,7 +76,7 @@ function LButton:touch(event)
   local phase = event.phase
   local target = event.target
   local touchedInBounds = isPointInBounds({x = event.x, y = event.y}, target.contentBounds)
-  local ctrl = self.controlEvent
+  local ctrl = LButton.controlEvent
   
   self:onControlEvent(ctrl.allTouchEvents)
   
@@ -156,10 +150,6 @@ function LButton:onControlEvent(eventName)
   end)
   return true -- touch event handled.
 end
-
--- ------
--- INSTANCE METHOD
--- ------
 
 function LButton:setLabel(text)
 end

@@ -36,7 +36,7 @@ end
 function application:stop()
 end
 
-function application:suspend()
+function application:pause()
 end
 
 function application:resume()
