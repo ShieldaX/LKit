@@ -1,9 +1,11 @@
--- lUtil.lua
+-- LUtil.lua
+-- @class Utility tools
 -- ======
 
-local lUtil = {}
+-- moudle packager
+local LUtil = {}
 
-local self = lUtil
+local self = LUtil
 
 ---
 local coronaMetaTable = getmetatable(display.getCurrentStage())
@@ -56,4 +58,4 @@ function self.print(t)
 --}}}
 end
 
-return lUtil
+return LUtil

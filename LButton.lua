@@ -6,8 +6,9 @@
 -- LIBRARIES
 -- ------
 
+local LUtil = require("LUtil")
 local LView = require("LView")
-local enum = require 'enum'
+local LEnum = require("LEnum")
 
 -- ------
 -- CLASS
@@ -19,7 +20,7 @@ local LButton = LView:subclass("LButton")
 -- CONSTANTS
 -- ------
 
-LButton.controlEvent = enum.def {
+LButton.controlEvent = LEnum {
     "touchDown",
     "touchDownRepeat",
     "touchDragInside",
@@ -36,27 +37,38 @@ LButton.controlEvent = enum.def {
 -- VARIABLES
 -- ------
 
+local isPointInBounds = LUtil.isPointInBounds
+
 -- ------
 -- FUNCTIONS
 -- ------
 
 -- ------
--- ONTOLOGY FUNCTIONS
+-- CLASS METHOD
 -- ------
 
 function LButton:initialize(opt)
   LView.initialize(self, opt)
+  
   local roundedRect = display.newRoundedRect(self.bounds, 0, 0, 160, 60, 12)
   roundedRect.strokeWidth = 2
   roundedRect:setFillColor(255, 255, 255)
   roundedRect:setStrokeColor(0, 122, 255)
+  
   local label = display.newText(self.bounds, "Label", 0, 0, native.systemFont, 30)
   label:setTextColor(0, 122, 255)
   label.x = roundedRect.x
   label.y = roundedRect.y
+  
+  self.targets = {}
+  -- begin to tracking touch
+  self.trackingTouch = true
   self.bounds:addEventListener("touch", self)
 end
 
+--- the original touch handler
+-- parse touch to control events
+-- @param event System touch event
 function LButton:touch(event)
 
   local phase = event.phase
@@ -106,11 +118,42 @@ function LButton:touch(event)
     
   end
   
-  return self.trackingTouch -- event handled
+  return self.trackingTouch -- event handled?
 
 end
 
-function LButton:setLabel()
+--- the original tap handler
+-- response to tap control event.
+-- @param event System tap event
+function LButton:tap(event)
+  if event.numTaps > 1 then
+    self:onControlEvent(self.controlEvent.touchDownRepeat)
+  end
+end
+
+--- send event to its targets
+-- @param eventName String specifying the name of the event to dispatch.
+function LButton:onControlEvent(eventName)
+  print(eventName)
+  if not self.trackingTouch then return false end
+  local targets = self.targets[eventName]
+  if not targets then return false end
+  table.foreach(targets, function(i, tar)
+    tar[1].bounds:dispatchEvent({
+      name = tar[2], -- the action name
+      state = eventName, -- control event
+      --source = event, -- original event
+      sender = self -- you may query sender to get more information about the context of the event triggering the action message
+    })
+  end)
+  return true -- touch event handled.
+end
+
+-- ------
+-- INSTANCE METHOD
+-- ------
+
+function LButton:setLabel(text)
 end
 
 return LButton
