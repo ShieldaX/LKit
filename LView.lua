@@ -27,10 +27,6 @@ local id = 0 -- view id
 -- FUNCTIONS
 -- ------
 
--- ------
--- ONTOLOGY FUNCTIONS
--- ------
-
 function LView:initialize(opt)
   id = id + 1
   self.id = id
@@ -53,7 +49,7 @@ function LView:initialize(opt)
 end
 
 --[[
--- Insert view as new a subview.
+--- Insert view as new a subview.
 -- @param view Subview to be insert.
 -- @param *zIndex Display order of new subview.
 ]]
@@ -76,7 +72,7 @@ end
 --
 
 --[[
--- Remove subView from self.
+--- Remove subView from self.
 -- @param subview Name or zIndex of subView to remove.
 ]]
 function LView:removeView(subview)
@@ -100,7 +96,7 @@ end
 --
 
 --[[
--- Clear all subviews in this view.
+--- Clear all subviews in this view.
 ]]
 function LView:clear()
   local subviews = self.subviews
@@ -108,7 +104,7 @@ end
 --
 
 --[[
--- Move subView to new Index.
+--- Move subView to new Index.
 -- @
 ]]
 function LView:moveViewToIndex(subview, toIndex)
@@ -130,7 +126,7 @@ end
 -- ------
 
 --[[
--- Retrive reference of a subview
+--- Retrive reference of a subview
 -- @param name The name of the subview.
 -- @return The subview reference or nil if none found.
 ]]
@@ -140,7 +136,7 @@ function LView:findViewByName( name )
 end
 
 --[[
--- Get view's name at the index.
+--- Get view's name at the index.
 -- @param index Subview's index.
 ]]
 function LView:nameOfView(index)
@@ -155,7 +151,7 @@ end
 --
 
 --[[
--- Get current view's root view -- window.
+--- Get current view's root view -- window.
 ]]
 function LView:getWindow()
   local view = self
@@ -169,7 +165,7 @@ end
 --
 
 --[[
--- Check if the view's descendant.
+--- Check if the view's descendant.
 -- @param targetView The view to check.
 ]]
 function LView:isDescendantOfView(targetView)
