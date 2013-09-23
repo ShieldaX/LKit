@@ -7,6 +7,7 @@
 -- ------
 
 local LView = require("LView")
+local enum = require 'enum'
 
 -- ------
 -- CLASS
@@ -17,6 +18,19 @@ local LButton = LView:subclass("LButton")
 -- ------
 -- CONSTANTS
 -- ------
+
+LButton.controlEvent = enum.def {
+    "touchDown",
+    "touchDownRepeat",
+    "touchDragInside",
+    "touchDragOutside",
+    "touchDragEnter",
+    "touchDragExit",
+    "touchUpInside",
+    "touchUpOutside",
+    "touchCancel",
+    "allTouchEvents"
+  }
 
 -- ------
 -- VARIABLES
@@ -44,8 +58,56 @@ function LButton:initialize(opt)
 end
 
 function LButton:touch(event)
-  -- touched
-  if event.phase == "ended" then print("touchUp") end
+
+  local phase = event.phase
+  local target = event.target
+  local touchedInBounds = isPointInBounds({x = event.x, y = event.y}, target.contentBounds)
+  local ctrl = self.controlEvent
+  
+  self:onControlEvent(ctrl.allTouchEvents)
+  
+  if phase == "began" then -- touch down
+  
+    display.getCurrentStage():setFocus( target ) -- retain touch
+    target.isFocus = true
+    target.isExit = false
+    self:onControlEvent(ctrl.touchDown)    
+  
+  elseif target.isFocus then
+  
+    if phase == "moved" then -- touch drag
+    
+      if touchedInBounds then
+        self:onControlEvent(ctrl.touchDragInside)
+        if target.isExit then
+          self:onControlEvent(ctrl.touchDragEnter)
+          target.isExit = false -- flag
+        end 
+      else
+        self:onControlEvent(ctrl.touchDragOutside)
+        if not target.isExit then
+          self:onControlEvent(ctrl.touchDragExit)
+          target.isExit = true -- flag back
+        end
+      end
+
+    elseif phase == "ended" or phase == "cancelled" then -- touch up or cancel
+
+      if phase == "cancelled" then
+        self:onControlEvent(ctrl.touchCancel)
+      else
+        self:onControlEvent(touchedInBounds and ctrl.touchUpInside or ctrl.touchUpOutside)
+      end
+      
+      display.getCurrentStage():setFocus( nil )
+      target.isFocus = false
+      
+    end
+    
+  end
+  
+  return self.trackingTouch -- event handled
+
 end
 
 function LButton:setLabel()
