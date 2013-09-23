@@ -52,7 +52,7 @@ function LWindow:initialize(opt)
   self.frame.y = display.screenOriginY
 end
 
-function LWindow:window()
+function LWindow:getWindow()
   return self
 end
 

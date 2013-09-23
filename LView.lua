@@ -21,6 +21,7 @@ local LView = class "LView"
 -- VARIABLES
 -- ------
 
+local _debug = true
 local id = 0 -- view id
 
 -- ------
@@ -41,6 +42,10 @@ function LView:initialize(opt)
   self.background = display.newRect(self.frame, 0, 0, width, height) -- make background **rect** as frame skeleton and
   self.backgroundColor = opt.backgroundColor or {255, 255, 255, 255} -- color table
   self.background:setFillColor(unpack(self.backgroundColor))
+  if _debug then
+    self.background.strokeWidth = 2
+    self.background:setStrokeColor(255, 0, 0, 100)
+  end
   
   self.subviews = {}
   self.gestureRecognizers = {}
@@ -160,7 +165,6 @@ function LView:getWindow()
   end
   -- until view doesn't have superview.
   return view
-  --return self.superview:getWindow()
 end
 --
 

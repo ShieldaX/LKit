@@ -46,11 +46,14 @@ timer.performWithDelay(2600, function()
   print(box.blue.name)
   print(box.gray.name)
   --foobar:removeView(1)
-  --print_r(foobar)
   --foobar:moveViewToIndex(1, 2)
-  --print(foo:getWindow()._id)
   --print_r(bar:isDescendantOfView(foobar))
   --print(foobar:nameOfView(5))
   --foobar:removeView('bar')
-  --print_r(box.gray)
 end)
+
+local function onSystemEvent(event)
+  print( "System event name and type: " .. event.name, event.type )
+end
+
+Runtime:addEventListener("system", onSystemEvent)
