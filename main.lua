@@ -27,7 +27,8 @@ local btn = Button {
     name = "new_button",
     width = 160,
     height = 60,
-    backgroundColor = {255, 255, 255, 0}
+    backgroundColor = {255, 255, 255, 0},
+    --trackingTouch = true
   }
 
 win:addView(box)
@@ -37,7 +38,7 @@ box:addView(btn)
 
 print(box:nameOfView(2))
 print(vv:isDescendantOfView(box))
-print("window level :", v:getWindow().name)
+print("window is :", vv:getWindow().name)
 print(box.name)
 
 --print_r(foobar)

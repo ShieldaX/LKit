@@ -62,7 +62,13 @@ function LButton:initialize(opt)
   
   self.targets = {}
   -- begin to tracking touch
-  self.trackingTouch = true
+  print("           opt", opt.trackingTouch)
+  if type(opt.trackingTouch) ~= "nil" then
+    self.trackingTouch = opt.trackingTouch
+  else
+    self.trackingTouch = true
+  end
+  print("           self", self.trackingTouch)
   self.bounds:addEventListener("touch", self)
 end
 
@@ -70,6 +76,8 @@ end
 -- parse touch to control events
 -- @param event System touch event
 function LButton:touch(event)
+
+  if not self.trackingTouch then return end
 
   local phase = event.phase
   local target = event.target
