@@ -7,6 +7,7 @@
 -- ======
 -- LIBRARIES
 -- ======
+local util = require 'util'
 local class = require 'middleclass'
 
 -- ======
@@ -17,6 +18,9 @@ local View = class 'View'
 -- ======
 -- CONSTANTS
 -- ======
+
+local ACW = display.actualContentWidth
+local ACH = display.actualContentHeight
 
 -- ======
 -- VARIABLES
@@ -43,17 +47,26 @@ function View:initialize(opt)
   self.name = name
   
   -- Visual Appearance
-  local dimen = opt.bounds
-  --assert(type(dimen) == "table" and table.getn(dimen) == 4, "invalid bounds parameter")
-  local originX, originY, width, height = dimen[1] or 0, dimen[2] or 0, dimen[3] or 100, dimen[4] or 100
+  -- implement paramters
+  local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or ACH
+  local xOffset, yOffset, xOrigin, yOrigin = opt.xOffset or 0, opt.yOffset or 0, - xOffset, - yOffset
+  
+  -- frame group
+  local frame = display.newGroup()
+  frame.x, frame.y = x, y
+  
   -- The bounds group, which describes the view¡¯s location and size in its own coordinate system.
-  self.bounds = display.newGroup()
+  local bounds = display.newGroup()
+  bounds.x, bounds.y = xOrigin, yOrigin
+  
   -- background rect is used for event handling.
   -- background is still used for compute frame's dimension.
-  self.background = display.newRect(self.bounds, originX, originY, width, height) -- insert background rect in bounds group
+  self.background = display.newRect(frame, 0, 0, width, height) -- insert background rect in frame group
   self.backgroundColor = opt.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent  
   self.background:setFillColor(unpack(self.backgroundColor))
-  
+    
+  self.frame = frame
+  self.bounds = bounds
   -- View Hierarchy
   self.subviews = {}
   self.superview = false -- not exist yet
