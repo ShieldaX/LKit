@@ -88,6 +88,26 @@ ts.regist(2, function()
     ts.window.bar.purple:moveToIndex(2)
 end, "bring subview front")
 
+ts.regist(1, function()
+    local rect = View {
+      name = "rect",
+      width = 128, height = 128,
+      --verticalAlign = View.Algin.ALIGN_CENTER
+      backgroundColor = {76, 217, 100}
+    }
+    util.center(rect.frame)
+    local window = ts.window
+    window:addSubview(rect)
+    print("check true")
+    local inWindow = rect:isDescendantOfView(window)
+    assert(rect:isDescendantOfView(window))
+    print(inWindow)
+    print("check false")
+    local inBar = rect:isDescendantOfView(window.bar)
+    assert(not inBar)
+    print(inBar)
+end, "check the view hierarchy")
+
 ts.regist(2, function()
     local window = ts.window
     window.bar.purple:removeFromSuperview()
