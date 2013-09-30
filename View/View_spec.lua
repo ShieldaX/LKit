@@ -14,17 +14,19 @@ local VCH = display.viewableContentHeight
 ts.desc("#Instance constructor")
 ts.regist(0, function()
     print("initialize")
-    local blue = {90, 200, 255}
+    ts.blueColor = {90, 200, 255}
+    local blue = ts.blueColor
     ts.window = View {
       name = "fullscreened",
-      bounds = {0, 20, VCW, VCH-20},
+      x = 0, y = 20,
+      width = VCW, height = VCH - 20,
       backgroundColor = blue,
-      --cornerRadius = 10,
+      --cornerRadius = 10em,
       --backgroundFilter = "filter.blur",
     }
     local window = ts.window
     assert(window and window.name == "fullscreened", "incorrect name")
-    assert(window.backgroundColor and window.backgroundColor == blue, "incorrect color")
+    assert(window.backgroundColor and window.backgroundColor == blue, "unmatched color")
     assert(window.bounds and window.bounds.width == VCW and window.bounds.height == VCH-20, "incorrect dimension")
 end, "display a fullscreen view")
 
@@ -40,19 +42,53 @@ end, "change background's color to white")
 ts.desc("#Managing the View Hierarchy")
 ts.regist(1, function()
     print("create a new view")
-    local grayColor = {142, 142, 147, 255}
+    ts.grayColor = {142, 142, 147, 255}
+    ts.blueColor = {90, 200, 250, 255}
     local bar = View {
       name = "bar",
-      bounds = {0, 0, VCW, 40},
-      backgroundColor = grayColor,
+      x = 0, y = 0,
+      yOffset = 22,
+      width = VCW, height = 44,
+      backgroundColor = ts.blueColor,
     }
     ts.window:addSubview(bar)
-    assert(ts.window.bar)
+    assert(ts.window[bar.name] == bar)
+    assert(ts.window.bar == bar)
+    assert(bar.superview == ts.window)
 end, "display a bar view at the top")
 
-ts.regist(1, function() end, "add a icon subview to bar view")
+ts.regist(1, function()
+    local bar = ts.window.bar
+    local shade_1 = View {
+      name = "shade",
+      y = 20,
+      height = 2,
+      backgroundColor = {52, 170, 220}, -- blue shade
+    }
+    local shade_2 = View {
+      name = "purple",
+      height = 22,
+      backgroundColor = {88, 86, 214},
+    }
+    bar:addSubview(shade_1)
+    bar:addSubview(shade_2)
+end, "add shade subviews to bar view")
 
-ts.regist(2, function() end, "remove icon subview from its superview")
+ts.regist(2, function()
+    local bar = ts.window.bar
+    print("background is always on bottom")
+    bar.purple:moveToIndex(1)
+end, "move subview to special index")
+
+ts.regist(2, function()
+    ts.window.bar.purple:moveToIndex(2)
+end, "bring subview front")
+
+ts.regist(2, function()
+    local window = ts.window
+    window.bar.purple:removeFromSuperview()
+    assert(type(window.bar.purple) == "nil", "reference is not removed")
+end, "remove square shade from its superview")
 
 ts.desc("#Animations")
 ts.regist(2, function() end, "create/modify/commit animation")
