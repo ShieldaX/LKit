@@ -18,7 +18,7 @@ ts.regist(0, function()
     local blue = ts.blueColor
     ts.window = View {
       name = "fullscreened",
-      x = 0, y = 20,
+      y = 20,
       width = VCW, height = VCH - 20,
       backgroundColor = blue,
       --cornerRadius = 10em,
@@ -27,7 +27,10 @@ ts.regist(0, function()
     local window = ts.window
     assert(window and window.name == "fullscreened", "incorrect name")
     assert(window.backgroundColor and window.backgroundColor == blue, "unmatched color")
-    assert(window.bounds and window.bounds.width == VCW and window.bounds.height == VCH-20, "incorrect dimension")
+    assert(window.frame and window.frame.width == VCW and window.frame.height == VCH-20, "incorrect dimension")
+    assert(window.frame.y == 20)
+    print(window.bounds.contentBounds.yMin)
+    print(window.bounds.contentBounds.yMax)
 end, "display a fullscreen view")
 
 ts.desc("#Configuring a View's Visual Appearance")
@@ -46,7 +49,6 @@ ts.regist(1, function()
     ts.blueColor = {90, 200, 250, 255}
     local bar = View {
       name = "bar",
-      x = 0, y = 0,
       yOffset = 22,
       width = VCW, height = 44,
       backgroundColor = ts.blueColor,
@@ -72,15 +74,17 @@ ts.regist(1, function()
     }
     bar:addSubview(shade_1)
     bar:addSubview(shade_2)
+    print("only purple subview should be see")
 end, "add shade subviews to bar view")
 
 ts.regist(2, function()
     local bar = ts.window.bar
     print("background is always on bottom")
     bar.purple:moveToIndex(1)
-end, "move subview to special index")
+end, "move subview back")
 
 ts.regist(2, function()
+    print("purple view come back to top")
     ts.window.bar.purple:moveToIndex(2)
 end, "bring subview front")
 
@@ -88,7 +92,7 @@ ts.regist(2, function()
     local window = ts.window
     window.bar.purple:removeFromSuperview()
     assert(type(window.bar.purple) == "nil", "reference is not removed")
-end, "remove square shade from its superview")
+end, "remove subview from its superview")
 
 ts.desc("#Animations")
 ts.regist(2, function() end, "create/modify/commit animation")
