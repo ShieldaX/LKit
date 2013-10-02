@@ -69,7 +69,7 @@ function View:initialize(opt)
   self.bounds = bounds
   
   -- View Hierarchy
-  self.subviews = {}
+  --self.subviews = {}
   self.superview = false -- not exist yet
   self.window = false -- not exist before insert into a window view.
   
@@ -105,8 +105,9 @@ function View:addSubview(view, zIndex)
   zIndex = zIndex or bounds.numChildren + 1
   bounds:insert(zIndex, view.frame)
   view.superview = self
+  view.window = self.window
   self[view.name] = view -- view reference
-  table.insert(self.subviews, view) -- add subview
+  --table.insert(self.subviews, view) -- add subview
 end
 
 --- Remove a subview (current view) from its parent
@@ -115,6 +116,8 @@ function View:removeFromSuperview(view)
   local frame = self.frame
   local superview = self.superview
   superview[self.name] = nil
+  self.superview = false
+  self.window = false
   frame:removeSelf()
 end
 
