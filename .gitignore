@@ -1,4 +1,4 @@
 # General
 *.ini
-
+thumbs.db
 .DS_Store

@@ -60,7 +60,7 @@ function View:initialize(opt)
   self.background = display.newRect(frame, 0, 0, width, height) -- insert background rect in frame group
   self.backgroundColor = opt.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent  
   self.background:setFillColor(unpack(self.backgroundColor))
-    
+  
   -- The bounds group, which describes the view¡¯s location and size in its own coordinate system.
   local bounds = display.newGroup()
   frame:insert(bounds)
