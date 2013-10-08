@@ -42,8 +42,8 @@ local ACH = display.actualContentHeight
 function Window:initialize(opt)
   -- define window properties
   opt = opt or {}
-  opt.x, opt.y = 0 -- top left
-  opt.xOffset = 0, opt.yOffset = 0 -- bounds with none offset
+  opt.x, opt.y = 0, 0 -- top left
+  opt.xOffset, opt.yOffset = 0, 0 -- bounds with none offset
   opt.width, opt.height = ACW, ACH -- clips to device screen
   opt.backgroundColor = {255, 255, 255, 0}
   
