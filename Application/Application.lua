@@ -9,6 +9,7 @@
 -- ======
 local util = require 'util'
 local class = require 'middleclass'
+local Window = require 'Window'
 
 -- ======
 -- CLASS
@@ -39,6 +40,7 @@ local ACH = display.actualContentHeight
 --- Instance constructor
 -- @param opt Intent table for construct new instance.
 function Application:initialize(opt)
+  self.window = Window { name = "mainWindow" }
 end
 
 return Application
