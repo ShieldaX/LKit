@@ -45,7 +45,7 @@ function Window:initialize(opt)
   opt.x, opt.y = 0, 0 -- top left
   opt.xOffset, opt.yOffset = 0, 0 -- bounds with none offset
   opt.width, opt.height = ACW, ACH -- clips to device screen
-  opt.backgroundColor = {255, 255, 255, 0}
+  --opt.backgroundColor = {255, 255, 255, 0}
   
   View.initialize(self, opt)
   
