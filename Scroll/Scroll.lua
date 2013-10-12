@@ -27,6 +27,7 @@ local ACH = display.actualContentHeight
 -- VARIABLES
 -- ======
 
+Scroll.static.defaultFriction = 0.98
 -- Internal identifier
 
 -- ======
@@ -40,6 +41,20 @@ local ACH = display.actualContentHeight
 --- Instance constructor
 -- @param opt Intent table for construct new instance.
 function Scroll:initialize(opt)
+  self.isDirectionClocked = false
+  self.enableScroll = true
+  self.scrollBar = ScrollBar {style = "default"}
+  self.contentHeight
+  self.contentWidth
+  self.contentOffsetX, self.contentOffsetY = 0, 0
+  self.direction = "vertical"
+  self.isBounceEnable = true
+  
+  -- scroll state
+  self.tracking = false
+  self.dragging = false
+  self.decelerating = false
+  
 end
 
 return Scroll
