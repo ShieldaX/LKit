@@ -41,6 +41,7 @@ Scroll.static.defaultFriction = 0.98
 --- Instance constructor
 -- @param opt Intent table for construct new instance.
 function Scroll:initialize(opt)
+  View.initialize(self, opt)
   self.isDirectionClocked = false
   self.enableScroll = true
   self.scrollBar = ScrollBar {style = "default"}
@@ -55,6 +56,34 @@ function Scroll:initialize(opt)
   self.dragging = false
   self.decelerating = false
   
+end
+
+function Scroll:touch(event)
+  local phase = event.phase
+  local target = event.target
+  
+  if phase = "began" then
+    self.tracking = true
+    self.dragging = false
+    display.getCurrentStage().setFocus(target)
+    self._tempTimer = timer.performWithDelay(1000, function()
+      print("detect motion")
+      display.getCurrentStage().setFocus(nil)
+      self.tracking = false
+    end)
+  else--if self.tracking then
+    if phase = "moved" then
+      timer.cancel(self._tempTimer)
+      self._tempTIimer = nil
+      self.dragging = true
+    elseif phase = "ended" or phase = "cancelled" then
+      
+      self.tracking, self.dragging = false, false
+      display.getCurrentStage().setFocus(nil)
+    end
+  end
+  
+  return self.tracking
 end
 
 return Scroll
