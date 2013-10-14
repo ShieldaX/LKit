@@ -76,6 +76,9 @@ function Scroll:touch(event)
       timer.cancel(self._tempTimer)
       self._tempTIimer = nil
       self.dragging = true
+      yDelta = event.y - event.yStart
+      -- move content view frame
+      -- get y velocity, and then fling the content
     elseif phase = "ended" or phase = "cancelled" then
       
       self.tracking, self.dragging = false, false
@@ -84,6 +87,12 @@ function Scroll:touch(event)
   end
   
   return self.tracking
+end
+
+function Scroll:scrollTo()
+end
+
+function Scroll:scrollBy()
 end
 
 return Scroll
