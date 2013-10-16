@@ -148,7 +148,7 @@ function Scroll:touch(event)
 		view._updateRuntime = false
 		
 		-- Set the limits now
-		-- setLimits( M, view )
+		self:setLimits()
 		
 		-- Cancel any active tween on the view
 		if view._tween then
@@ -164,7 +164,13 @@ function Scroll:touch(event)
     if "moved" == phase then
       view._delta = event.y - view._prevYPos
       view._prevYPos = event.y
-      view.y = view.y + view._delta
+      --view.y = view.y + view._delta
+      -- If the view is more than the limits
+      if view.y < self.upperLimit or view.y > self.bottomLimit then
+        view.y = view.y + ( view._delta * 0.5 )
+      else
+        view.y = view.y + view._delta 
+      end
       
       self:handleSnapBackVertical( false )
       

@@ -1,18 +1,26 @@
 -- Scroller.lua
 -- Enable scrolling module
 
-local function getVelocity(view)
+-- private var
+local upperLimit, bottomLimit -- dynamic scroll limitation
 
+-- private func
+local function updateLimit()
+end
+
+local function getVelocity()
 end
 
 local Scroller = {}
 
-function Scroller:touch()
+function Scroller:createScrollBar()
 
 end
 
-function Scroller:enterFrame()
+function Scroller:touch()
+end
 
+function Scroller:enterFrame()
 end
 
 function Scroller:included()
