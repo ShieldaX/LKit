@@ -32,9 +32,15 @@ end
 function Scroller:touch()
 end
 
-function Scroller:enterFrame()
+function Scroller:enterFrame(event)
   -- track velocity
-  
+  if self.tracking then
+    -- time elapse
+    local deltaTime = event.time - self._lastTime
+    self._lastTime = event.time
+    local calculatedVelocity = (view.y - view._lastY) / deltaTime
+    
+  end
   -- fling content
 end
 
