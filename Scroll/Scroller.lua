@@ -11,7 +11,19 @@ end
 local function getVelocity()
 end
 
-local Scroller = {}
+local Scroller = {
+  scrollEnabled = true,
+  dragging = false,
+  tracking = false,
+  decelerating  = false,
+  decelerationRate = 0.92,
+}
+
+function Scroller:loseFocus()
+end
+
+function Scroller:takeFocus()
+end
 
 function Scroller:createScrollBar()
 
@@ -21,6 +33,9 @@ function Scroller:touch()
 end
 
 function Scroller:enterFrame()
+  -- track velocity
+  
+  -- fling content
 end
 
 function Scroller:included()

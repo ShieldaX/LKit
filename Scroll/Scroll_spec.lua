@@ -19,10 +19,20 @@ ts.regist(0, function()
       name = "scroller",
       backgroundColor = {255, 255, 255},
       yOffset = 20,
+      yInset = 44,
+      yScrollBarInset = 44,
     }
   local image = display.newImageRect(ts.scroll.bounds, imagePath, unpack(imageSize))
   image.y = image.y + image.contentHeight*.5
   image.x = image.x + image.contentWidth*.5
 end, "create a fullscreen scroll view")
+
+ts.regist(1, function()
+  local view = ts.scroll.bounds
+  local first = view[1]
+  local image = display.newImageRect(view, imagePath, unpack(imageSize))
+  image.y = first.y + first.height*.5 + image.contentHeight*.5 + 20
+  image.x = image.x + image.contentWidth*.5
+end, "insert another pic")
 
 return ts

@@ -27,7 +27,7 @@ local ACH = display.actualContentHeight
 -- VARIABLES
 -- ======
 
-Scroll.static.friction = 0.972
+Scroll.static.friction = 0.94
 Scroll.static.scrollStopThreshold = 250
 -- Internal identifier
 
@@ -209,10 +209,11 @@ function Scroll:enterFrame(event)
     local timePassed = event.time - view._lastTime
 		view._lastTime = view._lastTime + timePassed
     print(view._velocity)
+    
     -- Stop scrolling if velocity is near zero
-		if math.abs( view._velocity ) < 0.01 then
+		if math.abs( view._velocity ) < 0.1 then
 			view._velocity = 0
-			view._updateRuntime = false			
+			view._updateRuntime = false
 		end
     
     -- Set the velocity
