@@ -28,7 +28,7 @@ local ACH = display.actualContentHeight
 -- ======
 
 Scroll.static.friction = 0.972
-Scroll.static.scrollStopThreshold = 20
+Scroll.static.scrollStopThreshold = 250
 -- Internal identifier
 
 -- ======
@@ -57,7 +57,7 @@ function Scroll:initialize(opt)
   view._timeHeld = 0
   view._maxVelocity = 2
   view._friction = self.class.friction
-  view:addEventListener("touch", self)
+  self.frame:addEventListener("touch", self)
   Runtime:addEventListener("enterFrame", self)
 end
 
@@ -117,7 +117,7 @@ function Scroll:touch(event)
 			view._trackVelocity = false			
 			view._updateRuntime = true
 			if event.time - view._timeHeld > self.class.scrollStopThreshold then
-			    --view._velocity = 0
+			    view._velocity = 0
 			end
 			view._timeHeld = 0
       
