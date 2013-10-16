@@ -56,6 +56,9 @@ function Scroll:initialize(opt)
 	view._lastTime = 0
   view._timeHeld = 0
   view._maxVelocity = 2
+  view._topPadding = 20
+  view._bottomPadding = 0
+  view._scrollHeight = self.background.height
   view._friction = self.class.friction
   self.frame:addEventListener("touch", self)
   Runtime:addEventListener("enterFrame", self)
@@ -69,6 +72,59 @@ local function clampVelocity( view )
 	elseif view._velocity > view._maxVelocity then
 		view._velocity = view._maxVelocity
 	end
+end
+
+-- Function to set the view's limits
+function Scroll:setLimits()
+  local view = self.bounds
+	-- Set the bottom limit
+	self.bottomLimit = view._topPadding
+	self.upperLimit = - view.height + self.background.height - view._bottomPadding
+
+end
+
+-- Function to handle vertical "snap back" on the view
+function Scroll:handleSnapBackVertical( snapBack )
+	local view = self.bounds
+	-- Set the limits now
+	self:setLimits()
+	
+	local limitHit = "none"
+	local bounceTime = 400
+	
+	-- Snap back vertically
+	if not view._isVerticalScrollingDisabled then
+		-- Put the view back to the top if it isn't already there ( and should be )
+		if view.y > self.bottomLimit then
+			-- Set the hit limit
+			limitHit = "bottom"
+			
+			-- Transition the view back to it's maximum position
+			if "boolean" == type( snapBack ) then
+				if snapBack == true then
+          print("snap back to the top")
+					-- Put the view back to the top
+					view._tween = transition.to( view, { time = bounceTime, y = self.bottomLimit, transition = easing.outQuad } )						
+				end
+			end
+			
+		-- Put the view back to the bottom if it isn't already there ( and should be )
+		elseif view.y < self.upperLimit then
+			-- Set the hit limit
+			limitHit = "top"
+			
+			-- Transition the view back to it's maximum position
+			if "boolean" == type( snapBack ) then
+				if snapBack == true then
+					print("snap back to the bottom")
+					-- Put the view back to the bottom
+					view._tween = transition.to( view, { time = bounceTime, y = self.upperLimit, transition = easing.outQuad } )
+				end
+			end
+		end
+	end
+	
+	return limitHit
 end
 
 function Scroll:touch(event)
@@ -109,7 +165,10 @@ function Scroll:touch(event)
       view._delta = event.y - view._prevYPos
       view._prevYPos = event.y
       view.y = view.y + view._delta
-      -- Set the time held
+      
+      self:handleSnapBackVertical( false )
+      
+      -- Set the time held      
       view._timeHeld = time
     elseif "ended" == phase or "cancelled" == phase then
       -- Reset values				
@@ -156,6 +215,10 @@ function Scroll:enterFrame(event)
 		clampVelocity( view )
 
     view.y = view.y + view._velocity * timePassed
+    local limit = self:handleSnapBackVertical( true )
+    if limit == "top" or limit == "bottom" then
+      view._updateRuntime = false
+    end
   end
   
   -- If we are tracking velocity
@@ -175,6 +238,9 @@ function Scroll:enterFrame(event)
     end
     view._prevY = view.y
   end
+end
+
+function Scroll:willBeginDragging()
 end
 
 function Scroll:scrollTo()

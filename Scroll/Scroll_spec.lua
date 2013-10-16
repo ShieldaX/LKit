@@ -25,8 +25,4 @@ ts.regist(0, function()
   image.x = image.x + image.contentWidth*.5
 end, "create a fullscreen scroll view")
 
-ts.regist(0, function()
-  print(ts.scroll.aField)
-end)
-
 return ts
