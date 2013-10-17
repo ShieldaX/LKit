@@ -1,22 +1,12 @@
 -- Scroller.lua
 -- Enable scrolling module
 
--- private var
-local upperLimit, bottomLimit -- dynamic scroll limitation
-
--- private func
-local function updateLimit()
-end
-
-local function getVelocity()
-end
-
 local Scroller = {
   scrollEnabled = true,
   dragging = false,
   tracking = false,
   decelerating  = false,
-  decelerationRate = 0.92,
+  decelerationRate = 0.92,  
 }
 
 function Scroller:loseFocus()
@@ -25,11 +15,7 @@ end
 function Scroller:takeFocus()
 end
 
-function Scroller:createScrollBar()
-
-end
-
-function Scroller:touch()
+function Scroller:createScrollBar(style)
 end
 
 function Scroller:enterFrame(event)
@@ -44,7 +30,16 @@ function Scroller:enterFrame(event)
   -- fling content
 end
 
-function Scroller:included()
+function Scroller:included(class)
+  -- private var
+  local upperLimit, bottomLimit -- dynamic scroll limitation
+  
+  function self:touch(event)
+  end
+  
+  function self:enterFrame(event)
+  end
+  
   self.contentView:addEventListener("touch", self)
   Runtime:addEventListener("enterFrame", self)
 end

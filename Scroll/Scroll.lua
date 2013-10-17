@@ -44,8 +44,8 @@ Scroll.static.scrollStopThreshold = 250
 function Scroll:initialize(opt)
   View.initialize(self, opt)
   local view = self.bounds
-  view._startXPos = 0
-	view._startYPos = 0
+  --view._startXPos = 0
+	--view._startYPos = 0
 	view._prevXPos = 0
 	view._prevYPos = 0
 	view._prevX = 0
@@ -134,8 +134,8 @@ function Scroll:touch(event)
   
 	if "began" == phase then	
 		-- Reset values	
-		view._startXPos = event.x
-		view._startYPos = event.y
+		--view._startXPos = event.x
+		--view._startYPos = event.y
 		view._prevXPos = event.x
 		view._prevYPos = event.y
 		view._prevX = 0
