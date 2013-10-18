@@ -194,7 +194,7 @@ function Scroll:touch(event)
 			    view._velocity = - view._velocity
 			end
       
-      display.getCurrentStage():setFocus( nil )
+      display.getCurrentStage():setFocus( event.target, nil )
 			view._isFocus = nil
     end
   end
@@ -254,6 +254,13 @@ function Scroll:scrollTo()
 end
 
 function Scroll:scrollBy()
+end
+
+function Scroll:removeFromSuperView()
+  -- remove event listeners if any.
+  Runtime:removeEventListener("enterFrame", self)
+  self.frame:removeEventListener("touch", self)
+  View.removeFromSuperView(self)
 end
 
 return Scroll
