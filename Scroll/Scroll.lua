@@ -208,7 +208,6 @@ function Scroll:enterFrame(event)
   if view._updateRuntime then
     local timePassed = event.time - view._lastTime
 		view._lastTime = view._lastTime + timePassed
-    print(view._velocity)
     
     -- Stop scrolling if velocity is near zero
 		if math.abs( view._velocity ) < 0.1 then
@@ -250,10 +249,16 @@ end
 function Scroll:willBeginDragging()
 end
 
-function Scroll:scrollTo()
+function Scroll:scrollToPosition(offset, animated)
+  self.bounds.y = offset.y or 0
 end
 
-function Scroll:scrollBy()
+function Scroll:scrollToRect(rect)
+end
+
+function Scroll:scrollBy(offsetY)
+  local view = self.bounds
+  view.y = view.y + offsetY
 end
 
 function Scroll:removeFromSuperView()
