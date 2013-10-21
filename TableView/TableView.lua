@@ -43,6 +43,9 @@ TableView.static.scrollStopThreshold = 250
 -- @param opt Intent table for construct new instance.
 function TableView:initialize(opt)
   View.initialize(self, opt)
+  self.sections = {}
+  self.header = nil
+  self.footer = nil  
 end
 
 -- ------
