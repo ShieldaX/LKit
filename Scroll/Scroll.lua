@@ -246,14 +246,18 @@ function Scroll:enterFrame(event)
   end
 end
 
-function Scroll:willBeginDragging()
-end
-
 function Scroll:scrollToPosition(offset, animated)
-  self.bounds.y = offset.y or 0
-end
-
-function Scroll:scrollToRect(rect)
+  if not offset then return end
+  local view = self.bounds
+  local targetY = offset or 0
+  -- close tracking and dragging listener
+  view._updateRuntime = false
+  view._trackVelocity = false
+  -- Reset velocity back to 0
+  view._velocity = 0
+  if animated then
+    transition.to( view, { y = targetY, time = 400, transition = easing.inOutQuad} )
+  end
 end
 
 function Scroll:scrollBy(offsetY)

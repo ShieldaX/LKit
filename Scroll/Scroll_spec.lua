@@ -35,4 +35,9 @@ ts.regist(1, function()
   image.x = image.x + image.contentWidth*.5
 end, "insert another pic")
 
+ts.desc("#Set content offset")
+ts.regist(2, function()
+  ts.scroll:scrollToPosition(200, true)
+end, "scroll to sepecial position")
+
 return ts
