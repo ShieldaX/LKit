@@ -1,6 +1,13 @@
 Coding Style Guidelines
 ======
 
+Common
+------
+
+- Use 2 spaces instead of tab
+- Never use global variables and global functions in library files
+- File name conventions: Capitalize for 'class like' modules which usually should used with `new()`, otherwise are `pure modules` that more like namespaces (example the `util` and `debug` module)
+
 Table
 ------
 
