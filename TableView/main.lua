@@ -3,5 +3,5 @@
 local util = require 'util'
 util.show_fps()
 
-local specRunner = require "Scroll_spec"
+local specRunner = require "TableView_spec"
 specRunner.run()
