@@ -90,6 +90,11 @@ function View:setBackgroundColor(color)
   self.backgroundColor = backgroundColor
 end
 
+function View:getContentSize()
+  local content = self.background
+  return content.contentWidth, content.contentHeight
+end
+
 -- ------
 -- Managing the View Hierarchy
 -- ------
