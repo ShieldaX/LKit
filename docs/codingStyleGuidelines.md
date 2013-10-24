@@ -15,6 +15,36 @@ Avoid using hyphened string as table's key:
 X "z-index"(confuse with minus operation)
 V "zIndex"(recommended) or "z_index"(okey but not good)
 
+Table Define:
+
+Generally like this,
+
+```
+self.font = {
+  section = {
+    header = {size = 24, font = native.systemFont},
+    Footer = {size = 24, font = native.systemFont}
+  },
+  row = {size = 20, font = native.systemFontBold}
+}
+
+local dataSource = {
+  header = {labelText = "Country List"},
+  {
+    titleHeader = "Asia",
+    {text = "China"},
+    {text = "Korea"},
+    {text = "Japan"},
+    {text = "India"},
+  },
+  {
+    titleHeader = "North America",
+    {text = "United States"},
+    {text = "Canada"},
+  },
+}
+```
+
 - - -
 
 Function

@@ -13,16 +13,16 @@ local VCW = display.viewableContentWidth
 local VCH = display.viewableContentHeight
 
 local dataSource = {
-    header = {labelText = "Country List"}
+    header = {labelText = "Country List"},
     {
-      labelText = "Asia",
+      titleHeader = "Asia",
       {text = "China"},
       {text = "Korea"},
       {text = "Japan"},
       {text = "India"},
     },
     {
-      labelText = "North America",
+      titleHeader = "North America",
       {text = "United States"},
       {text = "Canada"},
     },
@@ -36,10 +36,13 @@ ts.regist(0, function()
       }
     tableView:setDataSource(dataSource)
     util.print_r(tableView.dataSource)
+    ts.table = tableView
 end, "create a table view")
 
 ts.desc("#Index section and row")
 ts.regist(0, function()
+  print(#ts.table.dataSource)
+  --print(#ts.table.dataSource[5])
 end, "number of sections")
 
 ts.regist(0, function()
