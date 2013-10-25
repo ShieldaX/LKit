@@ -2,3 +2,5 @@
 *.ini
 thumbs.db
 .DS_Store
+mobdebug.lua
+*.swp

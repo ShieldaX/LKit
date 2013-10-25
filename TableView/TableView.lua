@@ -102,11 +102,26 @@ end
 -- ------
 
 function TableView:setHeaderView(opt)
+  
   if self.header then self.header:removeSelf() end
   self.header = display.newGroup()
   local label = display.newText(opt.labelText or "table header", 0, 0, system.FontBold, 20)
   label.x = self.background.x
   self.header:insert(label)
+  
+  --[[
+  if self.header then self.header:removeFromSuperview() end
+  local header = View {
+    name = "header",
+    height = self.defaultHeaderHeight or 40,
+    Label {
+      name = "label",
+      text = opt.labelText or "Header",
+      size = 20
+    }
+  }
+  self:addSubview(header)
+  ]]
 end
 
 function TableView:setFooterView(opt)
