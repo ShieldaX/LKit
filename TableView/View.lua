@@ -107,6 +107,7 @@ function View:addSubview(view, zIndex)
   view.superview = self
   view.window = self.window
   self[view.name] = view -- view reference
+  print("View named " .. view.name .. " inserted.")
   --table.insert(self.subviews, view) -- add subview
 end
 

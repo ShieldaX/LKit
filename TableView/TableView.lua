@@ -80,15 +80,20 @@ end
 function TableView:sectionForIndex(index)
 end
 
-function TableView:cellAtIndexPath(indexPath)
+-- Returns the table cell at the specified index path.
+-- @param indexPath The index path locating the row in the table.
+-- @return An object representing a cell of the table or nil if the cell is not visible or indexPath is out of range.
+function TableView:cellForRowAtIndexPath(indexPath)
   local section, row = indexPath.section or 1, indexPath.row or 1
+  -- TODO: is cell visible
   if section and row then
-    local offset = self:offsetToRowAtIndexPath(indexPath)
-    TableViewCell {
-      name = table.concat(indexPath),
+    local offset, cell = self:offsetToRowAtIndexPath(indexPath)
+    cell = TableViewCell {
+      name = section .. row,
       text = self.dataSource:textForRowAtIndexPath(indexPath),
       y = offset
     }
+    self:addSubview(cell)
   end
 end
 
@@ -111,7 +116,12 @@ end
 -- Scrolling the Table View
 -- ------
 
-function TableView:visibleCellIndexPaths()
+function TableView:indexPathsForVisibleRows()
+  local visibleBounds = self.background.contentBounds
+  
+end
+
+function TableView:visibleCells()
 end
 
 -- ------

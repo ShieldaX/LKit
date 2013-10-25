@@ -58,7 +58,10 @@ end, "insert sections")
 
 ts.regist(1, function()
     local tableView = ts.table
-    tableView:cellAtIndexPath({section = 1, row = 3})
+    tableView:cellForRowAtIndexPath({section = 1, row = 1})
+    tableView:cellForRowAtIndexPath({section = 1, row = 2})
+    tableView:cellForRowAtIndexPath({section = 1, row = 3})
+    util.print_r(tableView.bounds.numChildren)
 end, "insert rows in sections")
 
 ts.regist(1, function()

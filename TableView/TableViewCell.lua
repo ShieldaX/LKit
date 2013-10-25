@@ -9,6 +9,13 @@ local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
 
+local imageRectForImageView
+function imageRectFitsView(view, imagePath)
+  local width, height = view.contentWidth, view.contentHeight
+  display.newImageRect(view.parent, imagePath, view.x - width*.5, view.y - height*.5, width, height)
+  view.isVisible = false
+end
+
 -- ======
 -- CLASS
 -- ======
@@ -67,8 +74,8 @@ end
 -- ---
 
 -- set cell's highlighted status
-function TableViewCell:setHighlighted(highlighted)
-  self.highlightedBackground.isVisible = self.highlighted
+function TableViewCell:setHighlighted(unhighlighted)
+  self.highlightedBackground.isVisible = not unhighlighted
 end
 
 function TableViewCell:updateSelectionState()
