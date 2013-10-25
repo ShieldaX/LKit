@@ -41,9 +41,9 @@ local ACH = display.actualContentHeight
 function View:initialize(opt)
   -- Identifer
   local name = opt.name
-  assert(type(name) == "string" or type(name) == "number", "name should be specified.")
-  assert(string.find(name, "_", 1) ~= 1, "can't resolve '_' prefixed subview.")
-  assert(not string.find(name, "-", 1), "can't resolve '-' contained subview.")
+  assert(type(name) == "string" or type(name) == "number", "ERROR: name should be specified.")
+  assert(string.find(name, "_", 1) ~= 1, "WARNING: can't resolve '_' prefixed subview.")
+  assert(not string.find(name, "-", 1), "WARNING: can't resolve '-' contained subview.")
   self.name = name
   
   -- Visual Appearance

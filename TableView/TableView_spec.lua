@@ -8,6 +8,7 @@ local util = require 'util'
 local ts = require 'spec_runner'
 local Scroll = require 'Scroll'
 local TableView = require 'TableView'
+local DataSource = require 'DataSource'
 
 local VCW = display.viewableContentWidth
 local VCH = display.viewableContentHeight
@@ -30,29 +31,34 @@ local dataSource = {
 
 ts.desc("#Instance constructor")
 ts.regist(0, function()
+    local data = DataSource:new({data=dataSource})
     local tableView = TableView {
         name = "testTable",
         backgroundColor = {255, 255, 255, 255},
       }
-    tableView:setDataSource(dataSource)
-    util.print_r(tableView.dataSource)
+    tableView:setDataSource(data)
+    util.print_r(data.data)
     ts.table = tableView
 end, "create a table view")
 
 ts.desc("#Index section and row")
 ts.regist(0, function()
-  print(#ts.table.dataSource)
-  --print(#ts.table.dataSource[5])
+    local number = ts.table.dataSource:numberOfSections()
+    print(number)
 end, "number of sections")
 
 ts.regist(0, function()
-end, "number of rows in section")
+    local tableView = ts.table
+    print(tableView:offsetToRowAtIndexPath({section = 1, row = 3}))
+end, "offset to row in section")
 
 ts.desc("#Elements organization")
 ts.regist(0, function()
 end, "insert sections")
 
 ts.regist(1, function()
+    local tableView = ts.table
+    tableView:cellAtIndexPath({section = 1, row = 3})
 end, "insert rows in sections")
 
 ts.regist(1, function()

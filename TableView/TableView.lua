@@ -10,6 +10,8 @@
 local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
+local DataSource = require 'DataSource'
+local TableViewCell = require 'TableViewCell'
 
 -- ======
 -- CLASS
@@ -52,30 +54,13 @@ function TableView:initialize(opt)
   self.dataSource = nil
 end
 
-local function offsetForSection(index)
-  --section.bounds.yMin - self.background.bounds.yMin
-end
-
 -- ------
 -- Configuring a Table View
 -- ------
 
 function TableView:setDataSource(data)
-  if not type(data) == "table" then return false end
-  if #data > 0 then
-    self.dataSource = data
-  end
-end
-
-function TableView:setHeaderView(opt)
-  if self.header then self.header:removeSelf() end
-  self.header = display.newGroup()
-  local label = display.newText(opt.labelText or "table header", 0, 0, system.FontBold, 20)
-  label.x = self.background.x
-  self.header:insert(label)
-end
-
-function TableView:setFooterView(opt)
+  -- if not data is class data source return
+  self.dataSource = data
 end
 
 -- ------
@@ -93,23 +78,48 @@ function TableView:headerInSection(section)
 end
 
 function TableView:sectionForIndex(index)
-  local sectionData = self.dataSource[index]
-  local section = display.newGroup()
-  section.labelText = sectionData.labelText
-  self:headerInSection(section)
+end
+
+function TableView:cellAtIndexPath(indexPath)
+  local section, row = indexPath.section or 1, indexPath.row or 1
+  if section and row then
+    local offset = self:offsetToRowAtIndexPath(indexPath)
+    TableViewCell {
+      name = table.concat(indexPath),
+      text = self.dataSource:textForRowAtIndexPath(indexPath),
+      y = offset
+    }
+  end
 end
 
 -- ------
 -- Accessing Header and Footer Views
 -- ------
 
+function TableView:setHeaderView(opt)
+  if self.header then self.header:removeSelf() end
+  self.header = display.newGroup()
+  local label = display.newText(opt.labelText or "table header", 0, 0, system.FontBold, 20)
+  label.x = self.background.x
+  self.header:insert(label)
+end
+
+function TableView:setFooterView(opt)
+end
+
 -- ------
 -- Scrolling the Table View
 -- ------
 
+function TableView:visibleCellIndexPaths()
+end
+
 -- ------
 -- Managing Selections
 -- ------
+
+function TableView:indexPathsInBounds()
+end
 
 -- ------
 -- Inserting, Deleting, and Moving Rows and Sections
@@ -124,7 +134,7 @@ function TableView:insertSections(sections)
   end
 end
 
-function TableView:insertRowsAtIndexPath(indexPath)
+function TableView:insertRowsAtIndexPaths(indexPaths)
   assert(type(indexPath) == "table")
   local section, row = tonumber(indexPath.section), tonumber(indexPath.row)
   if section > 0 and row > 0 then
@@ -143,5 +153,31 @@ end
 -- Managing the Data Source
 -- ------
 
+-- ------
+-- Accessing Drawing Areas of the Table View
+-- ------
+
+function TableView:offsetToSection(index)
+  local data = self.dataSource
+  local offset = 0
+  for i = 1, index - 1 do
+    offset = offset + data:heightForHeaderInSection(i) + data:heightForFooterInSection(i)
+    for r = 1, data:numberOfRowsInSection(i) do
+      offset = offset + data:heightForRowAtIndexPath({section = i, row = r})
+    end
+  end
+  return offset
+end
+
+function TableView:offsetToRowAtIndexPath(indexPath)
+  local data = self.dataSource
+  local offset = 0
+  local section, row = indexPath.section, indexPath.row
+  offset = offset + data:heightForHeaderInSection(section)
+  for i = 1, row - 1 do
+    offset = offset + data:heightForRowAtIndexPath({section = section, row = i})
+  end
+  return offset
+end
 
 return TableView

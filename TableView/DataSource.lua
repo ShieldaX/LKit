@@ -25,8 +25,8 @@ DataSource.static._version = "0.0.1"
 -- Instance Method
 function DataSource:initialize(opt)
   self.data = opt.data
-  self.defaultSectionHeaderHeight = 0
-  self.defaultSectionFooterHeight = 0
+  self.defaultSectionHeaderHeight = 30
+  self.defaultSectionFooterHeight = 30
   self.defaultRowHeight = 40
   self.font = {
     section = {
@@ -57,18 +57,20 @@ end
 -- dimension of element
 
 function DataSource:heightForHeaderInSection(index)
-  if self:titleForHeaderInSection() then
-    return 30
+  if self:titleForHeaderInSection(index) then
+    return self.defaultSectionHeaderHeight
   end
+  return 0
 end
 
 function DataSource:heightForFooterInSection(index)
-  if self:titleForHeaderInSection() then
-    return 30
+  if self:titleForFooterInSection(index) then
+    return self.defaultSectionFooterHeight
   end
+  return 0
 end
 
-function DataSource:heightForRowAtPath(path)
+function DataSource:heightForRowAtIndexPath(path)
   local section, row = path.section, path.row
   if section and row then
     local sectionData = self.data[section]
@@ -79,6 +81,7 @@ function DataSource:heightForRowAtPath(path)
       end
     end
   end
+  return 0
 end
 
 -- content provider
@@ -91,6 +94,20 @@ end
 function DataSource:titleForFooterInSection(index)
   local section = self.data[index]
   if section then return section.titleFooter end
+end
+
+function DataSource:textForRowAtIndexPath(indexPath)
+  local section, row = indexPath.section, indexPath.row
+  if section and row then
+    local sectionData = self.data[section]
+    if sectionData then
+      local rowData = sectionData[row]
+      if rowData then
+        return rowData.text
+      end
+    end
+  end
+  return ""
 end
 
 -- update and reload

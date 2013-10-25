@@ -141,17 +141,22 @@ end
 -- @return true if view is in parent chain, false if view is not found.
 function View:isDescendantOfView(view)
   local super = self.superview
-  
+  local depth = 0
   while super do
     if super == view then
       super = nil
-      return true -- TODO: return depth number
+      return true, depth + 1
     else
       super = super.subview
+      depth = depth + 1
     end
   end
   
   return false
+end
+
+function View:layoutSubviews()
+
 end
 
 return View
