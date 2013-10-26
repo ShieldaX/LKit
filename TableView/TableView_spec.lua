@@ -61,6 +61,7 @@ ts.regist(1, function()
     tableView:cellForRowAtIndexPath({section = 1, row = 1})
     tableView:cellForRowAtIndexPath({section = 1, row = 2})
     tableView:cellForRowAtIndexPath({section = 1, row = 3})
+    tableView:cellForRowAtIndexPath({section = 2, row = 1})
     util.print_r(tableView.bounds.numChildren)
 end, "insert rows in sections")
 

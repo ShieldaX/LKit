@@ -10,7 +10,7 @@ local class = require 'middleclass'
 local View = require 'View'
 
 local imageRectForImageView
-function imageRectFitsView(view, imagePath)
+function replaceImageWith(view, imagePath)
   local width, height = view.contentWidth, view.contentHeight
   display.newImageRect(view.parent, imagePath, view.x - width*.5, view.y - height*.5, width, height)
   view.isVisible = false
@@ -65,7 +65,7 @@ function TableViewCell:initialize(opt)
   self.separator = separator
   
   -- selection state
-  self.seleted = false
+  self.selected = false
   self.highlighted = false
 end
 

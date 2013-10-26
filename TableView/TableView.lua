@@ -89,7 +89,7 @@ function TableView:cellForRowAtIndexPath(indexPath)
   if section and row then
     local offset, cell = self:offsetToRowAtIndexPath(indexPath)
     cell = TableViewCell {
-      name = section .. row,
+      name = section .. '_' .. row, -- 2D naming, using underscore to separate [11][3] from [1][13]
       text = self.dataSource:textForRowAtIndexPath(indexPath),
       y = offset
     }

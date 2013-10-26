@@ -16,7 +16,7 @@ local View = require 'View'
 --local TableViewSectionLabel = Label:subclass('TableViewSectionLabel')
 local TableViewSectionLabel = View:subclass('TableViewSectionLabel')
 
-function TableViewSectionLabel:initalize(opt)
+function TableViewSectionLabel:initialize(opt)
   opt.width = opt.width or 200
   opt.height = opt.height or 40
   View.initialize(self, opt)
