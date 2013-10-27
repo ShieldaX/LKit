@@ -149,8 +149,30 @@ end
 
 function TableView:indexPathsForVisibleRows()
   local visibleBounds = self.background.contentBounds
+  local yMin, yMax = visibleBounds.yMin, visibleBounds.yMax
+  local dataSource = self.dataSource
   local indexPaths = {}
-  
+  local offset = 0
+  local numberOfSections = dataSource:numberOfSections()
+  for s = 1, numberOfSections do -- loop the sections
+    offset = self:offsetToSection(s) -- reset offset base at begining
+    -- if the bottom of this section is visible
+    if self:offsetToSection(s+1) >= yMin and offset <= yMax then
+      -- checking each rows
+      for r = 1, dataSource:numberOfRowsInSection(s) do
+        local indexPath = {section = s, row = r}
+        local rowTop = offset + self:offsetToRowAtIndexPath(indexPath)
+        local rowBottom = offset + dataSource:heightForRowAtIndexPath(indexPath)
+        --offset = offset + dataSource:heightForRowAtIndexPath(indexPath)
+        -- collect or discard (intersect? )
+        if rowBottom >= yMin and rowTop <= yMax then
+          indexPaths[#indexPaths+1] = indexPath
+        elseif rowBottom > yMax then
+          break
+        end
+      end
+    end
+  end
   return indexPaths
 end
 

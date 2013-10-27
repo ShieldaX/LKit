@@ -50,7 +50,7 @@ end
 
 function DataSource:numberOfRowsInSection(index)
   index = tonumber(index)
-  assert(index > 0 and index < self:numberOfSections(), "WARNING: Tring to retrive section with invalid index number")
+  assert(index > 0 and index <= self:numberOfSections(), "WARNING: Tring to retrive section with invalid index number")
   return #self.data[index]
 end
 

@@ -56,7 +56,8 @@ end, "offset to row in section")
 
 ts.desc("#Elements organization")
 ts.regist(0, function()
-end, "insert sections")
+    util.print_r(ts.table:indexPathsForVisibleRows())
+end, "visible rows")
 
 ts.regist(1, function()
     local tableView = ts.table
