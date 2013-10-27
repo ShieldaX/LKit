@@ -25,15 +25,15 @@ DataSource.static._version = "0.0.1"
 -- Instance Method
 function DataSource:initialize(opt)
   self.data = opt.data
-  self.defaultSectionHeaderHeight = 30
-  self.defaultSectionFooterHeight = 30
-  self.defaultRowHeight = 40
+  self.defaultSectionHeaderHeight = 22
+  self.defaultSectionFooterHeight = 22
+  self.defaultRowHeight = 43
   self.font = {
     section = {
-      header = { size = 24, font = native.systemFont },
-      Footer = { size = 24, font = native.systemFont }
+      header = { size = 17, font = native.systemFont },
+      Footer = { size = 17, font = native.systemFont }
     },
-    row = { size = 20, font = native.systemFontBold }
+    row = { size = 17, font = native.systemFontBold }
   }
 end
 

@@ -26,7 +26,7 @@ local TableViewCell = View:subclass('TableViewCell')
 -- VARIABLES
 -- ======
 
-TableViewCell.static.defaultRowHeight = 40
+TableViewCell.static.defaultRowHeight = 43
 
 -- ======
 -- FUNCTIONS
@@ -49,7 +49,7 @@ function TableViewCell:initialize(opt)
   self.highlightedBackground = highlighted
   
   -- main text label
-  local text = display.newText("  " .. opt.text, 0, 0, native.systemFont, 20)
+  local text = display.newText("  " .. opt.text, 0, 0, native.systemFont, 17)
   text:setReferencePoint(display.CenterReferencePoint)
   text:setTextColor({255, 255, 255})
   bounds:insert(text)

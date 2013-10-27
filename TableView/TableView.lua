@@ -12,6 +12,7 @@ local class = require 'middleclass'
 local View = require 'View'
 local DataSource = require 'DataSource'
 local TableViewCell = require 'TableViewCell'
+local TableViewSectionLabel = require 'TableViewSectionLabel'
 
 -- ======
 -- CLASS
@@ -67,17 +68,30 @@ end
 -- Creating Table View Cells
 -- ------
 
-function TableView:headerInSection(section)
-  local header = display.newGroup()
-  local label = display.newText(header, section.labelText, 0, 0, system.FontBold, 20)
-  label:setReferencePoint(display.CenterReferencePoint)
-  label.y = label.contentHeight*.5
+function TableView:headerInSection(index)
+  local section = self:sectionForIndex(index)
+  local header = TableViewSectionLabel {
+    name = "headerView",
+    y = 0,
+    text = self.dataSource:titleForHeaderInSection(index),
+  }
+  
+  section:insert(header.frame)
   section.headerView = header
-  section.headerTitle = label
-  section.headerHeight = label.contentHeight
+  return header
 end
 
+-- Returns the table section at the specified index
 function TableView:sectionForIndex(index)
+  local sections = self.sections
+  if not sections[index] then
+    local section = display.newGroup()
+    section.x = 0
+    section.y = self:offsetToSection(index)
+    self.bounds:insert(section)
+    sections[index] = section
+  end
+  return sections[index]
 end
 
 -- Returns the table cell at the specified index path.
@@ -87,13 +101,15 @@ function TableView:cellForRowAtIndexPath(indexPath)
   local section, row = indexPath.section or 1, indexPath.row or 1
   -- TODO: is cell visible
   if section and row then
+    local group = self:sectionForIndex(section)
     local offset, cell = self:offsetToRowAtIndexPath(indexPath)
     cell = TableViewCell {
       name = section .. '_' .. row, -- 2D naming, using underscore to separate [11][3] from [1][13]
       text = self.dataSource:textForRowAtIndexPath(indexPath),
       y = offset
     }
-    self:addSubview(cell)
+    --self:addSubview(cell)
+    group:insert(cell.frame)
   end
 end
 
@@ -133,10 +149,15 @@ end
 
 function TableView:indexPathsForVisibleRows()
   local visibleBounds = self.background.contentBounds
+  local indexPaths = {}
   
+  return indexPaths
 end
 
 function TableView:visibleCells()
+  local cells = {}
+  --table.insert(cells)
+  return cells
 end
 
 -- ------

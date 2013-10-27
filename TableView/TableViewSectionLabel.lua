@@ -17,25 +17,29 @@ local View = require 'View'
 local TableViewSectionLabel = View:subclass('TableViewSectionLabel')
 
 function TableViewSectionLabel:initialize(opt)
-  opt.width = opt.width or 200
-  opt.height = opt.height or 40
+  opt.width = opt.width
+  opt.height = opt.height or 22
   View.initialize(self, opt)
-  local bounds = self.bounds  
-  local rectWidth, rectHeight = self.background.contentWidth, self.background.contentHeight  
+  
+  local bounds = self.bounds
+  
+  local rect = self.frame
+  local contentHeight, contentWidth = rect.contentHeight, rect.contentWidth
+  
   local startColor, endColor = {144, 158, 171}, {185, 193, 201}
   local gradient = graphics.newGradient(startColor, endColor, "down")
-  local rect = display.newRect( bounds, 0, 0, rectWidth, rectHeight )
-  rect:setFillColor(gradient)
-  rect.alpha = 1
-  local shadow = display.newLine( bounds, 0, rect.contentHeight - 1, rect.contentWidth, rect.contentHeight - 1)
-  shadow.width = 1
-  shadow.setColor({153, 158, 165})
+  local rectTint = display.newRect( bounds, 0, 0, contentWidth, contentHeight )
+  rectTint:setFillColor(gradient)
+  rectTint.alpha = 1
   
-  local text = display.newText("  " .. opt.text, 0, 0, native.systemFont, 24)
-  text:setReferencePoint(display.CenterReferencePoint)
-  bounds:insert(text)
-  text.x, text.y = text.contentWidth*.5, rectHeight*.5
+  local text = display.newText(bounds, "  " .. opt.text, 0, 0, native.systemFont, 17)
+  --text:setReferencePoint(display.CenterReferencePoint)
+  --bounds:insert(text)
+  text.x, text.y = text.contentWidth*.5, contentHeight*.5
   self.textView = text
+  
+  local shadow = display.newRect( bounds, 0, contentHeight - 1, contentWidth, 1)
+  shadow:setFillColor(153, 158, 165)
 end
 
 function TableViewSectionLabel:setText(text)
