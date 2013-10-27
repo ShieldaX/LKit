@@ -67,6 +67,7 @@ function TableViewCell:initialize(opt)
   -- selection state
   self.selected = false
   self.highlighted = false
+  self.initialized = true -- used for reusing
 end
 
 -- ---

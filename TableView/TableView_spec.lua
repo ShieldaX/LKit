@@ -26,7 +26,7 @@ local dataSource = {
     },
     {
       titleHeader = "North America",
-      {text = "United States"},
+      {text = "America"},
       {text = "Canada"},
     },
   }
@@ -61,15 +61,18 @@ end, "visible rows")
 
 ts.regist(1, function()
     local tableView = ts.table
-    tableView:headerInSection(1)
+    --[[
+
     tableView:cellForRowAtIndexPath({section = 1, row = 1})
     tableView:cellForRowAtIndexPath({section = 1, row = 2})
     tableView:cellForRowAtIndexPath({section = 1, row = 3})
     tableView:cellForRowAtIndexPath({section = 1, row = 4})
-    --tableView:cellForRowAtIndexPath({section = 1, row = 4})
     tableView:headerInSection(2)
     tableView:cellForRowAtIndexPath({section = 2, row = 1})
     tableView:cellForRowAtIndexPath({section = 2, row = 2})
+    ]]
+    tableView:headerInSection(1)
+    tableView:visibleCells()
     util.print_r(tableView.bounds.numChildren)
 end, "insert rows in sections")
 

@@ -10,7 +10,7 @@
 local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
-local DataSource = require 'DataSource'
+local DataSource = require 'DataSource' -- TODO: include as a module
 local TableViewCell = require 'TableViewCell'
 local TableViewSectionLabel = require 'TableViewSectionLabel'
 
@@ -23,8 +23,8 @@ local TableView = View:subclass('TableView')
 -- CONSTANTS
 -- ======
 
-local ACW = display.actualContentWidth
-local ACH = display.actualContentHeight
+--local ACW = display.actualContentWidth
+--local ACH = display.actualContentHeight
 
 -- ======
 -- VARIABLES
@@ -70,15 +70,17 @@ end
 
 function TableView:headerInSection(index)
   local section = self:sectionForIndex(index)
-  local header = TableViewSectionLabel {
-    name = "headerView",
-    y = 0,
-    text = self.dataSource:titleForHeaderInSection(index),
-  }
-  
-  section:insert(header.frame)
-  section.headerView = header
-  return header
+  if not section.headerView then
+    local header = TableViewSectionLabel {
+      name = "headerView",
+      y = 0,
+      text = self.dataSource:titleForHeaderInSection(index),
+    }
+    
+    section:insert(header.frame)
+    section.headerView = header
+  end
+  return section.headerView
 end
 
 -- Returns the table section at the specified index
@@ -111,6 +113,11 @@ function TableView:cellForRowAtIndexPath(indexPath)
     --self:addSubview(cell)
     group:insert(cell.frame)
   end
+end
+
+-- Request a resuable table cell with special indentifier
+-- @param resuableIndentifier String already defined on table creation.
+function TableView:dequeueReusableCell(reusableIndentifier)
 end
 
 -- ------
@@ -147,16 +154,17 @@ end
 -- Scrolling the Table View
 -- ------
 
-function TableView:indexPathsForVisibleRows()
-  local visibleBounds = self.background.contentBounds
-  local yMin, yMax = visibleBounds.yMin, visibleBounds.yMax
+function TableView:indexPathsForRowsInBounds(bounds)
+  local yMin = bounds.yMin
+  local yMax = bounds.yMax
   local dataSource = self.dataSource
   local indexPaths = {}
   local offset = 0
-  local numberOfSections = dataSource:numberOfSections()
-  for s = 1, numberOfSections do -- loop the sections
+  
+  -- loops throw sections
+  for s = 1, dataSource:numberOfSections() do
     offset = self:offsetToSection(s) -- reset offset base at begining
-    -- if the bottom of this section is visible
+    -- if the bottom of this section is in the blew rect's top
     if self:offsetToSection(s+1) >= yMin and offset <= yMax then
       -- checking each rows
       for r = 1, dataSource:numberOfRowsInSection(s) do
@@ -173,20 +181,41 @@ function TableView:indexPathsForVisibleRows()
       end
     end
   end
+  
   return indexPaths
+end
+
+function TableView:indexPathsForVisibleRows()
+  -- update visible limit
+  local yMin = - self.bounds.contentBounds.yMin
+  local yMax = yMin + self.background.contentHeight
+  return self:indexPathsForRowsInBounds({yMin = yMin, yMax = yMax})
 end
 
 function TableView:visibleCells()
   local cells = {}
-  --table.insert(cells)
+  local indexPaths = self:indexPathsForVisibleRows()
+  table.foreach(indexPaths, function(_, indexPath)
+    cells[#cells+1] = self:cellForRowAtIndexPath(indexPath)
+  end)
   return cells
+  --[[ visible section header
+  if section.contentBounds.yMin <= self.background.contentBounds.yMin then
+    --section header should displays, caculate the inset of the header
+    local top = self.background.contentBounds.yMin
+    local offset = section.contentBounds.yMin - top
+    print(offset)
+    header.y = header.initOffset + offset
+  end]]
 end
 
 -- ------
 -- Managing Selections
 -- ------
 
-function TableView:indexPathsInBounds()
+function TableView:indexPathForRowAtPoint(point)
+  local possiblePaths = self:indexPathsInBounds({yMin = point.y, yMax = point.y, xMin = point.x, xMax = point.x})
+  return #possiblePaths > 0 and possiblePaths[1]
 end
 
 -- ------
