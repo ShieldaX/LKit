@@ -37,7 +37,8 @@ end, "insert another pic")
 
 ts.desc("#Set content offset")
 ts.regist(2, function()
-  ts.scroll:scrollToPosition(200, true)
+  --ts.scroll:scrollToPosition(200, true)
+  --ts.scroll:touch()
 end, "scroll to sepecial position")
 
 return ts

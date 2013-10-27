@@ -6,7 +6,7 @@
 
 local util = require 'util'
 local ts = require 'spec_runner'
-local Scroll = require 'Scroll'
+--local Scroll = require 'Scroll'
 local TableView = require 'TableView'
 local DataSource = require 'DataSource'
 
