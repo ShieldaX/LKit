@@ -18,9 +18,9 @@ ts.regist(0, function()
   ts.scroll = Scroll {
       name = "scroller",
       backgroundColor = {255, 255, 255},
-      yOffset = 20,
-      yInset = 44,
-      yScrollBarInset = 44,
+      --yOffset = 20,
+      --yInset = 44,
+      --yScrollBarInset = 44,
     }
   local image = display.newImageRect(ts.scroll.bounds, imagePath, unpack(imageSize))
   image.y = image.y + image.contentHeight*.5
@@ -37,7 +37,7 @@ end, "insert another pic")
 
 ts.desc("#Set content offset")
 ts.regist(2, function()
-  --ts.scroll:scrollToPosition(200, true)
+  ts.scroll:scrollToPosition(200, true)
   --ts.scroll:touch()
 end, "scroll to sepecial position")
 

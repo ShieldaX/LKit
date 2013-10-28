@@ -44,7 +44,7 @@ Scroll.static.scrollStopThreshold = 250
 -- @param opt Intent table for construct new instance.
 function Scroll:initialize(opt)
   View.initialize(self, opt)
-  self.class:include(scroller)
+  self.class:include(scroller)  
   self.frame:addEventListener("touch", self)
   Runtime:addEventListener("enterFrame", self)
 end
@@ -54,12 +54,12 @@ function Scroll:scrollToPosition(offset, animated)
   local view = self.bounds
   local targetY = offset or 0
   -- close tracking and dragging listener
-  view._updateRuntime = false
-  view._trackVelocity = false
+  self.decelerating = false
+  self.dragging = false
   -- Reset velocity back to 0
-  view._velocity = 0
+  self.velocity = 0
   if animated then
-    transition.to( view, { y = targetY, time = 400, transition = easing.inOutQuad} )
+    self.tween = transition.to( view, { y = targetY, time = 400, transition = easing.inOutQuad} )
   end
 end
 
@@ -68,11 +68,17 @@ function Scroll:scrollBy(offsetY)
   view.y = view.y + offsetY
 end
 
+-- Scroll content view to make content in special bounds be visible.
+-- @param position Special position algin to scrolling bounds, currently only support "top" or "bottom".
+function Scroll:scrollToBounds(position)
+  position = position or "top"
+end
+
 function Scroll:removeFromSuperView()
   -- remove event listeners if any.
   Runtime:removeEventListener("enterFrame", self)
   self.frame:removeEventListener("touch", self)
-  View.removeFromSuperView(self)
+  View.removeFromSuperView(self) -- super call
 end
 
 return Scroll
