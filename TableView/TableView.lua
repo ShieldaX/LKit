@@ -9,7 +9,8 @@
 -- ======
 local util = require 'util'
 local class = require 'middleclass'
-local View = require 'View'
+--local View = require 'View'
+local Scroll = require 'Scroll'
 local DataSource = require 'DataSource' -- TODO: include as a module
 local TableViewCell = require 'TableViewCell'
 local TableViewSectionLabel = require 'TableViewSectionLabel'
@@ -17,7 +18,7 @@ local TableViewSectionLabel = require 'TableViewSectionLabel'
 -- ======
 -- CLASS
 -- ======
-local TableView = View:subclass('TableView')
+local TableView = Scroll:subclass('TableView')
 
 -- ======
 -- CONSTANTS
@@ -30,10 +31,6 @@ local TableView = View:subclass('TableView')
 -- VARIABLES
 -- ======
 
-TableView.static.friction = 0.94
-TableView.static.scrollStopThreshold = 250
--- Internal identifier
-
 -- ======
 -- FUNCTIONS
 -- ======
@@ -45,7 +42,7 @@ TableView.static.scrollStopThreshold = 250
 --- Instance constructor
 -- @param opt Intent table for construct new instance.
 function TableView:initialize(opt)
-  View.initialize(self, opt)
+  Scroll.initialize(self, opt)
   self.sections = {}
   self.header = nil
   self.footer = nil

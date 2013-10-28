@@ -11,7 +11,6 @@ local scroller = {
   decelerationRate = 0.94,
   tween = nil, -- content view transition reference
   upperLimit = nil, bottomLimit = nil, -- dynamic scroll limitation
-  offsetUpLimit = nil, offsetDownLimit = nil, -- dynamic scroll limitation
   _prevYPos = 0, _prevY = 0,
   _delta = 0,
   velocity = 0, maxVelocity = 2,
@@ -33,19 +32,9 @@ function scroller:limitVelocity()
   end
 end
 
--- update scrollable content height
-function scroller:updateScrollHeight()
-  self.scrollHeight = self.bounds.contentHeight
-  -- smallest scrolling height is view height
-  if self.scrollHeight < self.background.contentHeight then    
-    self.scrollHeight = self.background.contentHeight
-  end
-end
-
 function scroller:updateLimitation()
-  self:updateScrollHeight()
   self.bottomLimit = self._topPadding
-  self.upperLimit = self.background.contentHeight - self.scrollHeight - self._bottomPadding
+  self.upperLimit = - self.bounds.contentHeight + self.background.contentHeight - self._bottomPadding
 end
 
 function scroller:limitationReached(bounce) -- overscroll(bounce)

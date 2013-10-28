@@ -49,28 +49,29 @@ function Scroll:initialize(opt)
   Runtime:addEventListener("enterFrame", self)
 end
 
-function Scroll:scrollToPosition(offset, animated)
-  if not offset then return end
+function Scroll:scrollTo(offsetOrPosition, animated)
+  if not offsetOrPosition then return end
   local view = self.bounds
-  local targetY = offset or 0
+  local target = offsetOrPosition
+  if type(target) == "string" then
+    self:updateLimitation()
+    target = (target == "top" and self.bottomLimit) or (target == "bottom" and self.upperLimit)
+  end
+  if type(target) ~= "number" then return end
+  print("will scroll to " .. target)
   -- close tracking and dragging listener
   self.decelerating = false
   self.dragging = false
   -- Reset velocity back to 0
   self.velocity = 0
   if animated then
-    self.tween = transition.to( view, { y = targetY, time = 400, transition = easing.inOutQuad} )
+    self.tween = transition.to( view, { y = target, time = 400, transition = easing.inOutQuad} )
   end
-end
-
-function Scroll:scrollBy(offsetY)
-  local view = self.bounds
-  view.y = view.y + offsetY
 end
 
 -- Scroll content view to make content in special bounds be visible.
 -- @param position Special position algin to scrolling bounds, currently only support "top" or "bottom".
-function Scroll:scrollToBounds(position)
+function Scroll:scrollBoundsTo(bounds, position, animated)
   position = position or "top"
 end
 

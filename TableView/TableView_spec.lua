@@ -74,6 +74,7 @@ ts.regist(1, function()
     tableView:headerInSection(1)
     tableView:visibleCells()
     util.print_r(tableView.bounds.numChildren)
+    print(tableView.touch)
 end, "insert rows in sections")
 
 ts.regist(1, function()
