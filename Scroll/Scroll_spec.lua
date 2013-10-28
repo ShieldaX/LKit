@@ -11,7 +11,7 @@ local Scroll = require 'Scroll'
 local VCW = display.viewableContentWidth
 local VCH = display.viewableContentHeight
 local imagePath = "Tulip.jpg"
-local imageSize = {320, 100}
+local imageSize = {320, 478}
 
 ts.desc("#Instance constructor")
 ts.regist(0, function()

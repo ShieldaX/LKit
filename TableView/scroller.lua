@@ -2,6 +2,7 @@
 -- Enable scrolling module
 
 local util = require "util"
+--local ABS = math.abs
 
 local scroller = {
   scrollEnabled = true,
@@ -11,6 +12,7 @@ local scroller = {
   decelerationRate = 0.94,
   tween = nil, -- content view transition reference
   upperLimit = nil, bottomLimit = nil, -- dynamic scroll limitation
+  offsetUpLimit = nil, offsetDownLimit = nil, -- dynamic scroll limitation
   _prevYPos = 0, _prevY = 0,
   _delta = 0,
   velocity = 0, maxVelocity = 2,
@@ -19,9 +21,6 @@ local scroller = {
   _timeHeld = 0,
   _topPadding = 0, _bottomPadding = 0,
 }
-
--- TODO: metatable OOP
--- scrollerMetatable = {__index = scroller}
 
 function scroller:limitVelocity()
   -- Throttle the velocity if it goes over the max range
@@ -32,9 +31,19 @@ function scroller:limitVelocity()
   end
 end
 
+-- update scrollable content height
+function scroller:updateScrollHeight()
+  self.scrollHeight = self.bounds.contentHeight
+  -- smallest scrolling height is view height
+  if self.scrollHeight < self.background.contentHeight then    
+    self.scrollHeight = self.background.contentHeight
+  end
+end
+
 function scroller:updateLimitation()
+  self:updateScrollHeight()
   self.bottomLimit = self._topPadding
-  self.upperLimit = - self.bounds.contentHeight + self.background.contentHeight - self._bottomPadding
+  self.upperLimit = self.background.contentHeight - self.scrollHeight - self._bottomPadding
 end
 
 function scroller:limitationReached(bounce) -- overscroll(bounce)
@@ -71,7 +80,8 @@ function scroller:touch(event)
     self._delta = 0
     self.velocity = 0
     self._prevTime = 0
-    self.dragging = true
+    self.dragging = false
+    self.tracking = true
     self.decelerating = false
     
     -- Set the limits now
@@ -83,14 +93,18 @@ function scroller:touch(event)
       self.tween = nil
     end
     
+    self:willBeginDragging()
+    --if type(self.willBeginDragging) == "function" then self:willBeginDragging() end
+    --self:send("willBeginDragging", event)
     -- Set focus
     display.getCurrentStage():setFocus( event.target, event.id )
     target.isFocus = true
 
-  elseif target.isFocus then
-    if "moved" == phase then
+  elseif self.tracking then
+    if "moved" == phase then      
       self._delta = event.y - self._prevYPos
       self._prevYPos = event.y
+      if math.abs(self._delta) > 20 then self.dragging = true end      
       -- If the view is more than the limits, handle overscroll
       if contentView.y < self.upperLimit or contentView.y > self.bottomLimit then
         contentView.y = contentView.y + ( self._delta * 0.5 )
@@ -105,6 +119,7 @@ function scroller:touch(event)
     elseif "ended" == phase or "cancelled" == phase then
       self._lastTime = event.time
       self.dragging = false
+      self.tracking = false
       self.decelerating = true
       
       -- touch held

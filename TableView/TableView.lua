@@ -105,7 +105,8 @@ function TableView:cellForRowAtIndexPath(indexPath)
     cell = TableViewCell {
       name = section .. '_' .. row, -- 2D naming, using underscore to separate [11][3] from [1][13]
       text = self.dataSource:textForRowAtIndexPath(indexPath),
-      y = offset
+      y = offset,
+      identifier = "reuseCellInSection"..section
     }
     --self:addSubview(cell)
     group:insert(cell.frame)
@@ -113,8 +114,14 @@ function TableView:cellForRowAtIndexPath(indexPath)
 end
 
 -- Request a resuable table cell with special indentifier
--- @param resuableIndentifier String already defined on table creation.
-function TableView:dequeueReusableCell(reusableIndentifier)
+-- @param reuseIndentifier String already defined on table creation.
+function TableView:dequeueReusableCell(reuseIndentifier)
+  local reusableCells = self._reusableCells
+  table.foreach(reusableCells, function(i, cell)
+    if cell.identifier == reuseIndentifier then
+      return table.remove(reusableCells, i)
+    end
+  end)
 end
 
 -- ------
@@ -204,6 +211,10 @@ function TableView:visibleCells()
     print(offset)
     header.y = header.initOffset + offset
   end]]
+end
+
+function TableView:layout()
+  
 end
 
 -- ------
