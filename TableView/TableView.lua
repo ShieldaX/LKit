@@ -102,11 +102,12 @@ function TableView:cellForRowAtIndexPath(indexPath)
   if section and row then
     local group = self:sectionForIndex(section)
     local offset, cell = self:offsetToRowAtIndexPath(indexPath)
+    local reuseIndentifier = "reuseCellInSection"..section
     cell = TableViewCell {
       name = section .. '_' .. row, -- 2D naming, using underscore to separate [11][3] from [1][13]
       text = self.dataSource:textForRowAtIndexPath(indexPath),
       y = offset,
-      identifier = "reuseCellInSection"..section
+      identifier = reuseIndentifier
     }
     --self:addSubview(cell)
     group:insert(cell.frame)
@@ -119,7 +120,7 @@ function TableView:dequeueReusableCell(reuseIndentifier)
   local reusableCells = self._reusableCells
   table.foreach(reusableCells, function(i, cell)
     if cell.identifier == reuseIndentifier then
-      return table.remove(reusableCells, i)
+      reuseCell = table.remove(reusableCells, i)
     end
   end)
 end
