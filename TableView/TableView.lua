@@ -9,7 +9,7 @@
 -- ======
 local util = require 'util'
 local class = require 'middleclass'
---local View = require 'View'
+local View = require 'View'
 local Scroll = require 'Scroll'
 local DataSource = require 'DataSource' -- TODO: include as a module
 local TableViewCell = require 'TableViewCell'
@@ -44,22 +44,18 @@ local TableView = Scroll:subclass('TableView')
 function TableView:initialize(opt)
   Scroll.initialize(self, opt)
   self.sections = {}
-  self.header = nil
-  self.footer = nil
-  self._reusableCells = {} -- request element with special reuseId
-  self.selectedRow = nil
-  self.highlightedRow = nil
+  self.header = nil -- table header
+  self.footer = nil -- table footer
+  self._reusableCells = {} -- request element with special reuseIdentifier
+  self._availableCells = {} -- insert all cached elements for reusing
+  self.selectedRow = nil -- indexPath point to selected row
+  self.highlightedRow = nil -- indexPath point to row should be highlighted
   self.dataSource = nil
 end
 
 -- ------
 -- Configuring a Table View
 -- ------
-
-function TableView:setDataSource(data)
-  -- if not data is class data source return
-  self.dataSource = data
-end
 
 -- ------
 -- Creating Table View Cells
@@ -72,8 +68,7 @@ function TableView:headerInSection(index)
       name = "headerView",
       y = 0,
       text = self.dataSource:titleForHeaderInSection(index),
-    }
-    
+    }    
     section:insert(header.frame)
     section.headerView = header
   end
@@ -98,19 +93,24 @@ end
 -- @return An object representing a cell of the table or nil if the cell is not visible or indexPath is out of range.
 function TableView:cellForRowAtIndexPath(indexPath)
   local section, row = indexPath.section or 1, indexPath.row or 1
-  -- TODO: is cell visible
+  local dataSource = self.dataSource
   if section and row then
     local group = self:sectionForIndex(section)
-    local offset, cell = self:offsetToRowAtIndexPath(indexPath)
+    local offset = self:offsetToRowAtIndexPath(indexPath)
     local reuseIndentifier = "reuseCellInSection"..section
-    cell = TableViewCell {
-      name = section .. '_' .. row, -- 2D naming, using underscore to separate [11][3] from [1][13]
-      text = self.dataSource:textForRowAtIndexPath(indexPath),
-      y = offset,
-      identifier = reuseIndentifier
-    }
-    --self:addSubview(cell)
+    local cell = self:dequeueReusableCell(reuseIndentifier)
+    if not cell then
+      cell = TableViewCell {
+        name = section .. '_' .. row, -- 2D naming, using underscore to separate [11][3] from [1][13]
+        text = dataSource:textForRowAtIndexPath(indexPath),
+        y = offset,
+        height = dataSource:heightForRowAtIndexPath(indexPath),
+        identifier = reuseIndentifier
+      }      
+      table.insert(self._availableCells, cell)
+    end
     group:insert(cell.frame)
+    return cell
   end
 end
 
@@ -119,8 +119,9 @@ end
 function TableView:dequeueReusableCell(reuseIndentifier)
   local reusableCells = self._reusableCells
   table.foreach(reusableCells, function(i, cell)
+    -- return the first finding
     if cell.identifier == reuseIndentifier then
-      reuseCell = table.remove(reusableCells, i)
+      return table.remove(reusableCells, i)
     end
   end)
 end
@@ -131,20 +132,25 @@ end
 
 function TableView:setHeaderView(opt)
   
-  if self.header then self.header:removeSelf() end
+  if self.header then self.header:removeSelf() end -- clear previous header view
+  -- build new header with options
   self.header = display.newGroup()
   local label = display.newText(opt.labelText or "table header", 0, 0, system.FontBold, 20)
   label.x = self.background.x
   self.header:insert(label)
   
+  self.bounds:insert(self.header)
+end
+
+function TableView:setFooterView(opt)
   --[[
-  if self.header then self.header:removeFromSuperview() end
-  local header = View {
-    name = "header",
+  if self.footer then self.footer:removeFromSuperview() end
+  local footer = View {
+    name = "footer",
     height = self.defaultHeaderHeight or 40,
     Label {
       name = "label",
-      text = opt.labelText or "Header",
+      text = opt.labelText or "Footer",
       size = 20
     }
   }
@@ -152,51 +158,18 @@ function TableView:setHeaderView(opt)
   ]]
 end
 
-function TableView:setFooterView(opt)
-end
-
 -- ------
 -- Scrolling the Table View
 -- ------
 
-function TableView:indexPathsForRowsInBounds(bounds)
-  local yMin = bounds.yMin
-  local yMax = bounds.yMax
-  local dataSource = self.dataSource
-  local indexPaths = {}
-  local offset = 0
-  
-  -- loops throw sections
-  for s = 1, dataSource:numberOfSections() do
-    offset = self:offsetToSection(s) -- reset offset base at begining
-    -- if the bottom of this section is in the blew rect's top
-    if self:offsetToSection(s+1) >= yMin and offset <= yMax then
-      -- checking each rows
-      for r = 1, dataSource:numberOfRowsInSection(s) do
-        local indexPath = {section = s, row = r}
-        local rowTop = offset + self:offsetToRowAtIndexPath(indexPath)
-        local rowBottom = offset + dataSource:heightForRowAtIndexPath(indexPath)
-        --offset = offset + dataSource:heightForRowAtIndexPath(indexPath)
-        -- collect or discard (intersect? )
-        if rowBottom >= yMin and rowTop <= yMax then
-          indexPaths[#indexPaths+1] = indexPath
-        elseif rowBottom > yMax then
-          break
-        end
-      end
-    end
-  end
-  
-  return indexPaths
-end
-
 function TableView:indexPathsForVisibleRows()
   -- update visible limit
-  local yMin = - self.bounds.contentBounds.yMin
+  local yMin = - self.bounds.y
   local yMax = yMin + self.background.contentHeight
   return self:indexPathsForRowsInBounds({yMin = yMin, yMax = yMax})
 end
 
+-- update visible cells on demand
 function TableView:visibleCells()
   local cells = {}
   local indexPaths = self:indexPathsForVisibleRows()
@@ -204,18 +177,35 @@ function TableView:visibleCells()
     cells[#cells+1] = self:cellForRowAtIndexPath(indexPath)
   end)
   return cells
-  --[[ visible section header
-  if section.contentBounds.yMin <= self.background.contentBounds.yMin then
-    --section header should displays, caculate the inset of the header
-    local top = self.background.contentBounds.yMin
-    local offset = section.contentBounds.yMin - top
-    print(offset)
-    header.y = header.initOffset + offset
-  end]]
 end
 
-function TableView:layout()
+function TableView:visibleSections()  
+  -- update visible limit
+  local yMin = - self.bounds.y
+  local yMax = yMin + self.background.contentHeight
   
+  local offset = 0
+  -- loops throw sections
+  for s = 1, self.dataSource:numberOfSections() do
+    offset = self:offsetToSection(s) -- reset offset base at every begining
+    -- check rects intersection
+    local bottomOffset = self:offsetToSection(s+1)
+    if bottomOffset >= yMin and offset <= yMax then
+      -- section is visible, show its header
+      local header = self:headerInSection(s)
+      --[[
+      if header then
+        --header.frame:toFront()
+        local bottomLine = yMin
+        local inset = yMin - offset
+        if inset >= 0 and bottomOffset - yMin >= header.frame.contentHeight then
+          header.frame.y = inset
+        else
+        end
+      end
+      ]]
+    end
+  end
 end
 
 -- ------
@@ -231,6 +221,7 @@ end
 -- Inserting, Deleting, and Moving Rows and Sections
 -- ------
 
+-- @param sections Target Indexes to insert new sections
 function TableView:insertSections(sections)
   local _sections = self.sections
   for index in pairs(sections) do
@@ -240,7 +231,8 @@ function TableView:insertSections(sections)
   end
 end
 
-function TableView:insertRowsAtIndexPaths(indexPaths)
+-- @param animation Define animation will be used while insertion
+function TableView:insertRowsAtIndexPaths(indexPaths, animation)
   assert(type(indexPath) == "table")
   local section, row = tonumber(indexPath.section), tonumber(indexPath.row)
   if section > 0 and row > 0 then
@@ -258,6 +250,15 @@ end
 -- ------
 -- Managing the Data Source
 -- ------
+
+function TableView:setDataSource(data)
+  local Object = class.Object
+  assert(Object.isInstanceOf(data, DataSource), "ERROR: data is not a valid DataSource instance")
+  if self.dataSource then
+    self.dataSource = nil -- unload previous dataSource    
+  end
+  self.dataSource = data
+end
 
 -- ------
 -- Accessing Drawing Areas of the Table View
@@ -284,6 +285,36 @@ function TableView:offsetToRowAtIndexPath(indexPath)
     offset = offset + data:heightForRowAtIndexPath({section = section, row = i})
   end
   return offset
+end
+
+function TableView:indexPathsForRowsInBounds(bounds)
+  local yMin = bounds.yMin
+  local yMax = bounds.yMax
+  local dataSource = self.dataSource
+  local indexPaths = {}
+  local offset = 0
+  
+  -- loops throw sections
+  for s = 1, dataSource:numberOfSections() do
+    offset = self:offsetToSection(s) -- reset offset base at every begining
+    -- check rects intersection ?
+    if self:offsetToSection(s+1) >= yMin and offset <= yMax then
+      -- checking each rows
+      for r = 1, dataSource:numberOfRowsInSection(s) do
+        local indexPath = {section = s, row = r}
+        local rowTop = offset + self:offsetToRowAtIndexPath(indexPath)
+        local rowBottom = rowTop + dataSource:heightForRowAtIndexPath(indexPath)
+        -- collect or discard (intersect? )
+        if rowBottom >= yMin and rowTop <= yMax then
+          indexPaths[#indexPaths+1] = indexPath
+        elseif rowBottom > yMax then
+          break
+        end
+      end
+    end
+  end
+  
+  return indexPaths
 end
 
 return TableView

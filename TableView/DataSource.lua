@@ -50,7 +50,7 @@ end
 
 function DataSource:numberOfRowsInSection(index)
   index = tonumber(index)
-  assert(index > 0 and index <= self:numberOfSections(), "WARNING: Tring to retrive section with invalid index number")
+  assert(index > 0 and index <= self:numberOfSections(), "ERROR: Tring to retrive section with invalid index number")
   return #self.data[index]
 end
 
@@ -73,6 +73,7 @@ end
 function DataSource:heightForRowAtIndexPath(path)
   local section, row = path.section, path.row
   if section and row then
+    assert( row > 0 and row <= self:numberOfRowsInSection(section), "ERROR: The indexPath is over range")
     local sectionData = self.data[section]
     if sectionData then
       local rowData = sectionData[row]
@@ -81,7 +82,7 @@ function DataSource:heightForRowAtIndexPath(path)
       end
     end
   end
-  return 0
+  assert(false, "invalid indexPath")
 end
 
 -- content provider

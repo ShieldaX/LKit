@@ -93,9 +93,10 @@ function scroller:touch(event)
       self.tween = nil
     end
     
-    self:willBeginDragging()
-    --if type(self.willBeginDragging) == "function" then self:willBeginDragging() end
+    --self:willBeginDragging()
+    if type(self.willBeginDragging) == "function" then self:willBeginDragging() end
     --self:send("willBeginDragging", event)
+    
     -- Set focus
     display.getCurrentStage():setFocus( event.target, event.id )
     target.isFocus = true
@@ -104,7 +105,7 @@ function scroller:touch(event)
     if "moved" == phase then      
       self._delta = event.y - self._prevYPos
       self._prevYPos = event.y
-      if math.abs(self._delta) > 20 then self.dragging = true end      
+      if math.abs(self._delta) > 0 then self.dragging = true end      
       -- If the view is more than the limits, handle overscroll
       if contentView.y < self.upperLimit or contentView.y > self.bottomLimit then
         contentView.y = contentView.y + ( self._delta * 0.5 )
@@ -116,6 +117,10 @@ function scroller:touch(event)
       
       -- update the last held time
       self._timeHeld = time
+            
+      --util.print_r(#(self:indexPathsForVisibleRows()))
+      -- stuck section header
+      
     elseif "ended" == phase or "cancelled" == phase then
       self._lastTime = event.time
       self.dragging = false
@@ -145,9 +150,9 @@ end
 
 function scroller:enterFrame(event)
   local contentView = self.bounds
-  -- dragging content
+  -- dragging content  
   if self.dragging then
-    -- time elapsed
+  -- time elapsed
     local deltaTime = event.time - self._prevTime
     self._prevTime = event.time
     local calculatedVelocity = (contentView.y - self._prevY) / deltaTime
@@ -156,9 +161,9 @@ function scroller:enterFrame(event)
       self:limitVelocity()
     end
     self._prevY = contentView.y
-  end
+    
   -- fling content
-  if self.decelerating then
+  elseif self.decelerating then
     local timePassed = event.time - self._lastTime
     self._lastTime = event.time
     -- Stop scrolling if velocity is near zero
@@ -177,10 +182,6 @@ function scroller:enterFrame(event)
       self.decelerating = false
     end
   end
-end
-
-function scroller:included(class)
-  print("included")
 end
 
 return scroller
