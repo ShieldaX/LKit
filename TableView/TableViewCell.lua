@@ -85,6 +85,7 @@ function TableViewCell:updateSelectionState()
 end
 
 function TableViewCell:prepareForReuse()
+  print("I am ready to reuse now!")
 end
 
 return TableViewCell

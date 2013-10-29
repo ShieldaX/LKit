@@ -92,26 +92,42 @@ end
 -- @param indexPath The index path locating the row in the table.
 -- @return An object representing a cell of the table or nil if the cell is not visible or indexPath is out of range.
 function TableView:cellForRowAtIndexPath(indexPath)
-  local section, row = indexPath.section or 1, indexPath.row or 1
+  local section, row = indexPath.section, indexPath.row
   local dataSource = self.dataSource
+  local availableCells = self._availableCells
+  
   if section and row then
-    local group = self:sectionForIndex(section)
-    local offset = self:offsetToRowAtIndexPath(indexPath)
-    local reuseIndentifier = "reuseCellInSection"..section
-    local cell = self:dequeueReusableCell(reuseIndentifier)
-    if not cell then
-      cell = TableViewCell {
-        name = section .. '_' .. row, -- 2D naming, using underscore to separate [11][3] from [1][13]
-        text = dataSource:textForRowAtIndexPath(indexPath),
-        y = offset,
-        height = dataSource:heightForRowAtIndexPath(indexPath),
-        identifier = reuseIndentifier
-      }      
-      table.insert(self._availableCells, cell)
+    
+    local name = section .. '_' .. row -- 2D naming, using underscore to separate [11][3] from [1][13]
+    if not availableCells[name] then -- if cell is not available
+      local offset = self:offsetToRowAtIndexPath(indexPath)
+      local reuseIndentifier = "reuseCellInSection"..section
+      
+      local cell = self:dequeueReusableCell(reuseIndentifier) -- request reusable cell instance
+      
+      if not cell then -- create new table cell instance
+        cell = TableViewCell {
+          name = name,
+          text = dataSource:textForRowAtIndexPath(indexPath),
+          y = offset,
+          height = dataSource:heightForRowAtIndexPath(indexPath),
+          identifier = reuseIndentifier
+        }
+        self:sectionForIndex(section):insert(cell.frame) -- display in right position
+        print("create new cell instance.")
+      else
+        print("reuse a cell instance.")        
+        cell.frame.y = offset
+      end
+      
+      availableCells[name] = cell -- mark available at the same time
+    else
+      --print("no need to create or reuse")
+      --print(availableCells[name])
     end
-    group:insert(cell.frame)
-    return cell
+    
   end
+  
 end
 
 -- Request a resuable table cell with special indentifier
@@ -121,13 +137,15 @@ function TableView:dequeueReusableCell(reuseIndentifier)
   table.foreach(reusableCells, function(i, cell)
     -- return the first finding
     if cell.identifier == reuseIndentifier then
+      cell:prepareForReuse()
+      -- remove from reusableCells
       return table.remove(reusableCells, i)
     end
   end)
 end
 
 function TableView:_queueReusableCells()
-  -- local threshold = 20
+  -- local threshold = 20 -- TODO: implement reusableThreshold
   local reusableCells = self._reusableCells
   -- update visible bounds
   local visibleBounds = self.background.contentBounds
@@ -135,16 +153,17 @@ function TableView:_queueReusableCells()
   local yMax = visibleBounds.yMax
   -- loop through currently available cells
   local availableCells = self._availableCells
-  table.foreach(availableCells, function(i, cell)
+  table.foreach(availableCells, function(name, cell)
     local cellBounds = cell.frame.contentBounds
     if cellBounds.yMax < yMin or cellBounds.yMin > yMax then
       if cell.identifier then
-        table.insert(reusableCells, table.remove(availableCells, i))
-        print("Cell "..cell.identifier.." became reusable.")
+        table.insert(reusableCells, availableCells[name])
+        availableCells[name] = nil -- remove from availableCells
+        print("Cell with "..cell.identifier.." became reusable.")
       else
-        print("Cell not reusable will remove cell...")
-        table.remove(availableCells, i)
+        print("Cell not reusable will be removed...")
         cell.frame:removeSelf()
+        availableCells[name] = nil
       end
     end
   end)
@@ -195,12 +214,13 @@ end
 
 -- update visible cells on demand
 function TableView:visibleCells()
-  local cells = {}
+  --local cells = {}
   local indexPaths = self:indexPathsForVisibleRows()
   table.foreach(indexPaths, function(_, indexPath)
-    cells[#cells+1] = self:cellForRowAtIndexPath(indexPath)
+    --cells[#cells+1] = self:cellForRowAtIndexPath(indexPath)
+    self:cellForRowAtIndexPath(indexPath)
   end)
-  return cells
+  --return cells
 end
 
 function TableView:visibleSections()  
@@ -246,7 +266,7 @@ end
 -- ------
 
 -- @param sections Target Indexes to insert new sections
-function TableView:insertSections(sections)
+function TableView:insertSections(sections, animation)
   local _sections = self.sections
   for index in pairs(sections) do
     self:sectionForIndex(index)
