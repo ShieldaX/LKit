@@ -120,7 +120,7 @@ function scroller:touch(event)
             
       --util.print_r(#(self:indexPathsForVisibleRows()))
       -- stuck section header
-      
+      self:_queueReusableCells()
     elseif "ended" == phase or "cancelled" == phase then
       self._lastTime = event.time
       self.dragging = false

@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 local util = require 'util'
+local print_r = util.print_r
 local ts = require 'spec_runner'
 --local Scroll = require 'Scroll'
 local TableView = require 'TableView'
@@ -52,7 +53,7 @@ ts.regist(0, function()
         backgroundColor = {255, 255, 255, 255},
       }
     tableView:setDataSource(data)
-    util.print_r(data.data)
+    print_r(data.data)
     ts.table = tableView
 end, "create a table view")
 
@@ -69,7 +70,7 @@ end, "offset to row in section")
 
 ts.desc("#Elements organization")
 ts.regist(0, function()
-    util.print_r(ts.table:indexPathsForVisibleRows())
+    print_r(ts.table:indexPathsForVisibleRows())
 end, "visible rows")
 
 ts.regist(0, function()
@@ -84,8 +85,13 @@ ts.regist(0, function()
     ]]
     tableView:visibleCells()
     tableView:visibleSections()
-    util.print_r(tableView.bounds.numChildren)
+    print_r(tableView.bounds.numChildren)
 end, "insert rows in sections")
+
+ts.regist(0, function()
+    local tableView = ts.table
+    print(#tableView._availableCells)
+end, "available cells")
 
 ts.regist(1, function()
     local tableView = ts.table
@@ -107,7 +113,7 @@ ts.regist(1, function()
     local yMax = tableView:offsetToSection(2) + tableView:offsetToRowAtIndexPath({section = 2, row = 3})
     print("yMin", yMin, "From top of row 4 in section 1")
     print("yMax", yMax, "To bottom of row 2 in section 2")
-    util.print_r(tableView:indexPathsForRowsInBounds({yMin = yMin, yMax = yMax}))
+    print_r(tableView:indexPathsForRowsInBounds({yMin = yMin, yMax = yMax}))
 end, "indexPaths For Rows In Bounds")
 
 ts.regist(1, function()

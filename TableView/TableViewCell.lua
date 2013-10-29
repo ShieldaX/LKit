@@ -39,6 +39,7 @@ function TableViewCell:initialize(opt)
   local bounds = self.bounds
   self:setBackgroundColor({255, 255, 255, 255})
   
+  -- Frame dimensions
   local rect = self.frame
   local contentHeight, contentWidth = rect.contentHeight, rect.contentWidth
   
@@ -67,7 +68,7 @@ function TableViewCell:initialize(opt)
   -- selection state
   self.selected = false
   self.highlighted = false
-  self.initialized = true -- used for reusing
+  self.identifier = opt.identifier --reusble identifier
 end
 
 -- ---

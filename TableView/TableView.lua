@@ -126,6 +126,30 @@ function TableView:dequeueReusableCell(reuseIndentifier)
   end)
 end
 
+function TableView:_queueReusableCells()
+  -- local threshold = 20
+  local reusableCells = self._reusableCells
+  -- update visible bounds
+  local visibleBounds = self.background.contentBounds
+  local yMin = visibleBounds.yMin
+  local yMax = visibleBounds.yMax
+  -- loop through currently available cells
+  local availableCells = self._availableCells
+  table.foreach(availableCells, function(i, cell)
+    local cellBounds = cell.frame.contentBounds
+    if cellBounds.yMax < yMin or cellBounds.yMin > yMax then
+      if cell.identifier then
+        table.insert(reusableCells, table.remove(availableCells, i))
+        print("Cell "..cell.identifier.." became reusable.")
+      else
+        print("Cell not reusable will remove cell...")
+        table.remove(availableCells, i)
+        cell.frame:removeSelf()
+      end
+    end
+  end)
+end
+
 -- ------
 -- Accessing Header and Footer Views
 -- ------
