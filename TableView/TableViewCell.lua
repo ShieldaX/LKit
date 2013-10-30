@@ -9,12 +9,23 @@ local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
 
+-- cg stretcher
+local stretch = {}
+function stretch.heightTo(displayObject, height)
+  --TODO: stretch content height to target
+  displayObject.height = height or displayObject.height
+  -- object always expand or shrink the object from the center, so caculate the offset to set
+  displayObject.y = displayObject.contentHeight*.5
+end
+
+--[[
 local imageRectForImageView
 function replaceImageWith(view, imagePath)
   local width, height = view.contentWidth, view.contentHeight
   display.newImageRect(view.parent, imagePath, view.x - width*.5, view.y - height*.5, width, height)
   view.isVisible = false
 end
+]]
 
 -- ======
 -- CLASS
@@ -72,6 +83,7 @@ function TableViewCell:initialize(opt)
 end
 
 function TableViewCell:setLabelText(text)
+  text = text or ""
   if self.textLabel then
     local textLabel = self.textLabel
     textLabel.text = "  " .. text
@@ -81,20 +93,30 @@ function TableViewCell:setLabelText(text)
   end
 end
 
+function TableViewCell:setHeight(height) 
+  local delta = height - self.background.height
+  print("stretching height by", delta)
+  stretch.heightTo(self.background, height)
+  stretch.heightTo(self.highlightedBackground, height)
+  local contentHeight = self.background.contentHeight
+  self.separator.y = contentHeight - self.separator.contentHeight*.5
+  self.textLabel.y = contentHeight*.5
+end
+
 -- ---
 -- Manage seletion state
 -- ---
 
 -- set cell's highlighted status
-function TableViewCell:setHighlighted(unhighlighted)
-  self.highlightedBackground.isVisible = not unhighlighted
+function TableViewCell:setHighlighted()
+  self.highlightedBackground.isVisible = self.highlighted
 end
 
 function TableViewCell:updateSelectionState()
-  
 end
 
 function TableViewCell:prepareForReuse()
+  self:updateSelectionState()
   print("I am ready to reuse now!")
 end
 

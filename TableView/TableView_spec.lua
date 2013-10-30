@@ -20,7 +20,7 @@ local dataSource = {
     header = {labelText = "Country List"},
     {
       titleHeader = "Europe",
-      {text = "Russia"},
+      {text = "Russia", height = 60},
       {text = "France"},
       {text = "England"},
       {text = "Germany"},

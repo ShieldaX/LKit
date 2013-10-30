@@ -118,6 +118,7 @@ function TableView:cellForRowAtIndexPath(indexPath)
       else
         print("reuse a cell instance.")        
         cell.frame.y = offset
+        cell:setHeight(dataSource:heightForRowAtIndexPath(indexPath))
         cell:setLabelText(dataSource:textForRowAtIndexPath(indexPath))
         -- cell:reuseForRowAtIndexPath(indexPath)
       end
@@ -146,6 +147,8 @@ function TableView:dequeueReusableCell(reuseIdentifier)
   return cell
 end
 
+-- Mark rendered cells for reuse. With one reuse identifier at the same time,
+-- there is only one cell marked for reuse.
 function TableView:_queueReusableCells()
   local threshold = 0 -- TODO: implement reusableThreshold
   local reusableCells = self._reusableCells
