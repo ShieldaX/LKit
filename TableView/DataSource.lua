@@ -113,11 +113,14 @@ end
 
 -- update and reload
 
--- @merge True for merge rows in, false for sections addition
+-- @merge True for merge rows in, false for add new sections
 function DataSource:updateWith(data, merge)
   -- table.remove from new data
   -- table.insert to origin data
   -- dispatchEvent({name = "dataUpdate"})
+end
+
+function DataSource:reload()
 end
 
 return DataSource

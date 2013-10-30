@@ -39,12 +39,24 @@ local dataSource = {
       {text = "Singapore"},
       {text = "Sri Lanka"},
       {text = "Malaysia"},
+      {text = "Afghanistan"},
+      {text = "Mongolia"},
+      {text = "North Korea"},
+      {text = "South Korea"},
+      {text = "Turkey"},
     },
     {
       titleHeader = "America",
       {text = "United States", height = 60},
       {text = "Canada"},
       {text = "Mexico"},
+      {text = "Brazil"},
+      {text = "Cuba"},
+      {text = "Greenland"},
+      {text = "Jamaica"},
+      {text = "Peru"},
+      {text = "Colombia"},
+      {text = "Argentina"},
     },
   }
 
@@ -111,8 +123,8 @@ ts.regist(0, function()
     tableView:cellForRowAtIndexPath({section = 2, row = 1})
     tableView:cellForRowAtIndexPath({section = 2, row = 2})
     ]]
-    tableView:visibleCells()
-    tableView:visibleSections()
+    --tableView:visibleCells()
+    --tableView:visibleSections()
     print("visible section number")
     print_r(tableView.bounds.numChildren)
 end, "visible elements rows in sections")

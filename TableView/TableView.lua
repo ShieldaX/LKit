@@ -51,6 +51,7 @@ function TableView:initialize(opt)
   self.selectedRow = nil -- indexPath point to selected row
   self.highlightedRow = nil -- indexPath point to row should be highlighted
   self.dataSource = nil
+  self.stuckSectionHeader = opt.stuckSectionHeader or true -- section headers stick to the top by default for better UX
 end
 
 -- ------
@@ -60,20 +61,6 @@ end
 -- ------
 -- Creating Table View Cells
 -- ------
-
-function TableView:headerInSection(index)
-  local section = self:sectionForIndex(index)
-  if not section.headerView then
-    local header = TableViewSectionLabel {
-      name = "headerView",
-      y = 0,
-      text = self.dataSource:titleForHeaderInSection(index),
-    }    
-    section:insert(header.frame)
-    section.headerView = header
-  end
-  return section.headerView
-end
 
 -- Returns the table section at the specified index
 function TableView:sectionForIndex(index)
@@ -192,8 +179,21 @@ end
 -- Accessing Header and Footer Views
 -- ------
 
+function TableView:headerInSection(index)
+  local section = self:sectionForIndex(index)
+  if not section.headerView then
+    local header = TableViewSectionLabel {
+      name = "headerView",
+      y = 0,
+      text = self.dataSource:titleForHeaderInSection(index),
+    }    
+    section:insert(header.frame)
+    section.headerView = header
+  end
+  return section.headerView
+end
+
 function TableView:setHeaderView(opt)
-  
   if self.header then self.header:removeSelf() end -- clear previous header view
   -- build new header with options
   self.header = display.newGroup()
@@ -242,13 +242,15 @@ function TableView:visibleCells()
   --return cells
 end
 
+-- Display table sections via their header/footer.
 function TableView:visibleSections() 
+  --TODO: merge this caculate into Runtime
   -- update visible limit
   local yMin = - self.bounds.y
   local yMax = yMin + self.background.contentHeight
   
   local offset = 0
-  -- loops throw sections
+  -- loops throw all sections
   for s = 1, self.dataSource:numberOfSections() do
     offset = self:offsetToSection(s) -- reset offset base at every begining
     -- check rects intersection
@@ -256,17 +258,16 @@ function TableView:visibleSections()
     if bottomOffset >= yMin and offset <= yMax then
       -- section is visible, show its header
       local header = self:headerInSection(s)
-      --[[
-      if header then
-        --header.frame:toFront()
-        local bottomLine = yMin
+      
+      if header then        
         local inset = yMin - offset
         if inset >= 0 and bottomOffset - yMin >= header.frame.contentHeight then
+          header.frame:toFront()
           header.frame.y = inset
         else
         end
       end
-      ]]
+      
     end
   end
 end

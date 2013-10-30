@@ -153,6 +153,7 @@ end
 
 function scroller:enterFrame(event)
   self:_queueReusableCells()
+  self:visibleSections()
   self:visibleCells()
 
   local contentView = self.bounds
