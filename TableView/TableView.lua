@@ -13,7 +13,7 @@ local View = require 'View'
 local Scroll = require 'Scroll'
 local DataSource = require 'DataSource' -- TODO: include as a module
 local TableViewCell = require 'TableViewCell'
-local TableViewSectionLabel = require 'TableViewSectionLabel'
+local TableViewHeaderFooterView = require 'TableViewHeaderFooterView'
 
 -- ======
 -- CLASS
@@ -182,13 +182,12 @@ end
 function TableView:headerInSection(index)
   local section = self:sectionForIndex(index)
   if not section.headerView then
-    local header = TableViewSectionLabel {
+    local header = TableViewHeaderFooterView {
       name = "headerView",
-      y = 0,
       text = self.dataSource:titleForHeaderInSection(index),
     }    
     section:insert(header.frame)
-    section.headerView = header
+    section.headerView = header -- !reference
   end
   return section.headerView
 end
@@ -258,14 +257,28 @@ function TableView:visibleSections()
     if bottomOffset >= yMin and offset <= yMax then
       -- section is visible, show its header
       local header = self:headerInSection(s)
-      
-      if header then        
+      local section = self:sectionForIndex(s)
+      if header then       
         local inset = yMin - offset
-        if inset >= 0 and bottomOffset - yMin >= header.frame.contentHeight then
-          header.frame:toFront()
-          header.frame.y = inset
-        else
+        if inset > 0 then
+          if bottomOffset - yMin > header.frame.contentHeight then
+            -- stuck header
+            self.frame:insert(header.frame)
+            header.frame.y = 0
+            -- mark as top section header
+            if self.topHeader then
+              -- remove previous one if needed
+              print("overlap")
+            end
+            self.topHeader = header
+          else 
+            -- push header
+            section:insert(header.frame)
+            header.frame.y = - header.frame.contentHeight
+            self.topHeader = nil
+          end
         end
+
       end
       
     end

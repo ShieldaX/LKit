@@ -84,10 +84,13 @@ end
 --- Change the background color
 -- @param color Table of color. TODO: use Color object.
 function View:setBackgroundColor(color)
-  assert(type(color) == "table", "invalid color")
-  local backgroundColor = color
-  self.background:setFillColor(unpack(backgroundColor))
-  self.backgroundColor = backgroundColor
+  --assert(type(color) == "table", "invalid color")
+  if type(color) == "table" then
+    self.background:setFillColor(unpack(color))
+  else
+    self.background:setFillColor(color)
+  end
+  self.backgroundColor = color
 end
 
 -- ------
