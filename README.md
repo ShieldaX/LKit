@@ -28,7 +28,7 @@ local win = Window {
       height = "wrap",
       Button = {
         name = "print",
-        width =  "wrap",
+        width = "wrap",
         height = "wrap",
       }
     },
@@ -40,5 +40,5 @@ local win = Window {
   }
 }
 
-win.linear.rootView.print.frame -- global access
+win.linear.rootView.print.frame -- global accessing chain
 ```
