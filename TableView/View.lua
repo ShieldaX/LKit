@@ -116,7 +116,7 @@ end
 function View:removeFromSuperview(view)
   local frame = self.frame
   local superview = self.superview
-  superview[self.name] = nil
+  if superview then superview[self.name] = nil end
   self.superview = false
   self.window = false
   frame:removeSelf()

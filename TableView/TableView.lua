@@ -101,9 +101,9 @@ function TableView:cellForRowAtIndexPath(indexPath)
     local name = section .. '_' .. row -- 2D naming, using underscore to separate [11][3] from [1][13]
     if not availableCells[name] then -- if cell is not available
       local offset = self:offsetToRowAtIndexPath(indexPath)
-      local reuseIndentifier = "reuseCellInSection"..section
+      local reuseIdentifier = "reuseCellInSection"..section
       
-      local cell = self:dequeueReusableCell(reuseIndentifier) -- request reusable cell instance
+      local cell = self:dequeueReusableCell(reuseIdentifier) -- request reusable cell instance
       
       if not cell then -- create new table cell instance
         cell = TableViewCell {
@@ -111,13 +111,15 @@ function TableView:cellForRowAtIndexPath(indexPath)
           text = dataSource:textForRowAtIndexPath(indexPath),
           y = offset,
           height = dataSource:heightForRowAtIndexPath(indexPath),
-          identifier = reuseIndentifier
+          identifier = reuseIdentifier
         }
         self:sectionForIndex(section):insert(cell.frame) -- display in right position
         print("create new cell instance.")
       else
         print("reuse a cell instance.")        
         cell.frame.y = offset
+        cell:setLabelText(dataSource:textForRowAtIndexPath(indexPath))
+        -- cell:reuseForRowAtIndexPath(indexPath)
       end
       
       availableCells[name] = cell -- mark available at the same time
@@ -131,41 +133,55 @@ function TableView:cellForRowAtIndexPath(indexPath)
 end
 
 -- Request a resuable table cell with special indentifier
--- @param reuseIndentifier String already defined on table creation.
-function TableView:dequeueReusableCell(reuseIndentifier)
+-- @param reuseIdentifier String already defined on instance creation.
+-- @return A cell instance with the associated identifier or nil if no such instance exists in the reusableCells queue.
+function TableView:dequeueReusableCell(reuseIdentifier)
   local reusableCells = self._reusableCells
-  table.foreach(reusableCells, function(i, cell)
-    -- return the first finding
-    if cell.identifier == reuseIndentifier then
-      cell:prepareForReuse()
-      -- remove from reusableCells
-      return table.remove(reusableCells, i)
-    end
-  end)
+  -- Try to find cell with reuseIdentifier
+  cell = reusableCells[reuseIdentifier]
+  if cell then
+    cell:prepareForReuse()
+    reusableCells[reuseIdentifier] = nil
+  end
+  return cell
 end
 
 function TableView:_queueReusableCells()
-  -- local threshold = 20 -- TODO: implement reusableThreshold
+  local threshold = 0 -- TODO: implement reusableThreshold
   local reusableCells = self._reusableCells
   -- update visible bounds
   local visibleBounds = self.background.contentBounds
-  local yMin = visibleBounds.yMin
-  local yMax = visibleBounds.yMax
+  local yMin = visibleBounds.yMin + threshold
+  local yMax = visibleBounds.yMax - threshold
   -- loop through currently available cells
   local availableCells = self._availableCells
   table.foreach(availableCells, function(name, cell)
     local cellBounds = cell.frame.contentBounds
+
+    --[cull cells
     if cellBounds.yMax < yMin or cellBounds.yMin > yMax then
+
       if cell.identifier then
-        table.insert(reusableCells, availableCells[name])
-        availableCells[name] = nil -- remove from availableCells
-        print("Cell with "..cell.identifier.." became reusable.")
+        --table.insert(reusableCells, availableCells[name])
+        local identifier = cell.identifier
+
+        local previousCell = reusableCells[identifier]
+        if previousCell then
+          previousCell:removeFromSuperview()
+          reusableCells[identifier] = nil
+          previousCell = nil
+          print("Cell already exists has been removed.")
+        end
+        reusableCells[identifier] = cell -- apply new cell instance
+        print("Cell with "..identifier.." became reusable.")
       else
         print("Cell not reusable will be removed...")
-        cell.frame:removeSelf()
-        availableCells[name] = nil
+        cell:removeFromSuperview()
       end
+
+      availableCells[name] = nil -- remove from availableCells anyway
     end
+    -- cull cells]
   end)
 end
 
@@ -212,7 +228,7 @@ function TableView:indexPathsForVisibleRows()
   return self:indexPathsForRowsInBounds({yMin = yMin, yMax = yMax})
 end
 
--- update visible cells on demand
+-- update visible cells on demand (Runtime, Touch ...)
 function TableView:visibleCells()
   --local cells = {}
   local indexPaths = self:indexPathsForVisibleRows()
@@ -223,7 +239,7 @@ function TableView:visibleCells()
   --return cells
 end
 
-function TableView:visibleSections()  
+function TableView:visibleSections() 
   -- update visible limit
   local yMin = - self.bounds.y
   local yMax = yMin + self.background.contentHeight

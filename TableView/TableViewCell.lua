@@ -71,6 +71,16 @@ function TableViewCell:initialize(opt)
   self.identifier = opt.identifier --reusble identifier
 end
 
+function TableViewCell:setLabelText(text)
+  if self.textLabel then
+    local textLabel = self.textLabel
+    textLabel.text = "  " .. text
+    textLabel.x = textLabel.contentWidth*.5
+  else
+    print("WARNING: no main textLabel found")
+  end
+end
+
 -- ---
 -- Manage seletion state
 -- ---
@@ -86,6 +96,13 @@ end
 
 function TableViewCell:prepareForReuse()
   print("I am ready to reuse now!")
+end
+
+function TableViewCell:removeFromSuperview()
+  -- remove self holding components
+  self.highlightedBackground, self.highlightedColor, self.separator, self.textLabel, self.identifier = nil
+
+  View.removeFromSuperview(self)
 end
 
 return TableViewCell

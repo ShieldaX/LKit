@@ -33,7 +33,9 @@ end
 
 -- update scrollable content height
 function scroller:updateScrollHeight()
+  -- TODO: dynamic on data source if any.
   self.scrollHeight = self.bounds.contentHeight
+
   -- smallest scrolling height is view height
   if self.scrollHeight < self.background.contentHeight then    
     self.scrollHeight = self.background.contentHeight
@@ -119,8 +121,7 @@ function scroller:touch(event)
       self._timeHeld = time
             
       --util.print_r(#(self:indexPathsForVisibleRows()))
-      -- stuck section header
-      self:_queueReusableCells()
+      --TODO: stuck section header
       
     elseif "ended" == phase or "cancelled" == phase then
       self._lastTime = event.time
@@ -150,8 +151,10 @@ function scroller:touch(event)
 end
 
 function scroller:enterFrame(event)
-  local contentView = self.bounds
+  self:_queueReusableCells()
   self:visibleCells()
+
+  local contentView = self.bounds
   -- dragging content  
   if self.dragging then
   -- time elapsed
@@ -166,6 +169,9 @@ function scroller:enterFrame(event)
     
   -- fling content
   elseif self.decelerating then
+    -- Set the limits now
+    self:updateLimitation()
+
     local timePassed = event.time - self._lastTime
     self._lastTime = event.time
     -- Stop scrolling if velocity is near zero

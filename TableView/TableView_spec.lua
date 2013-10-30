@@ -19,6 +19,19 @@ display.setStatusBar(display.HiddenStatusBar)
 local dataSource = {
     header = {labelText = "Country List"},
     {
+      titleHeader = "Europe",
+      {text = "Russia"},
+      {text = "France"},
+      {text = "England"},
+      {text = "Germany"},
+      {text = "Spain"},
+      {text = "Italy"},
+      {text = "Portugal"},
+      {text = "Greece"},
+      {text = "Netherlands"},
+      {text = "Finland"},
+    },
+    {
       titleHeader = "Asia",
       {text = "China", height = 60},
       {text = "India"},
@@ -28,19 +41,10 @@ local dataSource = {
       {text = "Malaysia"},
     },
     {
-      titleHeader = "North America",
-      {text = "America", height = 60},
+      titleHeader = "America",
+      {text = "United States", height = 60},
       {text = "Canada"},
-    },
-    {
-      titleHeader = "Europe",
-      {text = "France", height = 60},
-      {text = "England"},
-      {text = "Germany"},
-      {text = "Spain"},
-      {text = "Italy"},
-      {text = "Portugal"},
-      {text = "Greece"},
+      {text = "Mexico"},
     },
   }
 
@@ -50,10 +54,24 @@ ts.regist(0, function()
     local tableView = TableView {
         name = "testTable",
         backgroundColor = {255, 255, 255, 255},
+        y = 120,
+        height = 300,
       }
     tableView:setDataSource(data)
     --print_r(data.data)
     ts.table = tableView
+    --[create debug overlay
+    local overlayTop = display.newRect( 0, 0, display.viewableContentWidth, 120 )
+    local overlayBottom = display.newRect( 0, 420, display.viewableContentWidth, 60 )
+    overlayTop:setFillColor(0, 0, 0)
+    overlayBottom:setFillColor(0, 0, 0)
+    overlayTop.alpha = .6
+    overlayBottom.alpha = .6
+    overlayTop.strokeWidth = 1
+    overlayBottom.strokeWidth = 1
+    overlayTop:setStrokeColor(255, 0, 0)    
+    overlayBottom:setStrokeColor(255, 0, 0)
+    --create debug overlay]
 end, "create a table view")
 
 ts.desc("#Index section and row")
@@ -98,7 +116,7 @@ end, "visible elements rows in sections")
 
 ts.regist(1, function()
     local tableView = ts.table
-    print(#tableView._availableCells)
+    --print(#tableView._availableCells)
 end, "available cells number")
 
 ts.regist(0, function()
@@ -108,7 +126,7 @@ ts.regist(0, function()
     print("yMin", yMin, "From top of row 4 in section 1")
     print("yMax", yMax, "To bottom of row 2 in section 2")
     local indexPaths = tableView:indexPathsForRowsInBounds({yMin = yMin, yMax = yMax})
-    assert(#indexPaths == 6)
+    --assert(#indexPaths == 6)
     print_r(indexPaths)
 end, "indexPaths For Rows In Bounds")
 
