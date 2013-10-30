@@ -65,8 +65,9 @@ ts.regist(0, function()
     local overlayBottom = display.newRect( 0, 420, display.viewableContentWidth, 60 )
     overlayTop:setFillColor(0, 0, 0)
     overlayBottom:setFillColor(0, 0, 0)
-    overlayTop.alpha = .6
-    overlayBottom.alpha = .6
+    local transparent = 1
+    overlayTop.alpha = transparent
+    overlayBottom.alpha = transparent
     overlayTop.strokeWidth = 1
     overlayBottom.strokeWidth = 1
     overlayTop:setStrokeColor(255, 0, 0)    
@@ -78,6 +79,8 @@ ts.desc("#Index section and row")
 ts.regist(0, function()
     local number = ts.table.dataSource:numberOfSections()
     print(number)
+    local bottom = ts.table:offsetToSection(number + 1)
+    print("scroll height should be", bottom)
 end, "number of sections")
 
 ts.regist(0, function()
