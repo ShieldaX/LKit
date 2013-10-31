@@ -95,7 +95,7 @@ end
 
 function TableViewCell:setHeight(height) 
   local delta = height - self.background.height
-  print("stretching height by", delta)
+  --print("stretching height by", delta)
   stretch.heightTo(self.background, height)
   stretch.heightTo(self.highlightedBackground, height)
   local contentHeight = self.background.contentHeight
@@ -117,7 +117,7 @@ end
 
 function TableViewCell:prepareForReuse()
   self:updateSelectionState()
-  print("I am ready to reuse now!")
+  --print("I am ready to reuse now!")
 end
 
 function TableViewCell:removeFromSuperview()

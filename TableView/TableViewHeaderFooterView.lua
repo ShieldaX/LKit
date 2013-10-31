@@ -20,7 +20,7 @@ function TableViewHeaderFooterView:initialize(opt)
   opt.width = opt.width
   opt.height = opt.height or 22
   View.initialize(self, opt)
-  
+  self.reuseIdentifier = opt.reuseIdentifier
   local bounds = self.bounds
   
   local rect = self.frame

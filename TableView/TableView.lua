@@ -43,6 +43,11 @@ local TableView = Scroll:subclass('TableView')
 -- @param opt Intent table for construct new instance.
 function TableView:initialize(opt)
   Scroll.initialize(self, opt)
+  local headerFooterLayer = display.newGroup()
+  headerFooterLayer.y = self.bounds.y
+  self.frame:insert(headerFooterLayer)
+  self.headerFooterView = headerFooterLayer
+  self._reusableHeaderFooterViews = {}
   self.sections = {}
   self.header = nil -- table header
   self.footer = nil -- table footer
@@ -101,9 +106,9 @@ function TableView:cellForRowAtIndexPath(indexPath)
           identifier = reuseIdentifier
         }
         self:sectionForIndex(section):insert(cell.frame) -- display in right position
-        print("create new cell instance.")
+        --print("create new cell instance.")
       else
-        print("reuse a cell instance.")        
+        --print("reuse a cell instance.")        
         cell.frame.y = offset
         cell:setHeight(dataSource:heightForRowAtIndexPath(indexPath))
         cell:setLabelText(dataSource:textForRowAtIndexPath(indexPath))
@@ -111,9 +116,6 @@ function TableView:cellForRowAtIndexPath(indexPath)
       end
       
       availableCells[name] = cell -- mark available at the same time
-    else
-      --print("no need to create or reuse")
-      --print(availableCells[name])
     end
     
   end
@@ -126,7 +128,7 @@ end
 function TableView:dequeueReusableCell(reuseIdentifier)
   local reusableCells = self._reusableCells
   -- Try to find cell with reuseIdentifier
-  cell = reusableCells[reuseIdentifier]
+  local cell = reusableCells[reuseIdentifier]
   if cell then
     cell:prepareForReuse()
     reusableCells[reuseIdentifier] = nil
@@ -160,12 +162,12 @@ function TableView:_queueReusableCells()
           previousCell:removeFromSuperview()
           reusableCells[identifier] = nil
           previousCell = nil
-          print("Cell already exists has been removed.")
+          --print("Cell already exists has been removed.")
         end
         reusableCells[identifier] = cell -- apply new cell instance
-        print("Cell with "..identifier.." became reusable.")
+        --print("Cell with "..identifier.." became reusable.")
       else
-        print("Cell not reusable will be removed...")
+        --print("Cell not reusable will be removed...")
         cell:removeFromSuperview()
       end
 
@@ -181,15 +183,41 @@ end
 
 function TableView:headerInSection(index)
   local section = self:sectionForIndex(index)
-  if not section.headerView then
-    local header = TableViewHeaderFooterView {
-      name = "headerView",
-      text = self.dataSource:titleForHeaderInSection(index),
-    }    
-    section:insert(header.frame)
-    section.headerView = header -- !reference
+  
+  if not section.header then
+    -- request reusble header any way
+    local header = self:dequeueReusableHeaderFooterView("globalHeader")
+    if not header then
+      -- just create new header footer view instance
+      header = TableViewHeaderFooterView {
+        name = "header",
+        --text = self.dataSource:titleForHeaderInSection(index),
+        text = self.dataSource:titleForHeaderInSection(index),
+        reuseIdentifier = "globalHeader",
+        --y = self:offsetToSection(index),
+      }
+      self.headerFooterView:insert(header.frame)
+      print("create new header instance")
+    else
+      print("reusing")
+      -- reuse already rendered header footer view
+      header:setText(self.dataSource:titleForHeaderInSection(index))      
+      --header:setText("reused")  
+    end
+    section.header = header
   end
-  return section.headerView
+  local contentOffset = - self.bounds.y
+  section.header.frame.y = self:offsetToSection(index) - contentOffset
+end
+
+function TableView:dequeueReusableHeaderFooterView(reuseIdentifier)
+  local reusableHeaderFooterViews = self._reusableHeaderFooterViews
+  local headerFooter = reusableHeaderFooterViews[reuseIdentifier]
+  if headerFooter then
+    headerFooter:prepareForReuse()
+    reusableHeaderFooterViews[reuseIdentifier] = nil
+  end
+  return headerFooter
 end
 
 function TableView:setHeaderView(opt)
@@ -242,45 +270,43 @@ function TableView:visibleCells()
 end
 
 -- Display table sections via their header/footer.
-function TableView:visibleSections() 
+function TableView:visibleSections()
   --TODO: merge this caculate into Runtime
   -- update visible limit
   local yMin = - self.bounds.y
   local yMax = yMin + self.background.contentHeight
   
-  local offset = 0
   -- loops throw all sections
   for s = 1, self.dataSource:numberOfSections() do
-    offset = self:offsetToSection(s) -- reset offset base at every begining
-    -- check rects intersection
-    local bottomOffset = self:offsetToSection(s+1)
-    if bottomOffset >= yMin and offset <= yMax then
-      -- section is visible, show its header
-      local header = self:headerInSection(s)
+    local top = self:offsetToSection(s)
+    local bottom = self:offsetToSection(s+1)
+    self:headerInSection(s)
+    -- check rects intersection to determine visible or not
+    if bottom >= yMin and top <= yMax then -- visible, show header
       local section = self:sectionForIndex(s)
-      if header then       
-        local inset = yMin - offset
-        if inset > 0 then
-          if bottomOffset - yMin > header.frame.contentHeight then
-            -- stuck header
-            self.frame:insert(header.frame)
-            header.frame.y = 0
-            -- mark as top section header
-            if self.topHeader then
-              -- remove previous one if needed
-              print("overlap")
-            end
-            self.topHeader = header
-          else 
-            -- push header
-            section:insert(header.frame)
-            header.frame.y = - header.frame.contentHeight
-            self.topHeader = nil
-          end
+      local header = section.header
+      if top < yMin then
+        -- top section header
+        local headerHeight = self.dataSource:heightForHeaderInSection(s)
+        if bottom >= yMin + headerHeight then
+          header.frame.y = 0
+          --print("stick header in section", s)
+        else
+          header.frame.y = bottom + self.bounds.y - headerHeight
+          --print("pushing up")
         end
-
       end
-      
+    else -- not visible, but is possible both above and blow.
+      local section = self:sectionForIndex(s)
+      local header = section.header
+      -- queue reusable header footer view
+      if header then
+        print("mark reusable")
+        if not self._reusableHeaderFooterViews[header.reuseIdentifier] then
+          self._reusableHeaderFooterViews[header.reuseIdentifier] = header
+        end
+        section.header = nil
+      end
     end
   end
 end
