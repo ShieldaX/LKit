@@ -66,13 +66,13 @@ ts.regist(0, function()
     local tableView = TableView {
         name = "testTable",
         backgroundColor = {255, 255, 255, 255},
-        y = 120,
-        height = 300,
+        --y = 120,
+        --height = 300,
       }
     tableView:setDataSource(data)
     --print_r(data.data)
     ts.table = tableView
-    --[create debug overlay
+    --[[create debug overlay
     local overlayTop = display.newRect( 0, 0, display.viewableContentWidth, 120 )
     local overlayBottom = display.newRect( 0, 420, display.viewableContentWidth, 60 )
     overlayTop:setFillColor(0, 0, 0)
@@ -84,7 +84,7 @@ ts.regist(0, function()
     overlayBottom.strokeWidth = 1
     overlayTop:setStrokeColor(255, 0, 0)    
     overlayBottom:setStrokeColor(255, 0, 0)
-    --create debug overlay]
+    --create debug overlay]]
 end, "create a table view")
 
 ts.desc("#Index section and row")
