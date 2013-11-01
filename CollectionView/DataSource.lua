@@ -29,7 +29,7 @@ function DataSource:initialize(opt)
   self.defaultRowWidth = 160
   self.defaultRowHeight = 43
   self.numberOfColumn = opt.numberOfColumn or 2
-  self.columnWidth = display.viewableContentWidth / self.numberOfColumn
+  self.columnWidth = math.floor(display.viewableContentWidth/self.numberOfColumn)
   self.data = self:map(opt.data)
 end
 
@@ -85,7 +85,7 @@ function DataSource:heightForRowAtIndexPath(path)
       local rowData = sectionData[row]
       if rowData then
         local height = rowData.height*(self.columnWidth/rowData.width)
-        return height or self.defaultRowHeight
+        return math.floor(height)
       end
     end
   end
@@ -135,7 +135,7 @@ end
 -- update and reload
 
 -- @merge True for merge rows in, false for add new sections
-function DataSource:updateWith(data, merge)
+function DataSource:updateData(data)
   -- table.remove from new data
   -- table.insert to origin data
   -- dispatchEvent({name = "dataUpdate"})

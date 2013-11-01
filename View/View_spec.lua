@@ -8,18 +8,29 @@ local util = require 'util'
 local ts = require 'spec_runner'
 local View = require 'View'
 
-local VCW = display.viewableContentWidth
-local VCH = display.viewableContentHeight
+local ACW = display.actualContentWidth
+local ACH = display.actualContentHeight
+local CW = display.contentWidth
+local CH = display.contentHeight
+local SOX = display.screenOriginX
+local SOY = display.screenOriginY
+
+ts.desc("#Test Pilot")
+ts.regist(0, function()
+    print("actual:", ACW, ACH)
+    print("content:", CW, CH)
+    print("origin:", SOX, SOY)
+end, "output device info")
 
 ts.desc("#Instance constructor")
-ts.regist(0, function()
+ts.regist(1, function()
     print("initialize")
     ts.blueColor = {90, 200, 255}
     local blue = ts.blueColor
     ts.window = View {
       name = "fullscreened",
-      y = 20,
-      width = VCW, height = VCH - 20,
+      --y = 20,
+      --width = VCW, height = VCH - 20,
       backgroundColor = blue,
       --cornerRadius = 10em,
       --backgroundFilter = "filter.blur",
@@ -27,8 +38,8 @@ ts.regist(0, function()
     local window = ts.window
     assert(window and window.name == "fullscreened", "incorrect name")
     assert(window.backgroundColor and window.backgroundColor == blue, "unmatched color")
-    assert(window.frame and window.frame.width == VCW and window.frame.height == VCH-20, "incorrect dimension")
-    assert(window.frame.y == 20)
+    --assert(window.frame and window.frame.width == VCW and window.frame.height == VCH-20, "incorrect dimension")
+    --assert(window.frame.y == 20)
     print(window.bounds.contentBounds.yMin)
     print(window.bounds.contentBounds.yMax)
 end, "display a fullscreen view")

@@ -263,6 +263,15 @@ function util.show_fps(opts)
 		self:insert(self.framerate)
 	end
 
+    -- pick lowest fps out every 30 frames
+    local function minLastFps(lastFps)
+        for i = 1, #lastFps do
+            if (lastFps[i] < 10000) then
+                return lastFps[i]
+            end
+        end
+    end
+
 	--
     -- update textual memory and fps numbers
 	--
@@ -277,15 +286,8 @@ function util.show_fps(opts)
 		lastFps[lastFpsCounter] = fps
 		lastFpsCounter = lastFpsCounter + 1
 		if(lastFpsCounter > maxFps) then lastFpsCounter = 1 end
-		-- pick lowest fps out every 30 frames
-		local function minLastFps()
-			for i = 1, #lastFps do
-				if (lastFps[i] < 10000) then
-					return lastFps[i]
-				end
-			end
-		end
-		local min=minLastFps() or 0
+
+		local min=minLastFps(lastFps) or 0
 		-- update fps text and change text colors
 		self:toFront()
 		local memoryUsed = system.getInfo("textureMemoryUsed")/1000000

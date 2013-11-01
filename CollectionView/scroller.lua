@@ -34,9 +34,16 @@ end
 -- update scrollable content height
 function scroller:updateScrollHeight()
   -- TODO: dynamic on data source if any.
-  --self.scrollHeight = self.bounds.contentHeight
-  self.scrollHeight = self:offsetToSection(self.dataSource:numberOfSections() + 1)
-
+  self.scrollHeight = self.bounds.contentHeight
+  --self.scrollHeight = self:offsetToSection(self.dataSource:numberOfSections() + 1)
+  --self.scrollHeight = self:offsetToRowAtIndexPath(self.dataSource:numberOfRowsInSection())
+  local dataSource = self.dataSource
+  local scrollHeight = self.scrollHeight
+  for i = 1, dataSource:numberOfSections() do
+    local lastIndexPath = {section = i, row = dataSource:numberOfRowsInSection(i)}
+    scrollHeight = math.max( scrollHeight, self:offsetToRowAtIndexPath(lastIndexPath) + dataSource:heightForRowAtIndexPath(lastIndexPath) )
+  end
+  self.scrollHeight = scrollHeight
   -- smallest scrolling height is view height
   if self.scrollHeight < self.background.contentHeight then    
     self.scrollHeight = self.background.contentHeight

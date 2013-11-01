@@ -50,7 +50,8 @@ function View:initialize(opt)
   -- implement paramters
   local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or ACH
   local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
-  
+  x = x + display.screenOriginX
+  y = y + display.screenOriginY*.5
   -- frame group
   local frame = display.newGroup()
   frame.x, frame.y = x, y

@@ -21,6 +21,10 @@ local View = class 'View'
 
 local ACW = display.actualContentWidth
 local ACH = display.actualContentHeight
+local CW = display.contentHeight
+local CH = display.contentHeight
+local SOX = display.screenOriginX
+local SOY = display.screenOriginY
 
 -- ======
 -- VARIABLES
@@ -48,7 +52,7 @@ function View:initialize(opt)
   
   -- Visual Appearance
   -- implement paramters
-  local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or ACH
+  local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or CH
   local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
   
   -- frame group
