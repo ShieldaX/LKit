@@ -3,6 +3,6 @@
 local util = require 'util'
 util.show_fps()
 
-local specRunner = require "TableView_spec"
---local specRunner = require "TableViewCell_spec"
+--local specRunner = require "DataSource_spec"
+local specRunner = require "CollectionView_spec"
 specRunner.run()

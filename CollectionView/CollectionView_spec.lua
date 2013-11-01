@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- DataSource_spec.lua
+-- CollectionView_spec.lua
 --
 -----------------------------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ local util = require 'util'
 local d = util.print_r
 local ts = require 'spec_runner'
 local DataSource = require 'DataSource'
+local CollectionView = require 'CollectionView'
 
 local VCW = display.viewableContentWidth
 local VCH = display.viewableContentHeight
@@ -32,14 +33,42 @@ local dataSource = {
 
 ts.desc("#Instance constructor")
 ts.regist(0, function()
-    local source = DataSource:new({data = dataSource})
+    local source = DataSource:new({numberOfColumn = 3, data = dataSource})
     d(source.data)
     ts.source = source
 end, "create a datasource")
 
+ts.regist(0, function()
+    local marginTop, viewHeight = 120, 300
+    ts.collection = CollectionView {
+      name = "collection",
+      y = marginTop,
+      height = viewHeight,
+      --backgroundColor = {255, 255, 255, 255},
+    }
+    ts.collection:setDataSource(ts.source)
+    --[create debug overlay
+    local overlayTop = display.newRect( 0, 0, display.viewableContentWidth, marginTop )
+    local overlayBottom = display.newRect( 0, marginTop + viewHeight, display.viewableContentWidth, display.contentHeight - marginTop + viewHeight )
+    overlayTop:setFillColor(0, 0, 0)
+    overlayBottom:setFillColor(0, 0, 0)
+    local transparent = 0.9
+    overlayTop.alpha = transparent
+    overlayBottom.alpha = transparent
+    overlayTop.strokeWidth = 1
+    overlayBottom.strokeWidth = 1
+    overlayTop:setStrokeColor(255, 0, 0)    
+    overlayBottom:setStrokeColor(255, 0, 0)
+    --create debug overlay]]
+end)
+
 ts.regist(1, function()
-    print(ts.source.columnWidth)
-    print(ts.source:heightForRowAtIndexPath({section = 1, row = 2}))
+  local collection = ts.collection
+  d(collection:indexPathsForRowsInBounds({yMin = 100, yMax = 400}))
+end)
+
+ts.regist(1, function()
+  local collection = ts.collection
 end)
 
 return ts

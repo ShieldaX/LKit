@@ -24,15 +24,28 @@ DataSource.static._version = "0.0.1"
 
 -- Instance Method
 function DataSource:initialize(opt)
-  self.data = opt.data
   self.defaultSectionHeaderHeight = 22
   self.defaultSectionFooterHeight = 22
+  self.defaultRowWidth = 160
   self.defaultRowHeight = 43
+  self.numberOfColumn = opt.numberOfColumn or 2
+  self.columnWidth = display.viewableContentWidth / self.numberOfColumn
+  self.data = self:map(opt.data)
 end
 
-function DataSource:initWithData(data)
-  assert(type(data) == "table", "WARNING: data must be wrapped in a table")
-  self:initialize({data = data})
+function DataSource:map(data)
+  local colNum = self.numberOfColumn
+  local mapped = {}
+  for c = 1, colNum do
+    mapped[c] = {}
+  end
+  for i = 1, #data do
+    local column = math.fmod( i, colNum )
+    if column == 0 then column = colNum end
+    table.insert(mapped[column], data[i])
+    --mapped[column][#mapped[column] + 1] = data[i]
+  end
+  return mapped
 end
 
 -- number of element
@@ -71,7 +84,8 @@ function DataSource:heightForRowAtIndexPath(path)
     if sectionData then
       local rowData = sectionData[row]
       if rowData then
-        return rowData.height or self.defaultRowHeight
+        local height = rowData.height*(self.columnWidth/rowData.width)
+        return height or self.defaultRowHeight
       end
     end
   end
@@ -102,6 +116,20 @@ function DataSource:textForRowAtIndexPath(indexPath)
     end
   end
   return ""
+end
+
+function DataSource:imageForRowAtIndexPath(indexPath)
+  return self:rowAtIndexPath(indexPath).image
+end
+
+function DataSource:rowAtIndexPath(indexPath)
+  local section, row = indexPath.section, indexPath.row
+  if section and row then
+    local sectionData = self.data[section]
+    if sectionData then
+      return sectionData[row]
+    end
+  end
 end
 
 -- update and reload
