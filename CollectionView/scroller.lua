@@ -2,7 +2,8 @@
 -- Enable scrolling module
 
 local util = require "util"
---local ABS = math.abs
+local Abs = math.abs
+local Max = math.max
 
 local scroller = {
   scrollEnabled = true,
@@ -41,7 +42,7 @@ function scroller:updateScrollHeight()
   local scrollHeight = self.scrollHeight
   for i = 1, dataSource:numberOfSections() do
     local lastIndexPath = {section = i, row = dataSource:numberOfRowsInSection(i)}
-    scrollHeight = math.max( scrollHeight, self:offsetToRowAtIndexPath(lastIndexPath) + dataSource:heightForRowAtIndexPath(lastIndexPath) )
+    scrollHeight = Max( scrollHeight, self:offsetToRowAtIndexPath(lastIndexPath) + dataSource:heightForRowAtIndexPath(lastIndexPath) )
   end
   self.scrollHeight = scrollHeight
   -- smallest scrolling height is view height
@@ -50,9 +51,9 @@ function scroller:updateScrollHeight()
   end
 end
 
-function scroller:updateLimitation()
+function scroller:updateLimitation() -- onUpdateScrollLimitation
   self:updateScrollHeight()
-  self.bottomLimit = self._topPadding
+  self.bottomLimit = self.yOffset or 0
   self.upperLimit = self.background.contentHeight - self.scrollHeight - self._bottomPadding
 end
 
@@ -109,13 +110,13 @@ function scroller:touch(event)
     
     -- Set focus
     display.getCurrentStage():setFocus( event.target, event.id )
-    target.isFocus = true
+    --target.isFocus = true
 
   elseif self.tracking then
     if "moved" == phase then      
       self._delta = event.y - self._prevYPos
       self._prevYPos = event.y
-      if math.abs(self._delta) > 0 then self.dragging = true end      
+      if Abs(self._delta) > 5 then self.dragging = true end      
       -- If the view is more than the limits, handle overscroll
       if contentView.y < self.upperLimit or contentView.y > self.bottomLimit then
         contentView.y = contentView.y + ( self._delta * 0.5 )
@@ -151,7 +152,7 @@ function scroller:touch(event)
       end
       
       display.getCurrentStage():setFocus( event.target, nil )
-      target.isFocus = false
+      --target.isFocus = false
     end
   end
   
@@ -184,7 +185,7 @@ function scroller:enterFrame(event)
     local timePassed = event.time - self._lastTime
     self._lastTime = event.time
     -- Stop scrolling if velocity is near zero
-    if math.abs( self.velocity ) < 0.1 then
+    if Abs( self.velocity ) < 0.1 then
       self.velocity = 0
       self.decelerating = false
     end

@@ -29,7 +29,8 @@ ts.regist(1, function()
     local blue = ts.blueColor
     ts.window = View {
       name = "fullscreened",
-      --y = 20,
+      y = SOY,
+      height = ACH,
       --width = VCW, height = VCH - 20,
       backgroundColor = blue,
       --cornerRadius = 10em,

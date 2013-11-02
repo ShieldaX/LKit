@@ -9,7 +9,7 @@ local d = util.print_r
 local ts = require 'spec_runner'
 local DataSource = require 'DataSource'
 local CollectionView = require 'CollectionView'
---util.hide_fps()
+util.hide_fps()
 
 local VCW = display.viewableContentWidth
 local VCH = display.viewableContentHeight
@@ -68,10 +68,11 @@ ts.regist(0, function()
 end, "create a datasource")
 
 ts.regist(0, function()
-    local marginTop, viewHeight = 0, 220
+    local marginTop, viewHeight = display.screenOriginY, 220
     ts.collection = CollectionView {
       name = "collection",
       y = marginTop,
+      yOffset = - display.screenOriginY,
       --height = viewHeight,
       --backgroundColor = {255, 255, 255, 255},
     }

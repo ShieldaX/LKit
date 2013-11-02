@@ -49,9 +49,8 @@ function View:initialize(opt)
   -- Visual Appearance
   -- implement paramters
   local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or ACH
-  local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
-  x = x + display.screenOriginX
-  y = y + display.screenOriginY*.5
+  self.xOffset, self.yOffset = opt.xOffset or 0, opt.yOffset or 0
+
   -- frame group
   local frame = display.newGroup()
   frame.x, frame.y = x, y
@@ -64,8 +63,8 @@ function View:initialize(opt)
   
   -- The bounds group, which describes the view¡¯s location and size in its own coordinate system.
   local bounds = display.newGroup()
+  bounds.x, bounds.y = self.xOffset, self.yOffset
   frame:insert(bounds)
-  bounds.x, bounds.y = xOffset, yOffset
   self.frame = frame
   self.bounds = bounds
   
