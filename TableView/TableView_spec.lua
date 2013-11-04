@@ -145,6 +145,27 @@ ts.regist(0, function()
     print_r(indexPaths)
 end, "indexPaths For Rows In Bounds")
 
+ts.desc("#interact with cell")
+ts.regist(1, function()
+    local tableView = ts.table
+    local y = 85
+    local testPoint = display.newCircle( 100, y, 2 )
+    testPoint:setFillColor(255, 0, 0)
+    ts.testIndexPath = tableView:indexPathForRowAtPoint({x = 100, y = y})
+    print_r(ts.testIndexPath)
+end, "indexPath at point")
+
+ts.regist(1, function()
+    local tableView = ts.table
+    local cellPointed = tableView:cellForRowAtIndexPath(ts.testIndexPath)
+    cellPointed:setHighlighted(true)
+    ts.cellPointed = cellPointed
+end, "cell at point")
+
+ts.regist(1, function()
+    ts.cellPointed:setHighlighted(false)
+end, "unhighlighted")
+
 --[[
 ts.regist(1, function()
 end, "move rows in sections")

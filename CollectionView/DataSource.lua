@@ -28,7 +28,7 @@ function DataSource:initialize(opt)
   self.defaultSectionFooterHeight = 22
   self.defaultRowWidth = 160
   self.defaultRowHeight = 43
-  self.numberOfColumn = opt.numberOfColumn or 2
+  self.numberOfColumn = opt.numberOfColumn or 1
   self.columnWidth = math.floor(display.viewableContentWidth/self.numberOfColumn)
   self.data = self:map(opt.data)
 end
@@ -118,12 +118,16 @@ function DataSource:textForRowAtIndexPath(indexPath)
   return ""
 end
 
+-- convenience function
 function DataSource:imageForRowAtIndexPath(indexPath)
   return self:rowAtIndexPath(indexPath).image
 end
 
+-- retrieve row data with index path
 function DataSource:rowAtIndexPath(indexPath)
   local section, row = indexPath.section, indexPath.row
+  assert(section > 0 and section <= self:numberOfSections(), "ERROR: Tring to retrive section with invalid index number")
+  --assert(row > 0 and row <= self:numberOfRowsInSection(), "ERROR: Tring to retrive row with invalid index number")
   if section and row then
     local sectionData = self.data[section]
     if sectionData then

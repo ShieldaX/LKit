@@ -108,8 +108,10 @@ end
 -- ---
 
 -- set cell's highlighted status
-function TableViewCell:setHighlighted()
-  self.highlightedBackground.isVisible = self.highlighted
+function TableViewCell:setHighlighted(highlighted)
+  assert(type(highlighted) == "boolean", "TYPE: highlighted expects boolean value, but got "..type(highlighted))
+  self.highlightedBackground.isVisible = highlighted
+  self.highlighted = highlighted
 end
 
 function TableViewCell:updateSelectionState()

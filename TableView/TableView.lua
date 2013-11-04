@@ -118,6 +118,7 @@ function TableView:cellForRowAtIndexPath(indexPath)
       availableCells[name] = cell -- mark available at the same time
     end
     
+    return availableCells[name]
   end
   
 end
@@ -316,7 +317,7 @@ end
 -- ------
 
 function TableView:indexPathForRowAtPoint(point)
-  local possiblePaths = self:indexPathsInBounds({yMin = point.y, yMax = point.y, xMin = point.x, xMax = point.x})
+  local possiblePaths = self:indexPathsForRowsInBounds({yMin = point.y, yMax = point.y, xMin = point.x, xMax = point.x})
   return #possiblePaths > 0 and possiblePaths[1]
 end
 

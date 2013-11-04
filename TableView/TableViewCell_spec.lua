@@ -41,13 +41,13 @@ end, "create a table view")
 
 ts.desc("#Response to user's action'")
 ts.regist(1, function()
-    ts.cell.highlighted = true
-    ts.cell:setHighlighted()
+    ts.cell:setHighlighted(true)
+    assert(ts.cell.highlighted == true)
 end, "set highlighted")
 
 ts.regist(1, function()
-    ts.cell.highlighted = false
-    ts.cell:setHighlighted()
+    ts.cell:setHighlighted(false)
+    assert(ts.cell.highlighted == false)
 end, "cancell highlighted")
 
 return ts

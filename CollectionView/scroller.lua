@@ -116,7 +116,7 @@ function scroller:touch(event)
     if "moved" == phase then      
       self._delta = event.y - self._prevYPos
       self._prevYPos = event.y
-      if Abs(self._delta) > 5 then self.dragging = true end      
+      if Abs(self._delta) > 1 then self.dragging = true end      
       -- If the view is more than the limits, handle overscroll
       if contentView.y < self.upperLimit or contentView.y > self.bottomLimit then
         contentView.y = contentView.y + ( self._delta * 0.5 )
