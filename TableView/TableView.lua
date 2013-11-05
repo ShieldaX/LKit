@@ -374,7 +374,8 @@ function TableView:offsetToSection(index)
   for i = 1, index - 1 do
     offset = offset + data:heightForHeaderInSection(i) + data:heightForFooterInSection(i)
     for r = 1, data:numberOfRowsInSection(i) do
-      offset = offset + data:heightForRowAtIndexPath({section = i, row = r})
+      print(r)
+      offset = offset + data:heightForRowAtIndexPath({section = i, row = r})      
     end
   end
   return offset

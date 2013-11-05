@@ -29,7 +29,7 @@ local dataSource = {
       {text = "Portugal"},
       {text = "Greece"},
       {text = "Netherlands"},
-      {text = "Finland"},
+      --{text = "Finland"},
     },
     {
       titleHeader = "Asia",
@@ -172,9 +172,14 @@ end, "move rows in sections")
 
 ts.regist(2, function()
 end, "move sections")
+]]
 
 ts.regist(2, function()
+  --table.remove(ts.table.dataSource.data[1], 1)
+  table.insert(ts.table.dataSource.data[1], 2, {text = "Finland"})
 end, "delete rows in sections")
+
+--[[
 
 ts.regist(1, function()
 end, "delete sections")
