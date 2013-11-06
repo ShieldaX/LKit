@@ -38,7 +38,7 @@ function scroller:updateScrollHeight()
   self.scrollHeight = self:offsetToSection(self.dataSource:numberOfSections() + 1)
 
   -- smallest scrolling height is view height
-  if self.scrollHeight < self.background.contentHeight then    
+  if self.scrollHeight < self.background.contentHeight then
     self.scrollHeight = self.background.contentHeight
   end
 end
@@ -58,13 +58,29 @@ function scroller:limitationReached(bounce) -- overscroll(bounce)
     limitHit = "bottom"
     if bounce == true then
       print("snap back to the top")
-      self.tween = transition.to( contentView, { time = bounceTime, y = self.bottomLimit, transition = easing.outQuad } )
+      --self.tween = transition.to( contentView, { time = bounceTime, y = self.bottomLimit, transition = easing.outQuad } )
+      --[ tracking bouncing motion to support runtime listener.
+      self.tween = transition.to( contentView, {
+        time = bounceTime,
+        y = self.bottomLimit,
+        transition = easing.outQuad,
+        onStart = function() self.bouncing = true end,
+        onComplete = function() self.bouncing = false end,
+      } )
+      --]
     end
   elseif contentView.y < self.upperLimit then
     limitHit = "top"
     if bounce == true then
       print("snap back to the bottom")
-      self.tween = transition.to( contentView, { time = bounceTime, y = self.upperLimit, transition = easing.outQuad } )
+      --self.tween = transition.to( contentView, { time = bounceTime, y = self.upperLimit, transition = easing.outQuad } )
+      self.tween = transition.to( contentView, {
+        time = bounceTime,
+        y = self.upperLimit,
+        transition = easing.outQuad,
+        onStart = function() self.bouncing = true end,
+        onComplete = function() self.bouncing = false end,
+      } )
     end
   end
   return limitHit
@@ -152,9 +168,6 @@ function scroller:touch(event)
 end
 
 function scroller:enterFrame(event)
-  self:_queueReusableCells()
-  --self:visibleSections()
-  self:visibleCells()
 
   local contentView = self.bounds
   -- dragging content  
@@ -191,6 +204,13 @@ function scroller:enterFrame(event)
     if limit == "top" or limit == "bottom" then
       self.decelerating = false
     end
+  end
+  -- if self is moving, so we need update visible content rect
+  if self.dragging or self.decelerating or self.bouncing then
+    print(os.time())
+    self:_queueReusableCells()
+    --self:visibleSections()
+    self:visibleCells()
   end
 end
 

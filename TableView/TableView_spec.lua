@@ -176,7 +176,7 @@ end, "move sections")
 
 ts.regist(2, function()
   --table.remove(ts.table.dataSource.data[1], 1)
-  table.insert(ts.table.dataSource.data[1], 2, {text = "Finland"})
+  --table.insert(ts.table.dataSource.data[1], 2, {text = "Finland"})
 end, "delete rows in sections")
 
 --[[

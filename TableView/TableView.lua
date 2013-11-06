@@ -56,7 +56,7 @@ function TableView:initialize(opt)
   self.selectedRow = nil -- indexPath point to selected row
   self.highlightedRow = nil -- indexPath point to row should be highlighted
   self.dataSource = nil
-  self.stuckSectionHeader = opt.stuckSectionHeader or true -- section headers stick to the top by default for better UX
+  --self.stuckSectionHeader = opt.stuckSectionHeader or true -- section headers stick to the top by default for better UX
 end
 
 -- ------
@@ -362,6 +362,7 @@ function TableView:setDataSource(data)
     self.dataSource = nil -- unload previous dataSource    
   end
   self.dataSource = data
+  self:visibleCells()
 end
 
 -- ------
@@ -374,7 +375,6 @@ function TableView:offsetToSection(index)
   for i = 1, index - 1 do
     offset = offset + data:heightForHeaderInSection(i) + data:heightForFooterInSection(i)
     for r = 1, data:numberOfRowsInSection(i) do
-      print(r)
       offset = offset + data:heightForRowAtIndexPath({section = i, row = r})      
     end
   end
