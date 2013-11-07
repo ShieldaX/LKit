@@ -16,10 +16,6 @@ local View = require 'View'
 -- ======
 local NavigationBar = View:subclass("NavigationBar")
 
-NavigationBar.static._tweenTime = 400 -- time for pushing and popping animation
-NavigationBar.static._tweenDelta = display.contentCenterX -- time for pushing and popping animation
-NavigationBar.static.hideShowBarDuration = 400 -- time for pushing and popping animation
-
 -- ======
 -- CONSTANTS
 -- ======
@@ -34,6 +30,20 @@ local SOY = display.screenOriginY
 -- ======
 -- VARIABLES
 -- ======
+
+NavigationBar.static._tweenTime = 400 -- time for pushing and popping animation
+NavigationBar.static._tweenDelta = display.contentCenterX -- time for pushing and popping animation
+NavigationBar.static.hideShowBarDuration = 400 -- time for pushing and popping animation
+
+local iconInfo = {
+  width = 40,
+  height = 40,
+  numFrames = 20,
+  sheetContentWidth = 200,
+  sheetContentHeight = 160
+}
+
+NavigationBar.static.icons = graphics.newImageSheet("assets/ios7icons.png", iconInfo)
 
 -- ======
 -- FUNCTIONS
@@ -53,13 +63,19 @@ function NavigationBar:initialize(opt)
   opt.backgroundColor = opt.backgroundColor or {255, 255, 255} -- display white background by default
   if opt.translucent==false then opt.backgroundColor[4] = 255 else opt.backgroundColor[4] = 240 end -- translucent setting
   opt.yOffset = display.topStatusBarContentHeight
-  View.initialize(self, opt)
-
+  View.initialize(self, opt)  
+  -- back button
+  local backButton = display.newImageRect(self.bounds, self.class.icons, 14, 40, 40)
+  backButton.y = 25
+  backButton.x = backButton.contentWidth*.4
+  backButton.isVisible = false
+  self.backButton = backButton
+  -- shadow
   local frame = self.frame
   local shadow = display.newRect( frame, 0, frame.contentHeight - 1, frame.contentWidth, 1 )
   shadow:setFillColor(153, 158, 165)
-  self.shadow = shadow
-
+  self.shadow = shadow  
+  -- items
   self.items = {} -- navigation item stack
   self.topItem, self.backItem = nil
   self.tween = nil
@@ -88,53 +104,119 @@ function NavigationBar:pushItem(item, animated)
     backItem.frame.alpha = 0
   end
 
+  -- back button
+  local backButton
+  if not item.hidesBackButton then
+    if not self.backButton.isVisible then
+      if backItem and not backItem.hidesBackButton then
+        -- prev button
+        print("should hides backItem backButton")
+      end
+      backButton = item.backButton or self.backButton
+      backButton.isVisible = true
+    elseif item.backButton then
+      pint("hides bar backButton first")
+      backButton = item.backButton
+      backButton.isVisible = true
+    end
+  else
+    if backItem and not backItem.hidesBackButton then
+      -- prev button
+      local prevBackButton = item.backButton or self.backButton      
+      print("should hides backItem backButton")
+      transition.to(prevBackButton, {time = time, alpha = 0})
+    end
+  end
+
   -- fade in and fade out if it's necessary
-  frame.isVisible = true
+  frame.isVisible = true  
   if animated == true then
+    local time = self.class._tweenTime
     if self.tween then transition.cancel(self.tween) end
-    if backItem then transition.from(backItem.frame, {time = self.class._tweenTime, alpha = 1, x = 0}) end
-    self.tween = transition.from(frame, {time = self.class._tweenTime, alpha = 0, x = self.class._tweenDelta})
+    self.tween = transition.from(frame, {time = time, alpha = 0, x = self.class._tweenDelta})
+    if backItem then
+      --TODO: manage transition, make it cancellable
+      transition.from(backItem.frame, {time = time, alpha = 1, x = 0})
+      if backButton and backButton.alpha == 1 then
+        transition.from(backButton, {time = time, alpha = 0})
+      end
+    end  
   end
 end
 
-function NavigationBar:popItem(animated)
+function NavigationBar:popItem(animated)  
   local items = self.items
-  if #items < 2 then print("WARNING: popping the last navigation item.") end
-  local item = table.remove(items) -- retain popped item
-  self.topItem = self.backItem
-  if #items > 1 then self.backItem = items[#items-1] end -- at least two item
-  local frame = item.frame
+  if #items < 2 then return print("WARNING: popping the last navigation item.") end
+  --if #items < 2 then print("WARNING: popping the last navigation item.") end
+  local item = table.remove(items) -- retain the popped item
+  
+  self.topItem = items[#items]
+  -- backItem exists when there are at least two items on stack.
+  if #items > 1 then
+    self.backItem = items[#items-1]
+  else
+    self.backItem = nil
+  end
   
   -- position item
+  local frame = item.frame
   frame.x = self.class._tweenDelta
   frame.alpha = 0
-  local backItem = self.backItem
-  if backItem then
-    backItem.frame.x = 0
-    backItem.frame.alpha = 1
+  -- current top item
+  local topItem = self.topItem
+  if topItem then
+    topItem.frame.x = 0
+    topItem.frame.alpha = 1
+  end
+
+  -- back button
+  local backButton
+  if topItem.hidesBackButton then
+    backButton = topItem.backButton or self.backButton
+    if backButton.isVisible then
+      backButton.alpha = 0
+    end
+  else
+    if topItem and not topItem.hidesBackButton then
+      -- prev button
+      curBackButton = topItem.backButton or self.backButton      
+      print("should show backItem backButton")
+      transition.to(curBackButton, {time = time, alpha = 1})
+    end
   end
 
   -- fade in and fade out if it's necessary
   frame.isVisible = true
   if animated == true then
+    local time = self.class._tweenTime
     if self.tween then transition.cancel(self.tween) end
-    if backItem then transition.from(backItem.frame, {time = self.class._tweenTime, alpha = 0, x = - self.class._tweenDelta}) end
-    self.tween = transition.from(frame, {time = self.class._tweenTime, alpha = 1, x = 0})
+    if topItem then
+      transition.from(topItem.frame, {time = time, alpha = 0, x = - self.class._tweenDelta})
+      if backButton and backButton.alpha == 0 then
+        transition.from(backButton, {time = time, alpha = 1})
+      end
+    end
+    self.tween = transition.from(frame, {time = time, alpha = 1, x = 0})
   end
+
+  return item
 end
 
-function NavigationBar:setHidden(hidden, animated)
+function NavigationBar:setItems(items, animated)
+  -- set navigation items stack directly
+end
+
+function NavigationBar:setBarHidden(hidden, animated)
   local frame = self.frame
   local transDelta = frame.contentHeight
   local originPos = frame.y
   if hidden == true then
-    if self.isHideen then return print("WARNING: navigator is already hidden.") end
+    --if self.isHideen then return print("WARNING: navigator is already hidden.") end
     frame.y = frame.yInitial - transDelta
-    print(frame.y)
   elseif self.isHideen then    
     frame.y = frame.yInitial
   else
-    print("WARNING: navigator is already display.")
+    --return print("WARNING: navigator is already display.")
   end
   self.isHideen = hidden or false
   if animated then

@@ -43,16 +43,6 @@ else
   NavigationItem.static.fontBoldItalic = "Helvetica-BoldItalic"
 end
 
-local iconInfo = {
-  width = 40,
-  height = 40,
-  numFrames = 20,
-  sheetContentWidth = 200,
-  sheetContentHeight = 160
-}
-
-NavigationItem.static.icons = graphics.newImageSheet("assets/ios7icons.png", iconInfo)
-
 -- ======
 -- FUNCTIONS
 -- ======
@@ -84,12 +74,7 @@ function NavigationItem:initialize(opt)
   self.leftButtons = {}
   self.rightButtons = {}
   self.rightButton = self.rightButtons[1]
-  
-  local backButton = display.newImageRect(bounds, self.class.icons, 14, 40, 40)
-  backButton.y = self.background.contentHeight*.5
-  backButton.x = backButton.contentWidth*.4
-  --backButton.isVisible = false
-  self.backButton = backButton
+  self.hidesBackButton = opt.hidesBackButton or false
 end
 
 function NavigationItem:setTintColor(color)
