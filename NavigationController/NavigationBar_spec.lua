@@ -43,11 +43,23 @@ ts.regist(2, function()
 end, "push item")
 
 ts.regist(2, function()
+    local second = NavigationItem {
+      name = "third", title = "People",
+      hidesBackButton = false,
+    }
+    ts.nav:pushItem(third, true)
+    print("pushing", second.name)
+    print("top:", ts.nav.topItem.name)
+    print("back:", ts.nav.backItem.name)
+end, "push item")
+
+ts.regist(2, function()
     ts.nav:popItem(true)
     print("top:", ts.nav.topItem.name)
     assert(not ts.nav.backItem)
 end, "pop item")
 
+ts.desc("#show and hide navigator")
 ts.regist(1, function()
     ts.nav:setBarHidden(true, true)
     timer.performWithDelay( 200, function(event)
@@ -62,10 +74,10 @@ ts.regist(1, function()
     timer.performWithDelay( 1600, function(event)
       ts.nav:setBarHidden(true, true)
     end)
-end)
+end, "hide navigator")
 
 ts.regist(4, function()
     ts.nav:setBarHidden(false, true)
-end)
+end, "show navigator")
 
 return ts

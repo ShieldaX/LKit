@@ -225,5 +225,4 @@ function NavigationBar:setBarHidden(hidden, animated)
   end
 end
 
-
 return NavigationBar
