@@ -8,8 +8,9 @@
 -- LIBRARIES
 -- ======
 local util = require 'util'
---local class = require 'middleclass'
+local class = require 'middleclass'
 local View = require 'View'
+local NavigationItem = require 'NavigationItem'
 
 -- ======
 -- CLASS
@@ -87,7 +88,8 @@ end
 -- @param item NavigationItem instance to push.
 -- @param animated True if the navigation bar should be animated; otherwise, false.
 function NavigationBar:pushItem(item, animated)
-  --if not item isInstanceOf NavigationItem then return end
+  local Object = class.Object
+  assert(Object.isInstanceOf(item, NavigationItem), "ERROR: item is not a valid NavigationItem instance")
   local items = self.items
   table.insert(items, item)
   self.backItem = self.topItem
