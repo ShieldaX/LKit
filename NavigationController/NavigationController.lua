@@ -1,6 +1,7 @@
 -----------------------------------------------
 -- @class: NavigationBar
 -- @file NavigationBar.lua - v0.0.1 (2013-09)
+-- Container view controller with a controller stack.
 -----------------------------------------------
 -- created at: 2013-09-25 10:30:13
 
@@ -10,12 +11,13 @@
 local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
+local NavigationBar = require 'NavigationBar'
 local NavigationItem = require 'NavigationItem'
 
 -- ======
 -- CLASS
 -- ======
-local NavigationBar = View:subclass("NavigationBar")
+local NavigationController = class("NavigationController")
 
 -- ======
 -- CONSTANTS
@@ -32,19 +34,8 @@ local SOY = display.screenOriginY
 -- VARIABLES
 -- ======
 
-NavigationBar.static._tweenTime = 400 -- time for pushing and popping animation
-NavigationBar.static._tweenDelta = display.contentCenterX -- time for pushing and popping animation
-NavigationBar.static.hideShowBarDuration = 400 -- time for pushing and popping animation
-
-local iconInfo = {
-  width = 40,
-  height = 40,
-  numFrames = 20,
-  sheetContentWidth = 200,
-  sheetContentHeight = 160
-}
-
-NavigationBar.static.icons = graphics.newImageSheet("assets/ios7icons.png", iconInfo)
+NavigationController.static.pushPopDistance = CW
+NavigationController.static.pushPopDuration = 400 -- time for pushing and popping animation
 
 -- ======
 -- FUNCTIONS
@@ -55,34 +46,8 @@ NavigationBar.static.icons = graphics.newImageSheet("assets/ios7icons.png", icon
 -- ------
 
 --- Instance constructor
--- @param opt Intent table for construct new instance.
-function NavigationBar:initialize(opt)
-  opt.x, opt.y = SOX, SOY
-  opt.width = CW
-  opt.name = opt.name or "navigator"
-  opt.height = display.topStatusBarContentHeight + 50
-  opt.backgroundColor = opt.backgroundColor or {255, 255, 255} -- display white background by default
-  if opt.translucent==false then opt.backgroundColor[4] = 255 else opt.backgroundColor[4] = 240 end -- translucent setting
-  opt.yOffset = display.topStatusBarContentHeight
-  View.initialize(self, opt)  
-  -- back button
-  local backButton = display.newImageRect(self.bounds, self.class.icons, 14, 40, 40)
-  backButton.y = 25
-  backButton.x = backButton.contentWidth*.4
-  backButton.isVisible = false
-  self.backButton = backButton
-  -- shadow
-  local frame = self.frame
-  local shadow = display.newRect( frame, 0, frame.contentHeight - 1, frame.contentWidth, 1 )
-  shadow:setFillColor(153, 158, 165)
-  self.shadow = shadow  
-  -- items
-  self.items = {} -- navigation item stack
-  self.topItem, self.backItem = nil
-  self.tween = nil
-  self.offsetTotitle = 0
-  self.frame.yInitial = self.frame.y
-  self.isHideen = false
+function NavigationController:initialize(opt)
+
 end
 
 -- @param item NavigationItem instance to push.
@@ -115,15 +80,12 @@ function NavigationBar:pushItem(item, animated)
         print("should hides backItem backButton")
       end
       backButton = item.backButton or self.backButton
-      backButton.alpha = 1
       backButton.isVisible = true
     elseif item.backButton then
       pint("hides bar backButton first")
       backButton = item.backButton
-      backButton.alpha = 1
       backButton.isVisible = true
     end
-    --print("shold show backButton for", item.name)
   else
     if backItem and not backItem.hidesBackButton then
       -- prev button
@@ -140,10 +102,9 @@ function NavigationBar:pushItem(item, animated)
     if self.tween then transition.cancel(self.tween) end
     self.tween = transition.from(frame, {time = time, alpha = 0, x = self.class._tweenDelta})
     if backItem then
-      print(backItem.name)
       --TODO: manage transition, make it cancellable
       transition.from(backItem.frame, {time = time, alpha = 1, x = 0})
-      if backButton then
+      if backButton and backButton.alpha == 1 then
         transition.from(backButton, {time = time, alpha = 0})
       end
     end  
@@ -154,8 +115,8 @@ function NavigationBar:popItem(animated)
   local items = self.items
   if #items < 2 then return print("WARNING: popping the last navigation item.") end
   --if #items < 2 then print("WARNING: popping the last navigation item.") end
-  local item = table.remove(items) -- retain the popped item  
-
+  local item = table.remove(items) -- retain the popped item
+  
   self.topItem = items[#items]
   -- backItem exists when there are at least two items on stack.
   if #items > 1 then
@@ -199,20 +160,13 @@ function NavigationBar:popItem(animated)
     if topItem then
       transition.from(topItem.frame, {time = time, alpha = 0, x = - self.class._tweenDelta})
       if backButton and backButton.alpha == 0 then
-        transition.from(backButton, {time = time, alpha = 1, onComplete = function()
-          backButton.isVisible = false
-        end})
+        transition.from(backButton, {time = time, alpha = 1})
       end
     end
-    self.tween = transition.from(frame, {time = time, alpha = 1, x = 0, onComplete = function()
-      item:removeFromSuperview()
-    end})
-  else
-    if backButton then backButton.isVisible = false end
-    item:removeFromSuperview()
+    self.tween = transition.from(frame, {time = time, alpha = 1, x = 0})
   end
 
-  --return item
+  return item
 end
 
 function NavigationBar:setItems(items, animated)

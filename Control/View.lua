@@ -49,34 +49,34 @@ function View:initialize(opt)
   assert(string.find(name, "_", 1) ~= 1, "can't resolve '_' prefixed subview.")
   assert(not string.find(name, "-", 1), "can't resolve '-' contained subview.")
   self.name = name
-
+  
   -- Visual Appearance
   -- implement paramters
   local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or CH
   local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
-
+  
   -- frame group
   local frame = display.newGroup()
   frame.x, frame.y = x, y
-
+  
   -- background rect is used for event handling.
   -- background is still used for compute frame's dimension.
   self.background = display.newRect(frame, 0, 0, width, height) -- insert background rect in frame group
-  self.backgroundColor = opt.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent
+  self.backgroundColor = opt.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent  
   self.background:setFillColor(unpack(self.backgroundColor))
-
+  
   -- The bounds group, which describes the view¡¯s location and size in its own coordinate system.
   local bounds = display.newGroup()
   frame:insert(bounds)
   bounds.x, bounds.y = xOffset, yOffset
   self.frame = frame
   self.bounds = bounds
-
+  
   -- View Hierarchy
   --self.subviews = {}
   self.superview = false -- not exist yet
   self.window = false -- not exist before insert into a window view.
-
+  
   -- Layout
   self.clipToBounds = opt.clipToBounds or false
 end
@@ -120,11 +120,11 @@ function View:addSubview(view, zIndex)
 end
 
 --- Remove a subview (current view) from its parent
-function View:removeFromSuperview()
+-- @param view Name of the parent view.
+function View:removeFromSuperview(view)
   local frame = self.frame
-  -- If the view’s superview is not nil, the superview releases the view.
   local superview = self.superview
-  if superview then superview[self.name] = nil end
+  superview[self.name] = nil
   self.superview = false
   self.window = false
   frame:removeSelf()
@@ -155,7 +155,7 @@ function View:isDescendantOfView(view)
       depth = depth + 1
     end
   end
-
+  
   return false
 end
 

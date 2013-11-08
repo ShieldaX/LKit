@@ -65,6 +65,42 @@ ts.regist(2, function()
     assert(not ts.nav.backItem)
 end, "pop item second time")
 
+ts.regist(2, function()
+    print("top:", ts.nav.topItem.name)
+    assert(not ts.nav.backItem)
+    local second = NavigationItem {
+      name = "clip", title = "Animals",
+      hidesBackButton = false,
+    }
+    ts.nav:pushItem(second, true)
+    print("pushing", second.name)
+    print("top:", ts.nav.topItem.name)
+    print("back:", ts.nav.backItem.name)
+end, "push second item")
+
+ts.regist(2, function()
+    local third = NavigationItem {
+      name = "third", title = "People",
+      hidesBackButton = false,
+    }
+    ts.nav:pushItem(third, true)
+    print("pushing", third.name)
+    print("top:", ts.nav.topItem.name)
+    print("back:", ts.nav.backItem.name)
+end, "push third item")
+
+ts.regist(2, function()
+    ts.nav:popItem(true)
+    print("top:", ts.nav.topItem.name)
+    print("back:", ts.nav.backItem.name)
+end, "pop item first time")
+
+ts.regist(2, function()
+    ts.nav:popItem(true)
+    print("top:", ts.nav.topItem.name)
+    assert(not ts.nav.backItem)
+end, "pop item second time")
+
 ts.desc("#show and hide navigator")
 ts.regist(1, function()
     ts.nav:setBarHidden(true, true)

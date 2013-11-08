@@ -79,6 +79,8 @@ function View:initialize(opt)
   
   -- Layout
   self.clipToBounds = opt.clipToBounds or false
+
+  self.exclusiveTouch = false -- touch focus on self
 end
 
 -- ------
