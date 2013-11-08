@@ -227,4 +227,8 @@ function NavigationBar:setBarHidden(hidden, animated)
   end
 end
 
+function NavigationBar:setBackgroundImage(imagePath)
+  -- stretch image to fit bar's bounds
+end
+
 return NavigationBar

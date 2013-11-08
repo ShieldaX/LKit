@@ -60,6 +60,8 @@ function NavigationItem:initialize(opt)
   opt.backgroundColor = {255, 255, 255, 0} -- force display transparent background
   View.initialize(self, opt)
   local bounds = self.bounds
+  
+  -- title
   local text = opt.title or opt.name
   local title = display.newText {
     parent = bounds,
@@ -69,16 +71,41 @@ function NavigationItem:initialize(opt)
     fontSize = 20,
     align = "center"
   }
-  title:setTextColor(0, 0, 0, 255)
+  self.tintColor = {0, 0, 0, 255}
+  title:setTextColor(unpack(self.tintColor))
   self.titleView = title
+  self.title = title.text
+  
+  -- bar buttons
   self.leftButtons = {}
   self.rightButtons = {}
   self.rightButton = self.rightButtons[1]
+  self.leftButton = self.leftButtons[1]
+  
   self.hidesBackButton = opt.hidesBackButton or false
+
+  -- A Boolean value indicating whether the left items are displayed in addition to the back button.
+  self.appendToBackButton = opt.appendToBackButton or true
+end
+
+-- ---
+-- Customizing Views
+-- ---
+function NavigationItem:setLeftButton(button, animated)
+  local leftButtons = self.leftButtons
+  table.insert(leftButtons, 1, button)
+  self.leftButton = button
+  button.frame.isVisible = false
+  button.y = self.titleView.y
+  button.x = button.frame.contentBounds*.5
+  if animated == true then
+    
+  end
 end
 
 function NavigationItem:setTintColor(color)
-  -- body
+  self.titleView:setTextColor(unpack(color))
+  self.tintColor = color
 end
 
 return NavigationItem

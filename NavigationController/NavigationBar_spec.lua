@@ -45,7 +45,7 @@ end, "push second item")
 ts.regist(2, function()
     local third = NavigationItem {
       name = "third", title = "People",
-      hidesBackButton = false,
+      hidesBackButton = true,
     }
     ts.nav:pushItem(third, true)
     print("pushing", third.name)
@@ -84,7 +84,7 @@ ts.regist(1, function()
     ]]
 end, "hide navigator")
 
-ts.regist(4, function()
+ts.regist(2, function()
     ts.nav:setBarHidden(false, true)
 end, "show navigator")
 
