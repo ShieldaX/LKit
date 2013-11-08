@@ -62,7 +62,7 @@ function NavigationBar:initialize(opt)
   opt.name = opt.name or "navigator"
   opt.height = display.topStatusBarContentHeight + 50
   opt.backgroundColor = opt.backgroundColor or {255, 255, 255} -- display white background by default
-  if opt.translucent==false then opt.backgroundColor[4] = 255 else opt.backgroundColor[4] = 240 end -- translucent setting
+  if opt.translucent==false then opt.backgroundColor[4] = 255 else opt.backgroundColor[4] = 200 end -- translucent setting
   opt.yOffset = display.topStatusBarContentHeight
   View.initialize(self, opt)  
   -- back button
@@ -138,13 +138,13 @@ function NavigationBar:pushItem(item, animated)
   if animated == true then
     local time = self.class._tweenTime
     if self.tween then transition.cancel(self.tween) end
-    self.tween = transition.from(frame, {time = time, alpha = 0, x = self.class._tweenDelta})
+    self.tween = transition.from(frame, {time = time, alpha = 0, x = self.class._tweenDelta, transition = easing.inOutQuad})
     if backItem then
       print(backItem.name)
       --TODO: manage transition, make it cancellable
-      transition.from(backItem.frame, {time = time, alpha = 1, x = 0})
+      transition.from(backItem.frame, {time = time, alpha = 1, x = 0, transition = easing.inOutQuad})
       if backButton then
-        transition.from(backButton, {time = time, alpha = 0})
+        transition.from(backButton, {time = time, alpha = 0, transition = easing.inOutQuad})
       end
     end  
   end
@@ -187,7 +187,7 @@ function NavigationBar:popItem(animated)
       -- prev button
       curBackButton = topItem.backButton or self.backButton      
       print("should show backItem backButton")
-      transition.to(curBackButton, {time = time, alpha = 1})
+      transition.to(curBackButton, {time = time, alpha = 1, transition = easing.inOutQuad})
     end
   end
 
@@ -197,14 +197,14 @@ function NavigationBar:popItem(animated)
     local time = self.class._tweenTime
     if self.tween then transition.cancel(self.tween) end
     if topItem then
-      transition.from(topItem.frame, {time = time, alpha = 0, x = - self.class._tweenDelta})
+      transition.from(topItem.frame, {time = time, alpha = 0, x = - self.class._tweenDelta, transition = easing.inOutQuad})
       if backButton and backButton.alpha == 0 then
-        transition.from(backButton, {time = time, alpha = 1, onComplete = function()
+        transition.from(backButton, {time = time, alpha = 1, transition = easing.inOutQuad, onComplete = function()
           backButton.isVisible = false
         end})
       end
     end
-    self.tween = transition.from(frame, {time = time, alpha = 1, x = 0, onComplete = function()
+    self.tween = transition.from(frame, {time = time, alpha = 1, x = 0, transition = easing.inOutQuad, onComplete = function()
       item:removeFromSuperview()
     end})
   else

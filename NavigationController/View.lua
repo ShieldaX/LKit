@@ -62,7 +62,7 @@ function View:initialize(opt)
   -- background rect is used for event handling.
   -- background is still used for compute frame's dimension.
   self.background = display.newRect(frame, 0, 0, width, height) -- insert background rect in frame group
-  self.backgroundColor = opt.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent
+  self.backgroundColor = opt.backgroundColor or {255, 255, 255, 255}  -- color table, default is transparent
   self.background:setFillColor(unpack(self.backgroundColor))
 
   -- The bounds group, which describes the view¡¯s location and size in its own coordinate system.
