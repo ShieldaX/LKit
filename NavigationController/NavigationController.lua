@@ -50,6 +50,7 @@ NavigationController.static.pushPopDuration = 400 -- time for pushing and poppin
 function NavigationController:initialize(opt)
   self.controllers = {} -- contollers table
   self.topController = nil
+  self.backController = nil
   self.visibleController = nil
   self.popGesture = opt.popGesture
 
@@ -66,13 +67,15 @@ function NavigationController:initialize(opt)
   self.view.frame:insert(self.navigationBar.frame)
   self.navigationBar.frame.y = 0
   
-  local rootController = ViewController {name = opt.name, title = opt.title}
+  local rootController = ViewController {name = opt.name, title = opt.title, hidesBackButton = true}
   self:pushController(rootController, false)
 end
 
+-- Push new controller to top of stack
 function NavigationController:pushController(controller, animated)
   local controllers = self.controllers
   table.insert(controllers, controller)
+  self.backController = self.topController
   self.topController = controller
   
   controller:loadView()
@@ -83,21 +86,42 @@ function NavigationController:pushController(controller, animated)
   -- navigation bar
   if controller.navigationItem then
     print("pushing navigation item")
-    self.navigationBar:pushItem(controller.navigationItem, true)
+    self.navigationBar:pushItem(controller.navigationItem, animated)
+  end
+
+  --TODO: call back controller pause
+  if self.backController then
+    backFrame = self.backController.view.frame
+    --self.backController:send("pause")
+  end
+  local function hidesBackFrame()
+    if backFrame then backFrame.isVisible = false end
   end
 
   -- moving horizontal
   if animated == true then
-    self.tween = transition.to(view.frame, {x = 0, transition = easing.inOutExpo})
+    self.tween = transition.from(view.frame, {x = view.frame.contentWidth, transition = easing.inOutExpo, onComplete = hidesBackFrame})
   else
-    --view.frame.x = 0
+    hidesBackFrame()
   end
 
   self.visibleController = controller
 end
 
 function NavigationController:popController(animated)
-  -- body
+  local controllers = self.controllers
+  assert(#controllers > 1, "ERROR: Try to pop the last view controller")
+  local controller = table.remove(controllers) -- remove top controller
+  self.topController = controllers[#controllers]
+  self.backController = controllers[#controllers - 1]
+
+  local function finalController()
+    controller:finalize()
+  end
+end
+
+function NavigationController:rootController()
+  return self.controllers[1]
 end
 
 function NavigationController:popToController(controller, animated)

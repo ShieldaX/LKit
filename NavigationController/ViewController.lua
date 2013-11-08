@@ -46,18 +46,20 @@ function ViewController:initialize(opt)
   assert(type(opt.title) == "string", "ERROR: title expects a string value, got "..type(opt.title))
   self.name = opt.name
   self.title = opt.title
-  self.navigationItem = NavigationItem { 
-    name = "login", title = "SIGN IN",
-    hidesBackButton = true,
+  
+  local navigationItem = opt.navigationItem or NavigationItem { 
+    name = self.name, title = self.title:upper(),
+    hidesBackButton = opt.hidesBackButton,
   }
-end
+  self.navigationItem = navigationItem
 
-function ViewController:loadView()
-  self.view = View {
-    name = self.name,    
-    height = ACH,
-    backgroundColor = {204, 204, 204, 255}, -- #ccc
-  }
+  function self:loadView()
+    self.view = View {
+      name = self.name,    
+      height = ACH,
+      backgroundColor = {204, 204, 204, 255}, -- #ccc
+    }
+  end
 end
 
 return ViewController
