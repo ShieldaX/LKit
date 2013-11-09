@@ -46,6 +46,12 @@ ts.regist(2, function()
       }
     end
     ts.ctrl:pushController(clipContoller, true)
-end)
+end, "push a view controller")
+
+ts.regist(2, function()
+    local ctrl = ts.ctrl
+    ctrl:popController(true)
+
+end, "pop a view controller")
 
 return ts

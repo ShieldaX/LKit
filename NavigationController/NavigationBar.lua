@@ -60,7 +60,10 @@ function NavigationBar:initialize(opt)
   opt.x, opt.y = SOX, SOY
   opt.width = CW
   opt.name = opt.name or "navigator"
-  opt.height = display.topStatusBarContentHeight + 50
+
+  local shadowHeight = opt.shadowHeight or 1
+
+  opt.height = display.topStatusBarContentHeight + 50 - shadowHeight
   opt.backgroundColor = opt.backgroundColor or {255, 255, 255} -- display white background by default
   if opt.translucent==false then opt.backgroundColor[4] = 255 else opt.backgroundColor[4] = 200 end -- translucent setting
   opt.yOffset = display.topStatusBarContentHeight
@@ -73,9 +76,9 @@ function NavigationBar:initialize(opt)
   self.backButton = backButton
   -- shadow
   local frame = self.frame
-  local shadow = display.newRect( frame, 0, frame.contentHeight - 1, frame.contentWidth, 1 )
+  local shadow = display.newRect( frame, 0, frame.contentHeight, frame.contentWidth, shadowHeight )
   shadow:setFillColor(153, 158, 165)
-  self.shadow = shadow  
+  self.shadow = shadow
   -- items
   self.items = {} -- navigation item stack
   self.topItem, self.backItem = nil
@@ -238,8 +241,16 @@ function NavigationBar:setBarHidden(hidden, animated)
   end
 end
 
+-- ---
+-- Config Appearance
+-- ---
+
 function NavigationBar:setBackgroundImage(imagePath)
   -- stretch image to fit bar's bounds
+end
+
+function NavigationBar:setTextAttributes(attributes)
+  -- titleVerticalAdjustment, font, fontSize, ...
 end
 
 return NavigationBar

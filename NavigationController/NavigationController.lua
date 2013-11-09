@@ -78,31 +78,29 @@ function NavigationController:pushController(controller, animated)
   self.backController = self.topController
   self.topController = controller
   
+  -- load view before moving
   controller:loadView()
   local view = controller.view
-  util.print_r(view.background.contentBounds)
   self.view:addSubview(view)
-  
-  -- navigation bar
-  if controller.navigationItem then
-    print("pushing navigation item")
-    self.navigationBar:pushItem(controller.navigationItem, animated)
+  controller:appear()
+
+  local function hidesBackController()
+    if self.backController then
+      self.backController:disappear()
+    end
   end
 
-  --TODO: call back controller pause
-  if self.backController then
-    backFrame = self.backController.view.frame
-    --self.backController:send("pause")
-  end
-  local function hidesBackFrame()
-    if backFrame then backFrame.isVisible = false end
+  -- navigation bar
+  if controller.navigationItem then
+    --print("pushing navigation item")
+    self.navigationBar:pushItem(controller.navigationItem, animated)
   end
 
   -- moving horizontal
   if animated == true then
-    self.tween = transition.from(view.frame, {x = view.frame.contentWidth, transition = easing.inOutExpo, onComplete = hidesBackFrame})
+    self.tween = transition.from(view.frame, {x = view.frame.contentWidth, transition = easing.inOutExpo, onComplete = hidesBackController})
   else
-    hidesBackFrame()
+    hidesBackController()
   end
 
   self.visibleController = controller
@@ -111,13 +109,35 @@ end
 function NavigationController:popController(animated)
   local controllers = self.controllers
   assert(#controllers > 1, "ERROR: Try to pop the last view controller")
-  local controller = table.remove(controllers) -- remove top controller
-  self.topController = controllers[#controllers]
-  self.backController = controllers[#controllers - 1]
+  
+  -- remove top controller
+  local controller = table.remove(controllers)
 
-  local function finalController()
+  -- move index back
+  self.topController = controllers[#controllers]
+  self.backController = controllers[#controllers - 1] --nil if #controllers == 1
+
+  local function switchController()
     controller:finalize()
+    self.topController:appear()
   end
+
+  -- frame need will move out
+  local frame = controller.view.frame
+
+  -- navigation bar
+  --print("popping navigation item")
+  self.navigationBar:popItem(animated)
+
+  -- moving horizontal
+  if animated == true then
+    --transition.cancel("navigationTween")
+    self.tween = transition.to(frame, {x = frame.contentWidth, transition = easing.inOutExpo, onComplete = switchController})
+  else
+    switchController()
+  end
+
+  self.visibleController = self.topController
 end
 
 function NavigationController:rootController()
