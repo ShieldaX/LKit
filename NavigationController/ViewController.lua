@@ -47,6 +47,7 @@ function ViewController:initialize(opt)
   self.name = opt.name
   self.title = opt.title
   self.view = nil
+  self.superController = nil
 
   -- config navigation item for navigation bar
   local navigationItem = opt.navigationItem or NavigationItem { 
@@ -57,8 +58,9 @@ function ViewController:initialize(opt)
 
   -- implement UIs before present
   function self:loadView()
+    if self.view then return print("View already exists") end
     self.view = View {
-      name = self.name,    
+      name = self.name,
       height = ACH,
       backgroundColor = {204, 204, 204, 255}, -- #ccc
     }
@@ -67,6 +69,7 @@ function ViewController:initialize(opt)
 
   function self:unloadView()
     local view = self.view
+    -- remove view from super controller's container view
     if view then view:removeFromSuperview() end
     self.view = nil
   end
@@ -84,6 +87,9 @@ function ViewController:initialize(opt)
   -- stop function in memory
   function self:finalize()
     print(self.name, "finalizing...")
+    if self.superController then
+      self.superController = nil
+    end
   end
 end
 

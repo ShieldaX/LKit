@@ -78,12 +78,13 @@ function NavigationController:pushController(controller, animated)
   self.backController = self.topController
   self.topController = controller
   
+  controller.superController = self
   -- load view before moving
   controller:loadView()
   local view = controller.view
   self.view:addSubview(view)
   controller:appear()
-
+  
   local function hidesBackController()
     if self.backController then
       self.backController:disappear()
