@@ -131,4 +131,8 @@ function Button:addTarget(obj, action)
   print("responses to", action)
 end
 
+function Button:removeTarget(obj, action)
+  self.frame:removeEventListener(action, obj)
+end
+
 return Button

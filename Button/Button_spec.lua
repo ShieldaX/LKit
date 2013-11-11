@@ -36,6 +36,7 @@ ts.regist(0, function()
     local sampleLabel = Label {
       name = "sample",
       text = "Controll State",
+      width = 200, height = 200,
     }
 
     function sampleLabel:release(action)
@@ -52,7 +53,13 @@ ts.regist(1, function()
 end, "set label's content")
 
 ts.regist(1, function()
+    local sampleObj = {type = "object"}
+
+    function sampleObj:release(action)
+      print(self.type .. " perform " .. action.name)
+    end
     ts.button:addTarget(ts.label, "release")
+    ts.button:addTarget(sampleObj, "release")
 end, "button add target")
 
 return ts

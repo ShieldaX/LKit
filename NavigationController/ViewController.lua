@@ -10,6 +10,7 @@
 local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
+local NavigationController = require 'NavigationController'
 local NavigationItem = require 'NavigationItem'
 
 -- ======
@@ -46,8 +47,11 @@ function ViewController:initialize(opt)
   assert(type(opt.title) == "string", "ERROR: title expects a string value, got "..type(opt.title))
   self.name = opt.name
   self.title = opt.title
-  self.view = nil
-  self.superController = nil
+  self.view = nil -- UI
+  self.parentController = nil -- The container view controller this is contained in.
+  self.presentedController = nil -- The view controller that is presented by this view controller.
+  self.presentingController = nil -- The view controller that presented this view controller.
+  self.navigationController = nil -- The nearest ancestor in the view controller hierarchy that is a navigation controller. Set by navigation contoller itself while pushing.
 
   -- config navigation item for navigation bar
   local navigationItem = opt.navigationItem or NavigationItem { 
@@ -91,6 +95,19 @@ function ViewController:initialize(opt)
       self.superController = nil
     end
   end
+
+  --[[ Get the nearest ancestor in the view controller hierarchy that is a navigation controller.
+  function self:getNavigationController()
+    local parentController = self.parentController
+    while parentController do
+      if Object.isInstanceOf(parentController, NavigationController) then
+        return parentController
+      else
+        parentController = parentController.parentController
+      end
+    end
+  end
+  ]]
 end
 
 return ViewController

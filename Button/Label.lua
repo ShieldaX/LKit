@@ -45,6 +45,7 @@ local SOY = display.screenOriginY
 function Label:initialize(opt)
   -- class custom opt:
   opt.backgroundColor = {255, 255, 255, 0} -- hide background rect
+  opt.backgroundColor = {0, 0, 0, 120} -- hide background rect
   self.tintColor = opt.tintColor or {0, 0, 0, 255}
 
   -- instantiation
@@ -60,6 +61,7 @@ function Label:initialize(opt)
   local label = display.newText {
     parent = self.bounds,
     x = width*.5, y = height*.5,
+    width = width, height = height,
     text = labelText,
     font = native.systemFontBold,
     fontSize = opt.fontSize or 30,
