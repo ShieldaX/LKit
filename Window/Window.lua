@@ -10,6 +10,7 @@
 local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
+local Application = require 'Application'
 
 -- ======
 -- CLASS
@@ -22,6 +23,12 @@ local Window = View:subclass('Window')
 
 local ACW = display.actualContentWidth
 local ACH = display.actualContentHeight
+local CW = display.contentWidth
+local CH = display.contentHeight
+local CCX = display.contentCenterX
+local CCY = display.contentCenterY
+local SOX = display.screenOriginX
+local SOY = display.screenOriginY
 
 -- ======
 -- VARIABLES
@@ -38,21 +45,36 @@ local ACH = display.actualContentHeight
 -- ------
 
 --- Instance constructor
--- @param opt Intent table for construct new instance.
-function Window:initialize(opt)
+-- @param api Table with customization params.
+function Window:initialize(api)
+  -- dimensions and coordinate
+  -- window should occupy full screen
+  -- TODO: screen should be another class
+  local screenWidth, screenHeight = ACW, ACH
+  local screenTop, screenLeft = SOY, SOX
+
   -- define window properties
-  opt = opt or {}
-  opt.x, opt.y = 0, 0 -- top left
-  opt.xOffset, opt.yOffset = 0, 0 -- bounds with none offset
-  opt.width, opt.height = ACW, ACH -- clips to device screen
-  --opt.backgroundColor = {255, 255, 255, 0}
+  local opt = {name = api.name or "mainWindow"}
+  opt.x, opt.y = screenLeft, screenTop -- left & top
+  opt.xOffset, opt.yOffset = 0, 0 -- global offset, currently both set to 0
+  opt.width, opt.height = screenWidth, screenHeight -- full screen size
+  opt.backgroundColor = api.backgroundColor or {255, 255, 255, 255}
   
   View.initialize(self, opt)
-  
+  self.frame.isVisible = false -- new window is invisible
+
   -- View Hierarchy
   --self.subviews = {}
   self.superview = nil -- root view
   self.window = self
+
+  -- root controller
+  self.rootController = api.rootController
+end
+
+function Window:makeKeyAndVisible()
+  self.frame.isVisible = true
+  Application.sharedApplication().mainWindow = self
 end
 
 -- ------
@@ -73,6 +95,7 @@ end
 -- @param view The target view to check.
 -- @return true if view is in parent chain, false if view is not found.
 function Window:isDescendantOfView(view)
+  return false
 end
 
 return Window

@@ -13,6 +13,25 @@ local VCH = display.viewableContentHeight
 
 ts.desc("#Instance constructor")
 ts.regist(0, function()
-end)
+
+    Application {name = "Mobile"}
+
+    local app = Application.sharedApplication()
+
+    function app:onStart()
+      print("application started ...")
+    end
+
+    Runtime:addEventListener("system", app)
+    util.print_r(app)
+    ts.app = app
+end, "get instance")
+
+ts.regist(0, function()
+    Application {name = "Fake App"}
+    local fakeApp = Application.sharedApplication()
+    util.print_r(fakeApp)
+    assert(fakeApp == ts.app)
+end, "keep singleton")
 
 return ts
