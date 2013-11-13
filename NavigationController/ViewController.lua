@@ -10,7 +10,6 @@
 local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
-local NavigationController = require 'NavigationController'
 local NavigationItem = require 'NavigationItem'
 
 -- ======
