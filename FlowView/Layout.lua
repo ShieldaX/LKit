@@ -35,4 +35,22 @@ function Layout:included(class)
   print("layout module included")
 end
 
+local Attributes = {}
+
+function Attributes.new()
+  local instance = {
+    indexPath = {1, 0}
+    zIndex = 0,
+    alpha = 1,
+    x = 0, y = 0, -- position
+    xScale = 1, yScale = 1, -- transform
+  }
+
+  function instance:isEqual(object)
+    -- compare
+  end
+
+  return instance
+end
+
 return Layout

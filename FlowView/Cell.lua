@@ -1,5 +1,6 @@
 -- Cell.lua
 -- Cell used in flow view.
+-- The layout and presentation of cells is managed by the collection view and its corresponding layout object.
 -- ------------------
 
 -- ======
@@ -21,31 +22,23 @@ local Cell = ResusbleView:subclass('Cell')
 --- Instance constructor
 function Cell:initialize(api)
   ResusbleView.initialize(self, api)
+  local self.view
   self:addSubview(View {name = "contentView"})
+  self.selected = false
+  self.highlighted = false
+  self.backgroundView = nil
+  self.selectedBackgroundView = nil
 end
 
+-- special config before reusing
 function Cell:prepareForReuse()
+  -- reset state
+  self.selected = false
+  self.highlighted = false
 end
 
--- ---
--- Managing Layout Changes
--- ---
-
-function Cell:applyLayout(layout)
-end
-
-function Cell:willTransitionTo( ... )
-  -- body
-end
-
-function Cell:enterFrame(event)
-  -- queue reusable cell (with reuseIdentifier)
-
-  if self.isInvalid then
-    -- invalidation loop
-    --self:invalid()
-    self.isInvalid = false
-  end
+function Cell:setSeleted(selected)
+  -- change appearance on selection changes
 end
 
 return Cell
