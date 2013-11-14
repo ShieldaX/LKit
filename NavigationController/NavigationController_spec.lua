@@ -36,7 +36,7 @@ end, "init a new navigation controller with root controller")
 ts.regist(2, function()
     local clipContoller = ViewController {
       name = "clip",
-      title = "clip",      
+      title = "clip",
     }
     function clipContoller:loadView()
       self.view = View {
