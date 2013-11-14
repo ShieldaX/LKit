@@ -21,6 +21,7 @@ local FlowView = View:subclass('FlowView')
 -- @param api Intent table for construct new instance.
 function FlowView:initialize(api)
   View.initialize(self, api)
+  self.direction = api.direction -- scroll direction
 end
 
 function FlowView:dequeueReusableCellForIndexPath(reuseIdentifier, indexPath)
