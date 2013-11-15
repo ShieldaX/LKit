@@ -32,9 +32,17 @@ function FlowView:enterFrame(event)
 
   if self.isInvalid then
     -- invalidation loop
-    --self:invalid()
+    self:invalidate()
     self.isInvalid = false
   end
+end
+
+function FlowView:invalidate()
+  self:prepareLayout()
+end
+
+function FlowView._prepareLayout(instance)
+  instance:prepareLayout()
 end
 
 return FlowView
