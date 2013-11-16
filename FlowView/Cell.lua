@@ -37,6 +37,12 @@ function Cell:prepareForReuse()
   self.highlighted = false
 end
 
+function Cell:applyLayout(layout)
+  ResusbleView.applyLayout(self, layout)
+  self.background.height = layout.height
+  self.background.y = self.background.height * .5
+end
+
 function Cell:setSeleted(selected)
   -- change appearance on selection changes
 end

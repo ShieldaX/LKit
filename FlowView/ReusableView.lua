@@ -31,6 +31,8 @@ end
 -- ---
 
 function ReusableView:applyLayout(layout)
+  self.frame.x = layout.x
+  self.frame.y = layout.y
 end
 
 function ReusableView:willTransitionTo( ... )

@@ -5,37 +5,97 @@
 local util = require 'util'
 
 local Layout = {
-  layout = {{}}, -- layout attributes table before view update.
-  updatedLayout = {{}}, -- layout attributes table shall the view apply in next invalidation cycle.
+  --layout = {{}}, -- layout attributes table before view update.
+  --updatedLayout = {{}}, -- layout attributes table shall the view apply in next invalidation cycle.
 }
+
+local function boundsIntersect(bounds, bounds1)
+  return bounds.yMax >= bounds1.yMin and bounds.xMax >= bounds1.xMin and bounds.yMin <= bounds1.yMax and bounds.xMin <= bounds1.xMax
+end
 
 function Layout:prepareLayout()
   self.interSpacing = 12
   self.columnWidth = math.floor(display.viewableContentWidth/self.numberOfColumns)
   print("columnWidth:", self.columnWidth)
-  local numberOfItems = self:numberOfItemsInSection(1)
-  self.columnHeights = {{}} -- table records column heights
+  --local numberOfItems = self:numberOfItemsInSection(1)
 end
 
 function Layout:updateLayout()
-  local columnHeights = self.columnHeights
+  local updated = {{}}
+  -- build table of columnHeights
+  local columnHeights = {}
+  for i = 1, self.numberOfColumns do
+    columnHeights[i] = 0
+  end
+
+  local contentHeight = 0
+
   local numberOfItems = self:numberOfItemsInSection(1)
   for i = 1, numberOfItems do
-    local itemHeight
-    self:heightForItemAtIndexPath({section = 1, row = i})
-    
+    -- set focus on shortest column
+    local cursorColumn = 1 -- default cursor is 1st column
+    local shortestColumnHeight = math.huge
+    for i = 1, #columnHeights do
+      if columnHeights[i] < shortestColumnHeight then
+        cursorColumn = i -- update column cursor
+        shortestColumnHeight = columnHeights[i] -- update shortest column height
+      end
+    end
+
+    -- ask for item height
+    local section = 1, row = i
+    local itemHeight = self:heightForItemAtIndexPath({section = section, row = row})
+
+    -- update cursor column height
+    columnHeights[cursorColumn] = columnHeights[cursorColumn] + itemHeight
+    --TODO: column height contains vertical spacing
+    --columnHeights[cursorColumn] = columnHeights[cursorColumn] + self.interSpacing
+    if contentHeight < columnHeights[cursorColumn] then
+      contentHeight = columnHeights[cursorColumn] -- update content height
+    end
+
+    -- update layout attributes for item
+    local layout = {
+      width = columnWidth,
+      height = itemHeight,
+      x = (cursorColumn - 1) * columnWidth,
+      y = columnHeights[cursorColumn],
+    }
+    updated[section][row] = layout
   end
+
+  if self.updatedLayout then self.updatedLayout = nil end
+  self.updatedLayout = updated
 end
 
 function  Layout:contentSize()
   -- used for scrolling limitation and so on
+  return {width = self.contentWidth, height = self.contentHeight}
 end
 
 function Layout:layoutForItemAtIndexPath(indexPath)
+  if not self.layout then
+    self:updateLayout()
+    self.layout = self.updatedLayout
+  end
+  return self.layout[indexPath.section][indexPath.row]
 end
 
-function Layout:layoutForItemInBounds(bounds)
+function Layout:layoutForItemsInBounds(bounds)
+  if not self.layout then
+    self:updateLayout()
+    self.layout = self.updatedLayout
+  end
 
+  local items = {}
+  table.foreach(self.layout[1], function(_, layout)
+    local itemBounds = {yMin = layout.y, yMax = layout.y + layout.height, xMin = layout.x, xMax = layout.x + layout.width}
+    -- filter items
+    if boundsIntersect(itemBounds, bounds) then
+      items[#items+1] = layout
+    end
+  end)
+  return items
 end
 
 -- ---
