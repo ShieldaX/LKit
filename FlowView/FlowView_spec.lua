@@ -17,7 +17,7 @@ local VCH = display.viewableContentHeight
 ts.desc("#initialize")
 ts.regist(0, function()
 
-  local data = {{
+  ts.data = {{
     {image = "photos/Biloxi05.jpg", width = 1024, height = 683},
     {image = "photos/Arch01.jpg", width = 680, height = 1024},
     {image = "photos/Butterfly01.jpg", width = 1024, height = 682},
@@ -68,14 +68,12 @@ ts.regist(0, function()
     numberOfColumns = 3,
   }
 
-  FlowView.data = data
   ts.view = flow
 end, "new flow view")
 
-ts.regist(0, function()
+ts.regist(1, function()
   local flow = ts.view
-  flow:prepareLayout()
-  flow:visibleCells()
+  flow:setDataSource(ts.data)
 end)
 
 return ts

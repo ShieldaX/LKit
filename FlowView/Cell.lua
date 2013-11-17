@@ -38,11 +38,20 @@ end
 
 function Cell:applyLayout(layout)
   ReusableView.applyLayout(self, layout)
-  self.background.width = layout.width - 2
-  self.background.height = layout.height - 2
+
+  self._bounds = {
+    yMin = layout.y,
+    yMax = layout.y + layout.height,
+    xMin = layout.x,
+    xMax = layout.x + layout.width,
+  }
+
+  self.background.width = layout.width
+  self.background.height = layout.height
   self.background.y = self.background.height * .5
   self.background.x = self.background.width * .5
-  local imageView = display.newImageRect( self.bounds, self.image, self.background.width, self.background.height )
+  if self.imageView then self.imageView:removeSelf() end
+  local imageView = display.newImageRect( self.bounds, self.image, self.background.width - 2, self.background.height -2 )
   imageView.x = imageView.contentWidth * .5
   imageView.y = imageView.contentHeight * .5
   self.imageView = imageView

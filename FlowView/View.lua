@@ -110,19 +110,26 @@ function View:addSubview(view, zIndex)
   view.superview = self
   view.window = self.window
   self[view.name] = view -- view reference
-  print("View named " .. view.name .. " inserted.")
+  --print("View named " .. view.name .. " inserted.")
   --table.insert(self.subviews, view) -- add subview
 end
 
 --- Remove a subview (current view) from its parent
--- @param view Name of the parent view.
-function View:removeFromSuperview(view)
+function View:removeFromSuperview()
   local frame = self.frame
   local superview = self.superview
   if superview then superview[self.name] = nil end
   self.superview = false
   self.window = false
-  frame:removeSelf()
+  --frame:removeSelf()
+end
+
+function View:finalize()
+  if self.superview then
+    self:removeFromSuperview()
+  end
+  self.name = nil
+  self.frame:removeSelf()
 end
 
 --- Move view to special index of its superview.

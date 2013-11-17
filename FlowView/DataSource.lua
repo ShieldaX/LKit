@@ -34,11 +34,10 @@ function DataSource:imageForItemAtIndexPath(indexPath)
 end
 
 function DataSource:cellForItemAtIndexPath(indexPath)
-  local reuseIdentifier = "flowCell"
+  local reuseIdentifier = self.reuseIdentifierForCell
   local cell = self:dequeueReusableCellForIndexPath(reuseIdentifier, indexPath)
   -- set properties that correspond to the data of the corresponding item
   -- ...
-  util.print_r(indexPath)
   cell.image = self:imageForItemAtIndexPath(indexPath)
   return cell
 end

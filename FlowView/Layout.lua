@@ -30,7 +30,7 @@ function Layout:updateLayout()
     columnHeights[i] = 0
   end
 
-  local contentHeight = 0
+  self.contentHeight = 0
 
   local numberOfItems = self:numberOfItemsInSection(1)
   for i = 1, numberOfItems do
@@ -60,12 +60,12 @@ function Layout:updateLayout()
     }
     updated[section][row] = layout
 
-        -- update cursor column height
+    -- update cursor column height
     columnHeights[cursorColumn] = columnHeights[cursorColumn] + itemHeight
     --TODO: column height contains vertical spacing
     --columnHeights[cursorColumn] = columnHeights[cursorColumn] + self.interSpacing
-    if contentHeight < columnHeights[cursorColumn] then
-      contentHeight = columnHeights[cursorColumn] -- update content height
+    if self.contentHeight < columnHeights[cursorColumn] then
+      self.contentHeight = columnHeights[cursorColumn] -- update content height
     end
   end
 
@@ -139,11 +139,11 @@ function Layout:finalizeViewUpdates()
   -- perform final animations ...
 end
 
--- Forces the collection view to recompute all of its layout information and reapply it.
+--[[ Forces the collection view to recompute all of its layout information and reapply it.
 function Layout:invalidateLayout()
   -- 
 end
-
+]]
 -- @param context An invalidation context lets you specify which parts of the layout changed.
 -- The layout object can then use that information to minimize the amount of data it recomputes.
 function Layout:invalidateWithContext(context)
