@@ -7,13 +7,13 @@
 -- LIBRARIES
 -- ======
 local util = require 'util'
-local View = require 'View'
-local ReusableView = require 'ResusbleView'
+--local View = require 'View'
+local ReusableView = require 'ReusableView'
 
 -- ======
 -- CLASS
 -- ======
-local Cell = ResusbleView:subclass('Cell')
+local Cell = ReusableView:subclass('Cell')
 
 -- ======
 -- FUNCTIONS
@@ -21,13 +21,12 @@ local Cell = ResusbleView:subclass('Cell')
 
 --- Instance constructor
 function Cell:initialize(api)
-  ResusbleView.initialize(self, api)
-  local self.view
-  self:addSubview(View {name = "contentView"})
+  api.backgroundColor = {142, 142, 147}
+
+  ReusableView.initialize(self, api)
+  --self:addSubview(View {name = "contentView"})
   self.selected = false
   self.highlighted = false
-  self.backgroundView = nil
-  self.selectedBackgroundView = nil
 end
 
 -- special config before reusing
@@ -38,9 +37,15 @@ function Cell:prepareForReuse()
 end
 
 function Cell:applyLayout(layout)
-  ResusbleView.applyLayout(self, layout)
-  self.background.height = layout.height
+  ReusableView.applyLayout(self, layout)
+  self.background.width = layout.width - 2
+  self.background.height = layout.height - 2
   self.background.y = self.background.height * .5
+  self.background.x = self.background.width * .5
+  local imageView = display.newImageRect( self.bounds, self.image, self.background.width, self.background.height )
+  imageView.x = imageView.contentWidth * .5
+  imageView.y = imageView.contentHeight * .5
+  self.imageView = imageView
 end
 
 function Cell:setSeleted(selected)

@@ -4,5 +4,5 @@ thumbs.db
 .DS_Store
 mobdebug.lua
 *.swp
-
+FlowView/photos/*
 *.sublime-workspace

@@ -3,6 +3,7 @@
 -- ------------------
 
 local util = require 'util'
+local d = util.print_r
 
 local Layout = {
   --layout = {{}}, -- layout attributes table before view update.
@@ -22,6 +23,7 @@ end
 
 function Layout:updateLayout()
   local updated = {{}}
+  local columnWidth = self.columnWidth
   -- build table of columnHeights
   local columnHeights = {}
   for i = 1, self.numberOfColumns do
@@ -43,25 +45,28 @@ function Layout:updateLayout()
     end
 
     -- ask for item height
-    local section = 1, row = i
-    local itemHeight = self:heightForItemAtIndexPath({section = section, row = row})
-
-    -- update cursor column height
-    columnHeights[cursorColumn] = columnHeights[cursorColumn] + itemHeight
-    --TODO: column height contains vertical spacing
-    --columnHeights[cursorColumn] = columnHeights[cursorColumn] + self.interSpacing
-    if contentHeight < columnHeights[cursorColumn] then
-      contentHeight = columnHeights[cursorColumn] -- update content height
-    end
+    local section = 1
+    local row = i
+    local indexPath = {section = section, row = row}
+    local itemHeight = self:heightForItemAtIndexPath(indexPath)
 
     -- update layout attributes for item
     local layout = {
+      indexPath = indexPath,
       width = columnWidth,
       height = itemHeight,
       x = (cursorColumn - 1) * columnWidth,
       y = columnHeights[cursorColumn],
     }
     updated[section][row] = layout
+
+        -- update cursor column height
+    columnHeights[cursorColumn] = columnHeights[cursorColumn] + itemHeight
+    --TODO: column height contains vertical spacing
+    --columnHeights[cursorColumn] = columnHeights[cursorColumn] + self.interSpacing
+    if contentHeight < columnHeights[cursorColumn] then
+      contentHeight = columnHeights[cursorColumn] -- update content height
+    end
   end
 
   if self.updatedLayout then self.updatedLayout = nil end
@@ -122,7 +127,7 @@ function Layout:prepareForViewUpdates(updateItems)
       context.cusorIndexPath = pathBefore
     elseif action == "move" and pathBefore and pathAfter then
       context.cusorIndexPath = pathAfter
-    elseif action == "reload"
+    elseif action == "reload" then
       context.cusorIndexPath = pathAfter
     else
     end
@@ -153,7 +158,7 @@ function Layout:offsetForProposedOffsetWithScrollingVelocity(proposedOffset, vel
 end
 
 function Layout:included(class)
-  print("layout module included")
+  print("Layout module included")
 end
 
 return Layout
