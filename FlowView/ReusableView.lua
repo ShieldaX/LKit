@@ -39,14 +39,4 @@ function ReusableView:willTransitionTo( ... )
   -- body
 end
 
-function ReusableView:enterFrame(event)
-  -- queue reusable cell (with reuseIdentifier)
-
-  if self.isInvalid then
-    -- invalidation loop
-    --self:invalid()
-    self.isInvalid = false
-  end
-end
-
 return ReusableView

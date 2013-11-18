@@ -21,6 +21,10 @@ function Layout:prepareLayout()
   --local numberOfItems = self:numberOfItemsInSection(1)
 end
 
+-- updateItems
+function Layout:prepareForCollectionViewUpdates(updateItems)
+end
+
 function Layout:updateLayout()
   local updated = {{}}
   local columnWidth = self.columnWidth
@@ -116,10 +120,16 @@ end
 -- layout information to reflect view updating
 -- ---
 
-function Layout:layoutForAppearingItem(indexPath)
+function Layout:layoutForAppearingItemAtIndexPath(indexPath)
+  local updatedLayout = self.updatedLayout
+  local section, row = indexPath.section, indexPath.row
+  return updatedLayout[section][row]
 end
 
-function Layout:layoutForDisappearingItem(indexPath)
+function Layout:layoutForDisappearingItemAtIndexPath(indexPath)
+  local layout = self.layout
+  local section, row = indexPath.section, indexPath.row
+  return layout[section][row]
 end
 
 -- @params updateItems Table of UpdateItem objects

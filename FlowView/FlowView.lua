@@ -51,6 +51,11 @@ function FlowView:setDataSource(data)
   Runtime:addEventListener("enterFrame", self)
 end
 
+-- The cell object at the corresponding index path or nil if the cell is not visible or indexPath is out of range.
+function FlowView:cellForItemWithIndexPath(indexPath)
+  return self[indexPath.section .. '_' .. indexPath.row]
+end
+
 function FlowView:dequeueReusableCellForIndexPath(reuseIdentifier, indexPath)
   local reusableCells = self.reusableCells
   local possibleCells = reusableCells[reuseIdentifier]
@@ -58,11 +63,13 @@ function FlowView:dequeueReusableCellForIndexPath(reuseIdentifier, indexPath)
     print("reuse cell")
     local cell = table.remove( possibleCells, 1 ) -- first in, first out
     cell:prepareForReuse()
+    cell.indexPath = indexPath
     cell.name = indexPath.section .. '_' .. indexPath.row
     return cell
   end
   local newCell = Cell {
     name = indexPath.section .. '_' .. indexPath.row,
+    indexPath = indexPath,
     reuseIdentifier = reuseIdentifier
   }
   print("create new cell")
@@ -121,31 +128,54 @@ function FlowView:visibleCells()
   return visibleItems
 end
 
+function FlowView:insertItemAtIndexPath(indexPath)
+  local appearingLayout = self:layoutForAppearingItemAtIndexPath(indexPath)
+  local visibleItems = self.visibleItems
+  local section, row = indexPath.section, indexPath.row
+
+  table.foreach(visibleItems, function(i, item)
+    local path = item.indexPath
+    -- if cell's indexPath will be behind the indexPath, just flow down this cell
+    if path.row >= row then
+      local targetLayout = self:layoutForAppearingItemAtIndexPath({section = section, row = path.row + 1})
+      transition.to( item.frame, {time = 600, x = targetLayout.x, y = targetLayout.y, transition = easing.outQuad} )
+    end
+  end)
+
+  local cell = self:cellForItemAtIndexPath(indexPath)
+  cell:applyLayout(appearingLayout)
+  self:addSubview(cell)
+  visibleItems[#visibleItems + 1] = cell -- cell visible
+
+  transition.from(cell.frame, {time = 600, alpha = 0, transition = easing.outQuad})
+  self.layout = self.updatedLayout
+end
+
 function FlowView:touch(event)
   self:handleScrollTouch(event)
   local contentView = self.bounds
   local phase = event.phase
   if phase == "began" then
-    -- set selected indexPath
+    -- set touched cell highlighted
     -- convert point to local
     local x, y = contentView:contentToLocal(event.x, event.y)
     local indexPathTouched = self:indexPathForItemAtPoint({x = x, y = y})
     util.print_r(indexPathTouched)
-    local cell = self[indexPathTouched.section .. '_' .. indexPathTouched.row]
+    local cell = self:cellForItemWithIndexPath(indexPathTouched)
     cell:setSelected(true)
   elseif self.tracking then
     if "moved" == phase then
-
+      -- will unhighlight touched cell
     elseif "ended" == phase or "cancelled" == phase then
-
+      -- select cell touched
     end
   end
 end
 
 function FlowView:enterFrame(event)
   -- queue reusable cell (with reuseIdentifier)
-  self:_queueReusableCells()
-  self:visibleCells()
+  --self:_queueReusableCells()
+  --self:visibleCells()
   if self.isLayoutInvalid then
     -- invalidation loop
     self:invalidateLayout()

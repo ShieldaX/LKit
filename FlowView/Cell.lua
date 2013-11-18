@@ -21,9 +21,10 @@ local Cell = ReusableView:subclass('Cell')
 
 --- Instance constructor
 function Cell:initialize(api)
-  api.backgroundColor = {142, 142, 147}
+  --api.backgroundColor = {142, 142, 147}
 
   ReusableView.initialize(self, api)
+  self.indexPath = api.indexPath
   --self:addSubview(View {name = "contentView"})
   self.selected = false
   self.highlighted = false
