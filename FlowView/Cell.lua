@@ -31,9 +31,11 @@ end
 
 -- special config before reusing
 function Cell:prepareForReuse()
+  ReusableView.prepareForReuse(self)
   -- reset state
   self.selected = false
   self.highlighted = false
+  self:setSelected(false)
 end
 
 function Cell:applyLayout(layout)
@@ -57,8 +59,15 @@ function Cell:applyLayout(layout)
   self.imageView = imageView
 end
 
-function Cell:setSeleted(selected)
+function Cell:setSelected(selected)
   -- change appearance on selection changes
+  if selected then
+    self:setBackgroundColor({0, 122, 255})
+    self.selected = true
+  else
+    self:setBackgroundColor({142, 142, 147})
+    self.selected = false
+  end
 end
 
 return Cell

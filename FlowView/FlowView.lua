@@ -36,6 +36,8 @@ function FlowView:initialize(api)
   View.initialize(self, api)
   self.direction = api.direction -- scroll direction
   self.numberOfColumns = api.numberOfColumns
+  self.indexPathsForSelectedItems = {}
+  self.indexPathsForHighlightedItems = {}
   self.reusableCells = {}
   self.visibleItems = {}
   self.reuseIdentifierForCell = "flowCell"
@@ -54,7 +56,7 @@ function FlowView:dequeueReusableCellForIndexPath(reuseIdentifier, indexPath)
   local possibleCells = reusableCells[reuseIdentifier]
   if possibleCells and #possibleCells > 0 then
     print("reuse cell")
-    local cell = table.remove( possibleCells, 1 )
+    local cell = table.remove( possibleCells, 1 ) -- first in, first out
     cell:prepareForReuse()
     cell.name = indexPath.section .. '_' .. indexPath.row
     return cell
@@ -72,18 +74,6 @@ function FlowView:invalidateLayout()
   -- 
 end
 
-function FlowView:enterFrame(event)
-  -- queue reusable cell (with reuseIdentifier)
-  self:_queueReusableCells()
-  self:visibleCells()
-  if self.isLayoutInvalid then
-    -- invalidation loop
-    self:invalidateLayout()
-    self.isLayoutInvalid = false
-  end
-  self:_enterFrame(event)
-end
-
 function FlowView:_queueReusableCells()
   local visibleBounds = {
     yMin = - self.bounds.y,
@@ -98,7 +88,7 @@ function FlowView:_queueReusableCells()
     local bounds = item._bounds
     if not boundsIntersect(bounds, visibleBounds) then
       -- cell not visible
-      print(item.name, "cell not visible")
+      --print(item.name, "cell not visible")
       reusableCells[#reusableCells + 1] = item
       item:removeFromSuperview()
       item.name = nil
@@ -129,6 +119,40 @@ function FlowView:visibleCells()
   end)
 
   return visibleItems
+end
+
+function FlowView:touch(event)
+  self:handleScrollTouch(event)
+  local contentView = self.bounds
+  local phase = event.phase
+  if phase == "began" then
+    -- set selected indexPath
+    -- convert point to local
+    local x, y = contentView:contentToLocal(event.x, event.y)
+    local indexPathTouched = self:indexPathForItemAtPoint({x = x, y = y})
+    util.print_r(indexPathTouched)
+    local cell = self[indexPathTouched.section .. '_' .. indexPathTouched.row]
+    cell:setSelected(true)
+  elseif self.tracking then
+    if "moved" == phase then
+
+    elseif "ended" == phase or "cancelled" == phase then
+
+    end
+  end
+end
+
+function FlowView:enterFrame(event)
+  -- queue reusable cell (with reuseIdentifier)
+  self:_queueReusableCells()
+  self:visibleCells()
+  if self.isLayoutInvalid then
+    -- invalidation loop
+    self:invalidateLayout()
+    self.isLayoutInvalid = false
+  end
+  self:handleScrolling(event)
+  --self:handleScrolling(event)
 end
 
 return FlowView

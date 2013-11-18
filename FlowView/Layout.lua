@@ -103,6 +103,15 @@ function Layout:layoutForItemsInBounds(bounds)
   return items
 end
 
+function Layout:indexPathForItemAtPoint(point)
+  local x, y = point.x, point.y
+  local pointBounds = {xMin = x, xMax = x, yMin = y, yMax = y}
+  local possibleItems = self:layoutForItemsInBounds(pointBounds)
+  if #possibleItems > 0 then
+    return possibleItems[1].indexPath
+  end
+end
+
 -- ---
 -- layout information to reflect view updating
 -- ---

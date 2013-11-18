@@ -11,7 +11,7 @@ local scroller = {
   tracking = false,
   decelerating  = false,
   decelerationRate = 0.94,
-  tween = nil, -- content view transition reference
+  scrollTween = nil, -- content view transition reference
   upperLimit = nil, bottomLimit = nil, -- dynamic scroll limitation
   offsetUpLimit = nil, offsetDownLimit = nil, -- dynamic scroll limitation
   _prevYPos = 0, _prevY = 0,
@@ -32,6 +32,7 @@ function scroller:limitVelocity()
   end
 end
 
+--TODO: give the main view chances to update content size
 -- update scrollable content height
 function scroller:updateScrollHeight()
   -- TODO: dynamic on data source if any.
@@ -59,19 +60,30 @@ function scroller:limitationReached(bounce) -- overscroll(bounce)
     limitHit = "bottom"
     if bounce == true then
       print("snap back to the top")
-      self.tween = transition.to( contentView, { time = bounceTime, y = self.bottomLimit, transition = easing.outQuad } )
+      self.scrollTween = transition.to( contentView, { time = bounceTime, y = self.bottomLimit, transition = easing.outQuad } )
     end
   elseif contentView.y < self.upperLimit then
     limitHit = "top"
     if bounce == true then
       print("snap back to the bottom")
-      self.tween = transition.to( contentView, { time = bounceTime, y = self.upperLimit, transition = easing.outQuad } )
+      self.scrollTween = transition.to( contentView, { time = bounceTime, y = self.upperLimit, transition = easing.outQuad } )
     end
   end
   return limitHit
 end
 
-function scroller:touch(event)
+-- scroll to make target bounds on top left of visible bounds
+function scroller:scrollBoundsToVisible(bounds, animated)
+  local contentView = self.bounds
+  local top, left = bounds.yMin, bounds.xMin
+  if animated then
+    self.scrollTween = transition.to( contentView, { time = bounceTime, y = top, transition = easing.outQuad } )
+  else
+    contentView.y = top
+  end
+end
+
+function scroller:handleScrollTouch(event)
   local contentView = self.bounds
   local phase = event.phase
   local time = event.time
@@ -91,10 +103,10 @@ function scroller:touch(event)
     -- Set the limits now
     self:updateLimitation()
     
-    -- Cancel any active tween on the content view
-    if self.tween then
-      transition.cancel( self.tween )
-      self.tween = nil
+    -- Cancel any active scrollTween on the content view
+    if self.scrollTween then
+      transition.cancel( self.scrollTween )
+      self.scrollTween = nil
     end
     
     --self:willBeginDragging()
@@ -152,7 +164,7 @@ function scroller:touch(event)
   return true
 end
 
-function scroller:_enterFrame(event)
+function scroller:handleScrolling(event)
 
   local contentView = self.bounds
   -- dragging content  
