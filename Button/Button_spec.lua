@@ -9,6 +9,7 @@ local ts = require 'spec_runner'
 local View = require 'View'
 local Button = require 'Button'
 local Label = require 'Label'
+local Input = require 'Input'
 
 --local VCW = display.viewableContentWidth
 --local VCH = display.viewableContentHeight
@@ -61,5 +62,14 @@ ts.regist(1, function()
     ts.button:addTarget(ts.label, "release")
     ts.button:addTarget(sampleObj, "release")
 end, "button add target")
+
+ts.regist(0, function()
+    local inputField = Input {
+      name = "userField",
+      x = 50,
+      y = display.contentCenterY,
+      width = 80, height = 30,
+    }
+end, "create input view")
 
 return ts

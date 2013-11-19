@@ -44,14 +44,15 @@ local SOY = display.screenOriginY
 function Input:initialize(api)
   -- class custom api:
   --api.backgroundColor = {255, 255, 255, 0} -- hide background rect
-  api.backgroundColor = {0, 0, 0, 0} -- hide background rect
+  api.backgroundColor = {0, 0, 0, 255} -- hide background rect
   -- instantiation
   View.initialize(self, api)
 
-  self.tintColor = api.tintColor or {0, 0, 0, 255}
-  self.size = api.size or 30
-  self.font = api.font or native.systemFontBold
+  --self.tintColor = api.tintColor or {0, 0, 0, 255}
+  --self.size = api.size or 30
+  --self.font = api.font or native.systemFontBold
   self.defaultText = api.defaultText
+  self.defaultColor = api.defaultColor
 
   -- layout real text field
   local frame = self.frame
@@ -62,23 +63,33 @@ function Input:initialize(api)
   local field = native.newTextField( left, top, width, height )
   --field.inputType = api.inputType
   --field.isSecure = api.isSecure
+  field.size = math.floor(height*.8)
 
-  self.field = field
-  field:addEeventListener("userInput", self)
+  --self.field = field
+  --field:addEventListener("userInput", self)
 end
 
 function Input:userInput(event)
-  print("user input just happen")
+  print("user inputting just happened")
 end
 
-function Input:animation(animation)
+function Input:animation(api)
   -- set frame to target position
+  local frame = self.frame
+  if api.delta == true then
+    frame:translate(api.x, api.y)
+  else
+    frame.x = api.x or frame.x
+    frame.y = api.y or frame.y
+  end
+
   -- then transition native field to act real animation
+  self.tween = transition.to(self.field, {x = frame.x, y = frame.y, transition = api.transition})
 end
 
 -- Roll input text back to default or none
 function Input:rollBack(clear)
-  self.field.text = clear and  '' or self.defaultText
+  self.field.text = clear == true and  '' or self.defaultText
 end
 
 function Input:setText(text)

@@ -107,8 +107,9 @@ function Button:setLabelForState(state)
   state = state or status.Normal
   if state == status.Normal then
     print("set label for state normal")
-  elseif state == status.Focused then
-  elseif state == status. then
+  elseif state == status.Highlighted then
+  elseif state == status.Disabled then
+  elseif state == status.Selected then
   end
 end
 
