@@ -67,9 +67,19 @@ ts.regist(0, function()
     local inputField = Input {
       name = "userField",
       x = 50,
-      y = display.contentCenterY,
+      y = 200,
       width = 80, height = 30,
     }
+    inputField.field.text = "email"
+    ts.input = inputField
 end, "create input view")
+
+ts.regist(1, function()
+    local opt = {
+      x = 100,
+      y = 100,
+    }
+    ts.input:transition(opt)
+end, "transition input view")
 
 return ts

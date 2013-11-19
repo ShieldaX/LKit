@@ -7,7 +7,7 @@
 -- ======
 -- LIBRARIES
 -- ======
---local util = require 'util'
+local util = require 'util'
 --local class = require 'middleclass'
 local View = require 'View'
 
@@ -43,8 +43,8 @@ local SOY = display.screenOriginY
 -- @param api Intent table for construct new instance.
 function Input:initialize(api)
   -- class custom api:
-  --api.backgroundColor = {255, 255, 255, 0} -- hide background rect
-  api.backgroundColor = {0, 0, 0, 255} -- hide background rect
+  api.backgroundColor = {255, 255, 255, 0} -- hide background rect
+  --api.backgroundColor = {0, 0, 0, 255} -- hide background rect
   -- instantiation
   View.initialize(self, api)
 
@@ -65,26 +65,37 @@ function Input:initialize(api)
   --field.isSecure = api.isSecure
   field.size = math.floor(height*.8)
 
-  --self.field = field
-  --field:addEventListener("userInput", self)
+  self.field = field
+  field:addEventListener("userInput", self)
 end
 
 function Input:userInput(event)
   print("user inputting just happened")
 end
 
-function Input:animation(api)
+function Input:transition(api)
   -- set frame to target position
   local frame = self.frame
+
+  util.print_r(self.field.contentBounds)
+  util.print_r(self.frame.contentBounds)
+
   if api.delta == true then
-    frame:translate(api.x, api.y)
+    --frame:translate(api.x, api.y)
   else
     frame.x = api.x or frame.x
     frame.y = api.y or frame.y
   end
-
+  --local bounds = frame.contentBounds
+  local left = frame.contentBounds.xMin
+  local top = frame.contentBounds.yMin
+  local width = frame.contentWidth
+  local height = frame.contentHeight
+  local x, y = self.background:localToContent(0, 0)
   -- then transition native field to act real animation
-  self.tween = transition.to(self.field, {x = frame.x, y = frame.y, transition = api.transition})
+  --self.field.x = x
+  --self.field.y = y
+  self.tween = transition.to(self.field, {x = x, y = y, transition = api.transition})
 end
 
 -- Roll input text back to default or none
