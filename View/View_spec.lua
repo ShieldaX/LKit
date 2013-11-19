@@ -84,6 +84,7 @@ ts.regist(1, function()
       height = 22,
       backgroundColor = {88, 86, 214},
     }
+    ts.shade_1 = shade_1
     bar:addSubview(shade_1)
     bar:addSubview(shade_2)
     print("only purple subview should be see")
@@ -119,6 +120,8 @@ ts.regist(1, function()
     local inBar = rect:isDescendantOfView(window.bar)
     assert(not inBar)
     print(inBar)
+    local inTree = ts.shade_1:isDescendantOfView(window)
+    assert(inTree == true)
 end, "check the view hierarchy")
 
 ts.regist(2, function()

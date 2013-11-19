@@ -153,12 +153,23 @@ function View:isDescendantOfView(view)
       super = nil
       return true, depth + 1
     else
-      super = super.subview
+      super = super.superview
       depth = depth + 1
     end
   end
-  
   return false
+end
+
+function View:getWindow()
+  if self.window == self then return self end
+  local super = self.superview
+  while super do
+    if super.window == super then
+      return super
+    else
+      super = super.superview
+    end
+  end
 end
 
 function View:layoutSubviews()
