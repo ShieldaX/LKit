@@ -34,9 +34,9 @@ local SOY = display.screenOriginY
 
 Button.static.State = {
   Normal = 1,
-  Focused = 2,
-  Pressed = 3,
-  Release = 4
+  Highlighted = 2,
+  Disabled = 3,
+  Selected = 4
 }
 
 -- ======
@@ -92,10 +92,24 @@ function Button:initialize(opt)
   self.enabled = opt.enabled or true
   self.touchBounds = self.rectNormal.contentBounds
 
+  self.highlighted = false -- button sets and clears this state automatically when a touch enters and exits during tracking and when there is a touch up.
+  self.tracking = false -- is tracking a touch event
+  self.touchInside = false -- is there a touch event happen in touchBounds
+
   if self.enabled then
     self.frame:addEventListener("touch", self)
   end
   
+end
+
+function Button:setLabelForState(state)
+  local status = Button.State
+  state = state or status.Normal
+  if state == status.Normal then
+    print("set label for state normal")
+  elseif state == status.Focused then
+  elseif state == status. then
+  end
 end
 
 function Button:setStatePressed()
