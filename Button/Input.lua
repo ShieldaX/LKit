@@ -61,7 +61,8 @@ function Input:initialize(api)
   local width = frame.contentWidth
   local height = frame.contentHeight
   local field = native.newTextField( left, top, width, height )
-  --field.inputType = api.inputType
+  field.text = self.defaultText
+  field:setTextColor(unpack(self.defaultColor))
   --field.isSecure = api.isSecure
   field.size = math.floor(height*.8)
 
@@ -69,11 +70,7 @@ function Input:initialize(api)
   field:addEventListener("userInput", self)
 end
 
-function Input:userInput(event)
-  print("user inputting just happened")
-end
-
-function Input:transition(api)
+function Input:transitionTo(api)
   -- set frame to target position
   local frame = self.frame
 
@@ -98,9 +95,16 @@ function Input:transition(api)
   self.tween = transition.to(self.field, {x = x, y = y, transition = api.transition})
 end
 
+-- ---
+-- Handle User Input
+-- ---
 -- Roll input text back to default or none
 function Input:rollBack(clear)
   self.field.text = clear == true and  '' or self.defaultText
+end
+
+function Input:userInput(event)
+  print("user inputting just happened")
 end
 
 function Input:setText(text)

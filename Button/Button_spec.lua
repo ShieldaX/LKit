@@ -79,7 +79,7 @@ ts.regist(1, function()
       x = 100,
       y = 100,
     }
-    ts.input:transition(opt)
+    ts.input:transitionTo(opt)
 end, "transition input view")
 
 return ts
