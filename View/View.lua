@@ -74,8 +74,8 @@ function View:initialize(opt)
   
   -- View Hierarchy
   --self.subviews = {}
-  self.superview = false -- not exist yet
-  self.window = false -- not exist before insert into a window view.
+  self.superview = nil -- not exist yet
+  self.window = nil -- not exist before insert into a window view.
   
   -- Layout
   self.clipToBounds = opt.clipToBounds or false
@@ -112,13 +112,19 @@ end
 -- So the last added subview, with biggest zIndex value, is in most front of the list. The bottom subview is in order of 1.
 function View:addSubview(view, zIndex)
   assert(view.name and view.bounds)
+
+  view:willMoveToSuperview(self)
+  
   local bounds = self.bounds
   zIndex = zIndex or bounds.numChildren + 1
   bounds:insert(zIndex, view.frame)
   view.superview = self
-  view.window = self.window
   self[view.name] = view -- view reference
   --table.insert(self.subviews, view) -- add subview
+  view.window = self.window --view:getWindow()
+
+  self:didAddSubview(view)
+  view:didMoveToSuperview()
 end
 
 --- Remove a subview (current view) from its parent
@@ -126,10 +132,25 @@ end
 function View:removeFromSuperview(view)
   local frame = self.frame
   local superview = self.superview
-  superview[self.name] = nil
-  self.superview = false
-  self.window = false
+  if superview then
+    superview[self.name] = nil
+    superview:willRemoveSubview(self)
+    self.superview = nil
+  end
+  self.window = nil
   frame:removeSelf()
+end
+
+function View:didAddSubview(view)
+end
+
+function View:didMoveToSuperview()
+end
+
+function View:willMoveToSuperview(view)
+end
+
+function View:willRemoveSubview(view)
 end
 
 --- Move view to special index of its superview.
