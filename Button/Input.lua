@@ -52,7 +52,7 @@ function Input:initialize(api)
   --self.size = api.size or 30
   --self.font = api.font or native.systemFontBold
   self.defaultText = api.defaultText
-  self.defaultColor = api.defaultColor
+  self.defaultColor = api.defaultColor or {0, 0, 0, 255}
 
   -- layout real text field
   local frame = self.frame

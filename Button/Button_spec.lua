@@ -32,6 +32,18 @@ ts.regist(0, function()
     ts.button = simpleButton
 end, "create a new button instance")
 
+ts.regist(1, function()
+    ts.button:setStateDisabled()
+end)
+
+ts.regist(2, function()
+    ts.button:setStateNormal()
+end)
+
+ts.regist(2, function()
+    ts.button:setStatePressed()
+end)
+
 ts.desc("#control state")
 ts.regist(0, function()
     local sampleLabel = Label {

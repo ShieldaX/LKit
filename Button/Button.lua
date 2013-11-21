@@ -52,8 +52,10 @@ Button.static.State = {
 function Button:initialize(opt)
   -- class custom opt:
   opt.backgroundColor = {255, 255, 255, 0} -- hide background rect
-  self.tintColor = opt.tintColor or {0, 122, 255, 255}
-  self.buttonTintColor = opt.buttonTintColor or {255, 255, 255, 255}
+  --self.tintColor = opt.tintColor or {0, 122, 255, 255}
+  --self.buttonTintColor = opt.buttonTintColor or {255, 255, 255, 255}
+  self.tintColor = opt.tintColor or {255, 255, 255, 255}
+  self.buttonTintColor = opt.buttonTintColor or {0, 122, 255, 255}
 
   -- instantiation
   View.initialize(self, opt)
@@ -89,7 +91,8 @@ function Button:initialize(opt)
   self:setStateNormal()
 
   -- response to touch
-  self.enabled = opt.enabled or true
+  self.enabled = true
+  if opt.enabled == false then self.enabled = false end
   self.touchBounds = self.rectNormal.contentBounds
 
   self.highlighted = false -- button sets and clears this state automatically when a touch enters and exits during tracking and when there is a touch up.
@@ -98,6 +101,8 @@ function Button:initialize(opt)
 
   if self.enabled then
     self.frame:addEventListener("touch", self)
+  else
+    self:setStateDisabled()
   end
   
 end
@@ -113,31 +118,43 @@ function Button:setLabelForState(state)
   end
 end
 
-function Button:setStatePressed()
+function Button:setStatePressed() -- setHighlighted(highlighted)
   local highlightedColor = self.tintColor
   self.rectNormal:setFillColor(unpack(highlightedColor))
   self.textLabel:setTextColor(unpack(self.buttonTintColor))
+  self.status = Button.State.Highlighted
 end
 
 function Button:setStateNormal()
   local normalColor = self.buttonTintColor
   self.rectNormal:setFillColor(unpack(normalColor))
   self.textLabel:setTextColor(unpack(self.tintColor))
+  if self.status == Button.State.Disabled then self.rectNormal:setStrokeColor(unpack(normalColor)) end
+  self.status = Button.State.Normal
+end
+
+function Button:setStateDisabled()
+  local disabledColor = {142, 142, 147, 255}
+  self.rectNormal:setFillColor(unpack(disabledColor))
+  self.textLabel:setTextColor(unpack(self.tintColor))
+  self.rectNormal:setStrokeColor(unpack(disabledColor))
+  self.status = Button.State.Disabled
 end
 
 function Button:touch(event)
-  print("Event Name:", event.name)
-  local phase = event.phase
-  if phase == "began" then
-    self:setStatePressed()
-  elseif phase == "ended" then
-    local action = {
-      name = "release",
-      target = self,
-      time = os.time()
-    }
-    self.frame:dispatchEvent(action)
-    self:setStateNormal()
+  if self.status ~= Button.State.Disabled then
+    local phase = event.phase
+    if phase == "began" then
+      self:setStatePressed()
+    elseif phase == "ended" then
+      local action = {
+        name = "release",
+        target = self,
+        time = os.time()
+      }
+      self.frame:dispatchEvent(action)
+      self:setStateNormal()
+    end
   end
 end
 
