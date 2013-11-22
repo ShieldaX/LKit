@@ -3,5 +3,5 @@
 local util = require 'util'
 util.show_fps()
 
-local View_spec = require "View_spec"
-View_spec.run()
+local spec = require "Control_spec"
+spec.run()

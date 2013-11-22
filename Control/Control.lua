@@ -22,7 +22,7 @@ local Control = View:subclass('Control')
 -- ======
 
 Control.State = {
-  Normal = 1, -- Glow
+  Normal = 1,
   Highlighted = 2,
   Disabled = 3,
   Selected = 4
@@ -43,6 +43,7 @@ Control.State = {
 --- Instance constructor
 -- @param opt Intent table for construct new instance.
 function Control:initialize(opt)
+  View.initialize(self, opt)
 end
 
 return Control
