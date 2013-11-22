@@ -101,11 +101,12 @@ end
 -- ------
 
 --- Instance constructor
--- @param api Intent table for construct new instance.
-function Toast.show(api)
+-- @param text Text Content to show. [string]
+-- @param *time Optional timer to dismiss toast view. [positive number greater than 1]
+function Toast.text(text, time)
   if isFrequent() then return end
-  local text = api.text
-  local time = tonumber(api.time)
+  text = type(text) == "string" and text or "--"
+  local time = tonumber(time)
   time = time and time > 1 and time or 2000
   if not text then
     text = "width: " .. textContent.contentWidth .. ", " .. "height: " .. textContent.contentHeight 
