@@ -45,11 +45,12 @@ local SOY = display.screenOriginY
 --- Instance constructor
 -- @param api Intent table for construct new instance.
 function Image:initialize(api)
-  
-  
   View.initialize(self, api)
+  local bounds = self.bounds
+  bounds:insert(api.image)
+  --sizeToFit(self.background.contentWidth)
+  ...
 end
-
 
 
 return Image
