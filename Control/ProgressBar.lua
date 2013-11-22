@@ -45,9 +45,10 @@ end
 --- Instance constructor
 -- @param api Intent table for construct new instance.
 function ProgressBar:initialize(api)
-  api.height = 10
+  api.height = api.height or 8
   api.width = api.width or 100
   View.initialize(self, api)
+  local tintColor = {142, 142, 147}
 
   -- markers
   self.progress = 0 -- number with percentage, from 0 to 100.
@@ -58,13 +59,36 @@ function ProgressBar:initialize(api)
 
   local baseBar = display.newRoundedRect( bounds, 0, 0, api.width, height, height*.5 )
   baseBar:setFillColor(142, 142, 147)
-  baseBar.strokeWidth = 2,
-  baseBar:setStrokeColor(142, 142, 147)
+  --baseBar.strokeWidth = 2
+  --baseBar:setStrokeColor(142, 142, 147, 0)
   self.baseBar = baseBar
+  util.print_r(self.frame.contentBounds)
 
   local bar = display.newRoundedRect( bounds, 0, 0, height, height, height*.5 )
   bar:setFillColor(76, 217, 100, 204)
   self.bar = bar
+
+  local label = display.newText {
+    parent = bounds,
+    text = "0%",
+    font = native.systemFontBold,
+    fontSize = 12,
+    align = "center",
+    x = self.background.x, y = self.background.y + height + 10,
+  }
+
+  label.value = 0
+
+  label:setTextColor(unpack(tintColor))
+  Runtime:addEventListener("enterFrame", label)
+
+  function label:enterFrame(event)
+      self.text = string.format("%.0f", self.value) .. "%"
+  end
+
+  self.label = label
+
+  util.print_r(self.frame.contentBounds)
 end
 
 function ProgressBar:update(progress)
@@ -79,6 +103,8 @@ function ProgressBar:update(progress)
     progress = 1
   end
 
+  --self.label.text = tostring(progress * 100) .. "%"
+
   local width = progress * self.background.contentWidth
 
   if width < self.background.contentHeight then
@@ -86,10 +112,11 @@ function ProgressBar:update(progress)
   end
 
   local bar = self.bar
-  --bar.width = width
-  --bar.x = bar.width * .5
+  local label = self.label
+  if label.tween then transition.cancel(label.tween) end
 
-  self.tween = transition.to( bar, {time = 400, width = width, x = width * .5} )
+  self.tween = transition.to(bar, {time = 400, width = width, x = width * .5})
+  label.tween = transition.to(label, {time = 400, value = progress * 100})
 
   self:didUpdateProgress()
 end
