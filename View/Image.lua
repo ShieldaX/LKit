@@ -1,8 +1,9 @@
 -----------------------------------------------
 -- @class: Image
--- @file Image.lua - v0.0.1 (2013-09)
+-- @file Image.lua - v0.0.1 (2013-11)
+-- A view-based container for displaying either a single image or for animating a series of images.
 -----------------------------------------------
--- created at: 2013-09-25 10:30:13
+-- created at: 2013-11-22 11:42:38
 
 -- ======
 -- LIBRARIES

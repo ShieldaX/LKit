@@ -7,6 +7,7 @@
 local util = require 'util'
 local ts = require 'spec_runner'
 local Application = require 'Application'
+local Toast = require 'Toast'
 
 local VCW = display.viewableContentWidth
 local VCH = display.viewableContentHeight
@@ -33,5 +34,14 @@ ts.regist(0, function()
     util.print_r(fakeApp)
     assert(fakeApp == ts.app)
 end, "keep singleton")
+
+ts.desc("#test for notification system")
+ts.regist(0, function()
+    Toast.show {}
+end, "show toast notification")
+
+ts.regist(2, function()
+    Toast.show {text = "toggle display"}
+end, "show toast notification")
 
 return ts
