@@ -42,6 +42,8 @@ function FlowView:initialize(api)
   self.visibleItems = {}
   self.reuseIdentifierForCell = "flowCell"
   self.reusableCells[self.reuseIdentifierForCell] = {}
+
+  self.updating = false
 end
 
 function FlowView:setDataSource(data)
@@ -129,6 +131,8 @@ function FlowView:visibleCells()
 end
 
 function FlowView:insertItemAtIndexPath(indexPath)
+  self.updating = true -- Toggle update screen manually.
+
   local appearingLayout = self:layoutForAppearingItemAtIndexPath(indexPath)
   local visibleItems = self.visibleItems
   local section, row = indexPath.section, indexPath.row
@@ -147,8 +151,14 @@ function FlowView:insertItemAtIndexPath(indexPath)
   self:addSubview(cell)
   visibleItems[#visibleItems + 1] = cell -- cell visible
 
-  transition.from(cell.frame, {time = 600, alpha = 0, transition = easing.outQuad})
-  self.layout = self.updatedLayout
+  local function didUpdate()
+    self.layout = self.updatedLayout
+    self.updating = false
+    print("layout updated")
+  end
+
+  transition.from(cell.frame, {time = 600, alpha = 0, transition = easing.outQuad, onComplete = didUpdate})
+  --self.layout = self.updatedLayout
 end
 
 function FlowView:touch(event)
@@ -174,8 +184,10 @@ end
 
 function FlowView:enterFrame(event)
   -- queue reusable cell (with reuseIdentifier)
-  --self:_queueReusableCells()
-  --self:visibleCells()
+  if not self.updating then
+    self:_queueReusableCells()
+    self:visibleCells()
+  end
   if self.isLayoutInvalid then
     -- invalidation loop
     self:invalidateLayout()

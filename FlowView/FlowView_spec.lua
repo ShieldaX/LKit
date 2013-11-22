@@ -75,7 +75,7 @@ ts.regist(0, function()
       flow:setDataSource(ts.data)
       flow:visibleCells()
 end)
-
+--[[
 ts.desc("#insert and delete")
 ts.regist(2, function()
     -- insert data to view data source
@@ -89,5 +89,5 @@ ts.regist(2, function()
 
     flow:insertItemAtIndexPath({section = 1, row = 6})
 end, "insert a new cell")
-
+]]
 return ts
