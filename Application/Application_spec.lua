@@ -37,11 +37,11 @@ end, "keep singleton")
 
 ts.desc("#test for notification system")
 ts.regist(0, function()
-    Toast.text()
+    Toast.text("aaa", Toast.Length.Short)
 end, "show toast notification")
 
 ts.regist(2, function()
-    Toast.text("toggle display")
+    Toast.text("toggle display", Toast.Length.Long)
 end, "show toast notification")
 
 return ts
