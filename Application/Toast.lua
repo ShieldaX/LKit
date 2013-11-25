@@ -33,7 +33,7 @@ local SOY = display.screenOriginY
 Toast.static.Position = {
   Bottom = {x = display.contentCenterX, y = display.contentHeight-display.screenOriginY-128},
   Top = {x = display.contentCenterX, y = 128+display.screenOriginY},
-  Center = {x = display.contentCenterX, y = display.contentCenterY}
+  Center = {x = display.contentCenterX, y = display.contentCenterY},
 }
 
 Toast.static.Length = {
