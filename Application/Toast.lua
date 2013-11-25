@@ -82,17 +82,21 @@ local function updateBackgroundBounds(textWidth, textHeight)
   background.height = textHeight + edgeInset.top + edgeInset.bottom
 end
 
-local function show()
+local function show(position)
   if Toast.tweenB then transition.cancel( Toast.tweenB ) end
   if Toast.tweenT then transition.cancel( Toast.tweenT ) end
+  background.x = position.x
+  background.y = position.y
   background.alpha = 1
+  textContent.x = background.x
+  textContent.y = background.y
   textContent.alpha = 1
   _lastTime = os.clock()*1000
 end
 
 local function dismissAfter(delay)
   --if Toast.tweenB then transition.cancel( Toast.tweenB ) end
-  Toast.tweenB = transition.to(background, {delay = delay, length = gte, transition = easing.inQuad, alpha = 0})
+  Toast.tweenB = transition.to(background, {delay = delay, time = gte, transition = easing.inQuad, alpha = 0})
   Toast.tweenT = transition.to(textContent, {delay = delay, time = gte, transition = easing.inQuad, alpha = 0})
 end
 
@@ -108,18 +112,20 @@ end
 --- Instance constructor
 -- @param text Text Content to show. [string]
 -- @param *length Optional timer to dismiss toast view. [positive number greater than 1]
-function Toast.text(text, length)
+function Toast.text(text, position, length)
   if isFrequent() then return end
   text = type(text) == "string" and text or "--"
   local length = tonumber(length)
   length = length and length > 1 and length or Toast.Length.Short
   if not text then
-    text = "width: " .. textContent.contentWidth .. ", " .. "height: " .. textContent.contentHeight 
+    text = "width: " .. textContent.contentWidth .. ", " .. "height: " .. textContent.contentHeight
   end
   textContent.text = text
   local textWidth, textHeight = textContent.contentWidth, textContent.contentHeight
   updateBackgroundBounds(textWidth, textHeight)
-  show()
+  position = position or Toast.Position.Bottom
+  assert(position.x and position.y, "invalid toast position")
+  show(position)
   dismissAfter(length)
 end
 
