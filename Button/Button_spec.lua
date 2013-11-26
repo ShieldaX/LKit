@@ -48,8 +48,9 @@ ts.desc("#control state")
 ts.regist(0, function()
     local sampleLabel = Label {
       name = "sample",
-      text = "Controll State",
-      width = 200, height = 200,
+      text = "Control State",
+      align = "left",
+      width = 200,
     }
 
     function sampleLabel:release(action)
@@ -61,7 +62,7 @@ ts.regist(0, function()
 end, "create sample label")
 
 ts.regist(1, function()
-    local text = "State Normal"
+    local text = "State Normal >>"
     ts.label:setText(text)
 end, "set label's content")
 
@@ -74,24 +75,5 @@ ts.regist(1, function()
     ts.button:addTarget(ts.label, "release")
     ts.button:addTarget(sampleObj, "release")
 end, "button add target")
-
-ts.regist(0, function()
-    local inputField = Input {
-      name = "userField",
-      x = 50,
-      y = 200,
-      width = 80, height = 30,
-    }
-    inputField.field.text = "email"
-    ts.input = inputField
-end, "create input view")
-
-ts.regist(1, function()
-    local opt = {
-      x = 100,
-      y = 100,
-    }
-    ts.input:transitionTo(opt)
-end, "transition input view")
 
 return ts
