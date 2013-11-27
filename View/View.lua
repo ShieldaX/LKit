@@ -194,7 +194,38 @@ function View:getWindow()
 end
 
 function View:layoutSubviews()
-
+  local bounds = self.bounds
+  local _width, _height = self:getContentSize()
+  local subviews = self.subviews
+  table.foreach(subviews, function(i, v)
+    local w, h = v:getContentSize()
+    local inset, outset = v.inset, v.ou
+  end)
 end
 
 return View
+
+--[[
+local LayoutParams = {}
+
+function LayoutParams.insetsMake(top, right, bottom, left)
+  local kv = {
+    top = top or 0,
+    right = right or 0,
+    bottom = bottom or 0,
+    left = left or 0
+  }
+
+  return kv
+end
+
+-- @param force Whether force the content size be same as origin size. [boolean]
+local function insetRect(rect, insets, force)
+  assert(rect and insets)
+  if rect.contentWidth ~= rect.width or rect.contentHeight ~= rect.height then print("WARNING: content size(screen) is different from origin size") end
+  rect.width = rect.width - (insets.left + insets.right)
+  rect.height = rect.height - (insets.top + insets.bottom)
+  rect.x = rect.width*.5 + insets.left
+  rect.y = rect.height*.5 + insets.top
+end
+]]

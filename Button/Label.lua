@@ -77,25 +77,25 @@ function Label:initialize(api)
   self.highlightedTextColor = api.hightlightedColor -- [default] nil
 
   -- text label
-  self.font = api.font
+  self.font = api.font or native.systemFontBold
   self.align = api.align or "left"
   self.text = api.text
   self.fontSize = api.fontSize or 16
   self.numberOfLines = api.numberOfLines
   self.maxLayoutWidth = api.width
 
-  -- render text
-  local labelConfig = {
+  -- render text under special context
+  local context = {
     --parent = self.bounds,
     --x = width*.5, y = height*.5,
     width = self.maxLayoutWidth,
     -- height = height,
     text = self.text,
-    font = api.font or native.systemFontBold,
+    font = self.font,
     fontSize = self.fontSize, -- system default 16
     align = self.align,
   }
-  local label = display.newText(labelConfig)
+  local label = display.newText(context)
   label:setTextColor(unpack(self.textColor))
   self.textObject = label
 
@@ -127,9 +127,27 @@ function Label:setText(text)
 end
 
 function Label:sizeFitsWidth(width)
-  
+  local rect = {contentWidth = width}
+  if self.textObject then self.textObject:removeSelf() end
+  self.textObject = self:drawText(rect) -- assign the new text object.
+  self.bounds:insert(self.textObject)
 end
 
+function Label:drawText(rect)
+  local context = {
+    text = self.text,
+    width = rect.contentWidth,
+    font = self.font or native.systemFontBold,
+    fontSize = self.fontSize or 16,
+    align = self.align or "left",
+  }
+  local textObject = display.newText(context)
+  textObject:setTextColor(unpack(self.textColor))
+  return textObject
+end
 
+function Label:sizeThatFits()
+  -- body
+end
 
 return Label
