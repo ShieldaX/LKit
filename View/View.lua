@@ -56,6 +56,7 @@ function View:initialize(opt)
   local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
   
   -- frame group
+  -- The frame defines the position and dimensions of the view in the coordinate system of its superview.
   local frame = display.newGroup()
   frame.x, frame.y = x, y
   
@@ -65,22 +66,33 @@ function View:initialize(opt)
   self.backgroundColor = opt.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent  
   self.background:setFillColor(unpack(self.backgroundColor))
   
-  -- The bounds group, which describes the view¡¯s location and size in its own coordinate system.
+  -- The bounds group, which describes the view's location and size in its own coordinate system.
   local bounds = display.newGroup()
   frame:insert(bounds)
   bounds.x, bounds.y = xOffset, yOffset
-  self.frame = frame
+
+  self.frame = frame -- commonly used during layout to adjust the size or position of the view.
   self.bounds = bounds
   
   -- View Hierarchy
-  --self.subviews = {}
+  self.subviews = {}
   self.superview = nil -- not exist yet
   self.window = nil -- not exist before insert into a window view.
   
-  -- Layout
+  -- Layout and Constraints
   self.clipToBounds = opt.clipToBounds or false
+  self.attribute = {
+    left = 0, right = 0,
+    top = 0, bottom = 0,
+    leading = 0, trailing = 0,
+    width = "content", height = "parent",
+    centerX = 0, centerY = 0,
+    baseline = 0
+  }
 
+  -- Configuring the Event-Related Behavior
   self.exclusiveTouch = false -- touch focus on self
+  self.interactionEnabled = true
 end
 
 -- ------
@@ -134,6 +146,7 @@ function View:removeFromSuperview(view)
   local superview = self.superview
   if superview then
     superview[self.name] = nil
+    --superview.subviews[self.name] = nil
     superview:willRemoveSubview(self)
     self.superview = nil
   end
@@ -171,7 +184,6 @@ function View:isDescendantOfView(view)
   local depth = 0
   while super do
     if super == view then
-      super = nil
       return true, depth + 1
     else
       super = super.superview
@@ -199,8 +211,11 @@ function View:layoutSubviews()
   local subviews = self.subviews
   table.foreach(subviews, function(i, v)
     local w, h = v:getContentSize()
-    local inset, outset = v.inset, v.ou
+    local inset, outset = v.inset, v.outset
   end)
+end
+
+function View:sizeThatFits()
 end
 
 return View
