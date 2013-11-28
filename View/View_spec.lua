@@ -81,7 +81,7 @@ ts.regist(1, function()
     }
     local shade_2 = View {
       name = "purple",
-      height = 22,
+      height = 24,
       backgroundColor = {88, 86, 214},
     }
     ts.shade_1 = shade_1

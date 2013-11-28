@@ -156,10 +156,10 @@ end
 --- Move view to special index of its superview.
 -- @param zIndex The target z-order to move the view to. This parameter is adopt from native group object.
 function View:moveToIndex(zIndex)
+  if not self.superview then return end
   zIndex = tonumber(zIndex)
-  assert(zIndex > 0, "invalid z-order param")
-  stage = display.getCurrentStage()
-  stage:insert(self.frame)
+  assert(zIndex > 0, "invalid zIndex param")
+  display.getCurrentStage():insert(self.frame)
   self.superview.bounds:insert(zIndex, self.frame)
 end
 
