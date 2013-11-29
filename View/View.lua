@@ -53,7 +53,9 @@ function View:initialize(opt)
   -- Visual Appearance
   -- implement paramters
   local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or CH
-  local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
+  --local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
+  local padding = opt.padding or {left = 0, right = 0, top = 0, bottom = 0}
+  local xOffset, yOffset = padding.left, padding.top
   
   -- frame group
   -- The frame defines the position and dimensions of the view in the coordinate system of its superview.
@@ -81,13 +83,30 @@ function View:initialize(opt)
   
   -- Layout and Constraints
   self.clipToBounds = opt.clipToBounds or false
-  self.attribute = {
-    left = 0, right = 0,
-    top = 0, bottom = 0,
-    leading = 0, trailing = 0,
-    width = "content", height = "parent",
+  self.layout = {
+    -- relative to super view or sibling views
+    margin = { -- Specifies extra space of this view. The space are outside this view's bounds.
+      left = 0, right = 0,
+      leading = 0, trailing = 0,
+      top = 0, bottom = 0,
+    },
+    alignment = {
+      centerHorizontal = true,
+    },
+    --left = 0, right = 0,
+    --top = 0, bottom = 0,
+    --leading = 0, trailing = 0,
+    -- defined self content
+    padding = {
+      left = 0, right = 0,
+      leading = 0, trailing = 0,
+      top = 0, bottom = 0,
+    },
+    width = "content", -- wrap content
+    height = "parent", -- match parent
     centerX = 0, centerY = 0,
-    baseline = 0
+    baseline = 0,
+    weight = 0,
   }
 
   -- Configuring the Event-Related Behavior

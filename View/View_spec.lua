@@ -61,7 +61,8 @@ ts.regist(1, function()
     ts.blueColor = {90, 200, 250, 255}
     local bar = View {
       name = "bar",
-      yOffset = 22,
+      --yOffset = 22,
+      padding = {top = 22, left = 0},
       width = VCW, height = 44,
       backgroundColor = ts.blueColor,
     }
