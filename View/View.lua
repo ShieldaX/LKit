@@ -170,7 +170,7 @@ function View:removeFromSuperview(view)
     self.superview = nil
   end
   self.window = nil
-  frame:removeSelf()
+  --frame:removeSelf()
 end
 
 function View:didAddSubview(view)
@@ -222,6 +222,14 @@ function View:getWindow()
       super = super.superview
     end
   end
+end
+
+function View:finalize()
+  if self.superview then
+    self:removeFromSuperview()
+  end
+  self.name = nil
+  self.frame:removeSelf()
 end
 
 function View:layoutSubviews()
