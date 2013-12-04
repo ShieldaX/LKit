@@ -2,6 +2,7 @@
 -- @class: Input
 -- @file Input.lua - v0.0.1 (2013-09)
 -- wrapper of native input field
+-- (Implement Reference)[http://www.coronalabs.com/blog/2013/12/03/tutorial-customizing-text-input]
 -----------------------------------------------
 
 -- ======
@@ -63,8 +64,8 @@ function Input:initialize(api)
   local field = native.newTextField( left, top, width, height )
   field.text = self.defaultText
   field:setTextColor(unpack(self.defaultColor))
-  --field.isSecure = api.isSecure
-  field.size = math.floor(height*.8)
+  field.isSecure = api.isSecure
+  field.size = api.fontSize or height*.67
 
   self.field = field
   field:addEventListener("userInput", self)
