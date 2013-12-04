@@ -43,74 +43,150 @@ local SOY = display.screenOriginY
 --- Instance constructor
 -- @param api Intent table for construct new instance.
 function Input:initialize(api)
-  -- class custom api:
-  api.backgroundColor = {255, 255, 255, 0} -- hide background rect
-  --api.backgroundColor = {0, 0, 0, 255} -- hide background rect
+  api.backgroundColor = api.backgroundColor or {1, 1, 1} -- override default value
+  api.width = api.width or display.contentWidth*.75
+  api.height = api.height or 20
   -- instantiation
   View.initialize(self, api)
+  local bounds = self.bounds
+  local frame = self.frame
+  local width = frame.width
+  local height = frame.height -- frame.height + 10
+  
+  api.cornerRadius = api.cornerRadius or height*.33
+  api.font = api.font or native.systemFont
 
-  --self.tintColor = api.tintColor or {0, 0, 0, 255}
-  --self.size = api.size or 30
-  --self.font = api.font or native.systemFontBold
-  self.defaultText = api.defaultText
-  self.defaultColor = api.defaultColor or {0, 0, 0, 255}
+  self.background:removeSelf(); self.background = nil
+  local background = display.newRoundedRect(bounds, 0, 0, width, height, api.cornerRadius)
+  background.strokeWidth = api.strokeWidth or 2
+  background:setFillColor(unpack(self.backgroundColor))
+  background:setStrokeColor(unpack(api.strokeColor or {0, 0, 0}))
+  self.background = background
+
+  self.defaultText = api.defaultText or ""
+  self.defaultColor = api.defaultColor or {0, 0, 0}
+  self.inputColor = api.inputColor or self.defaultColor
+  self.everInput = false
 
   -- layout real text field
-  local frame = self.frame
-  local left = frame.contentBounds.xMin
-  local top = frame.contentBounds.yMin
-  local width = frame.contentWidth
-  local height = frame.contentHeight
-  local field = native.newTextField( left, top, width, height )
-  field.text = self.defaultText
-  field:setTextColor(unpack(self.defaultColor))
-  field.isSecure = api.isSecure
-  field.size = api.fontSize or height*.67
+  local field = native.newTextField( 0, 0, width - api.cornerRadius, height - background.strokeWidth*2)
 
+  -- config text field
+  field.font = native.newFont(api.font)
+  field.inputType = api.inputType or "default"
+  field.isSecure = api.isSecure
+  field.hasBackground = false
+
+  local deviceScale = ( display.pixelWidth / display.contentWidth ) * 0.5
+  local fontSize = api.fontSize or height*.33
+  field.size = fontSize*deviceScale
+  
+  self.bounds:insert(field)
   self.field = field
+
+  -- placeholder 
+  self:rollBack()
+
   field:addEventListener("userInput", self)
 end
 
-function Input:transitionTo(api)
-  -- set frame to target position
-  local frame = self.frame
-
-  util.print_r(self.field.contentBounds)
-  util.print_r(self.frame.contentBounds)
-
-  if api.delta == true then
-    --frame:translate(api.x, api.y)
-  else
-    frame.x = api.x or frame.x
-    frame.y = api.y or frame.y
-  end
-  --local bounds = frame.contentBounds
-  local left = frame.contentBounds.xMin
-  local top = frame.contentBounds.yMin
-  local width = frame.contentWidth
-  local height = frame.contentHeight
-  local x, y = self.background:localToContent(0, 0)
-  -- then transition native field to act real animation
-  --self.field.x = x
-  --self.field.y = y
-  self.tween = transition.to(self.field, {x = x, y = y, transition = api.transition})
-end
-
--- ---
--- Handle User Input
--- ---
--- Roll input text back to default or none
-function Input:rollBack(clear)
-  self.field.text = clear == true and  '' or self.defaultText
-end
-
 function Input:userInput(event)
-  print("user inputting just happened")
+  local phase = event.phase
+  if phase == "began" then
+
+    -- user begins editing textField
+    if not self.everInput then self:onUserBeganInput() end
+    -- scroll content up
+    self:sendEvent({
+      name = "inputBegan",
+      target = self,
+    })
+
+  elseif phase == "ended" then
+
+    -- textField loses focus
+    -- roll back ?
+    if self.field.text == '' then self:rollBack() end
+    
+    self:sendEvent({
+      name = "inputEnded",
+      target = self,
+    })
+
+    --native.setKeyboardFocus( nil )
+
+    -- transfer input focus
+  elseif phase == "submitted" then
+
+    if self.field.text == '' then self:rollBack() end
+
+    if not self.tween then
+      self:sendEvent({
+        name = "inputSubmitted",
+        target = self,
+      })
+    end
+
+    if self.nextFocus then
+      native.setKeyboardFocus( self.nextFocus.field )
+    elseif not self.tween then
+      native.setKeyboardFocus( nil )
+    end
+
+  elseif phase == "editing" then
+
+    print( event.newCharacters )
+    print( event.oldText )
+    print( event.startPosition )
+    print( event.text )
+
+    self:sendEvent({
+      name = "inputEditing",
+      target = self,
+    })
+
+  end
+end
+
+-- Roll input text back to default or none
+-- rolling back only happened when there is no text and just losed focus by default.
+function Input:rollBack(clear)
+  self.field.text = clear == true and '' or self.defaultText
+  self.field:setTextColor(unpack(self.defaultColor))
+  self.everInput = false
+end
+
+function Input:onUserBeganInput()
+  -- switch color
+  self.field.text = ''
+  self.field:setTextColor(unpack(self.inputColor))
+  self.everInput = true
 end
 
 function Input:setText(text)
   assert(type(text) == "string")
   self.field.text = text
+end
+
+function Input:onValidate()
+end
+
+function Input:sendEvent(event)
+  self.frame:dispatchEvent(event)
+end
+
+function Input:addTarget(obj, action)
+  self.frame:addEventListener(action, obj)
+  print("responses to", action)
+end
+
+function Input:removeTarget(obj, action)
+  self.frame:removeEventListener(action, obj)
+end
+
+function Input:finalize()
+  if self.field then self.field:removeSelf() end
+  View.finalize(self)
 end
 
 return Input

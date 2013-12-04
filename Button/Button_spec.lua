@@ -76,4 +76,11 @@ ts.regist(1, function()
     ts.button:addTarget(sampleObj, "release")
 end, "button add target")
 
+ts.regist(1, function()
+    local field = Input {
+      name = "test",
+      
+    }
+end, "build text input field")
+
 return ts
