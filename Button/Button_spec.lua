@@ -77,10 +77,22 @@ ts.regist(1, function()
 end, "button add target")
 
 ts.regist(1, function()
-    local field = Input {
+    ts.input = Input {
       name = "test",
-      
+      x = 10,
+      y = display.contentCenterY,
+      --cornerRadius = 5,
     }
 end, "build text input field")
+
+ts.regist(1, function()
+    local inputFrame = ts.input.frame
+    transition.to(inputFrame, {time = 200, delta = true, y = 20})
+end, "translate input view")
+
+ts.regist(1, function()
+    local inputFrame = ts.input.frame
+    transition.to(inputFrame, {time = 400, delta = false, y = 40, transition = easing.outQuad})
+end, "translate input view")
 
 return ts

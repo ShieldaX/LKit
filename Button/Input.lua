@@ -43,7 +43,7 @@ local SOY = display.screenOriginY
 --- Instance constructor
 -- @param api Intent table for construct new instance.
 function Input:initialize(api)
-  api.backgroundColor = api.backgroundColor or {1, 1, 1} -- override default value
+  api.backgroundColor = api.backgroundColor or {255, 255, 255} -- override default value
   api.width = api.width or display.contentWidth*.75
   api.height = api.height or 20
   -- instantiation
@@ -53,7 +53,7 @@ function Input:initialize(api)
   local width = frame.width
   local height = frame.height -- frame.height + 10
   
-  api.cornerRadius = api.cornerRadius or height*.33
+  api.cornerRadius = api.cornerRadius or height*.2
   api.font = api.font or native.systemFont
 
   self.background:removeSelf(); self.background = nil
@@ -70,6 +70,8 @@ function Input:initialize(api)
 
   -- layout real text field
   local field = native.newTextField( 0, 0, width - api.cornerRadius, height - background.strokeWidth*2)
+  field.x = background.x
+  field.y = background.y
 
   -- config text field
   field.font = native.newFont(api.font)
@@ -78,7 +80,7 @@ function Input:initialize(api)
   field.hasBackground = false
 
   local deviceScale = ( display.pixelWidth / display.contentWidth ) * 0.5
-  local fontSize = api.fontSize or height*.33
+  local fontSize = api.fontSize or height*.67
   field.size = fontSize*deviceScale
   
   self.bounds:insert(field)
