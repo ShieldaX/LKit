@@ -32,6 +32,7 @@ local SOY = display.screenOriginY
 -- VARIABLES
 -- ======
 
+-- Control state
 Button.static.State = {
   Normal = 1,
   Highlighted = 2,
@@ -56,28 +57,34 @@ function Button:initialize(api)
   api.height = api.height or 20
   api.width = api.width or api.height*1.618
   self.buttonTintColor = self.tintColor
-  self.buttonTintColor[4] = 128
+  self.buttonTintColor[4] = 128 -- translucent tint color
 
   -- instantiation
   View.initialize(self, api)
+  local bounds = self.bounds
+  local background = self.background
 
   -- rect with border
-  local insetTop, insetRight, insetBottom, insetLeft = api.insetTop or 0, api.insetRight or 0, api.insetBottom or 0, api.insetLeft or 0
-  local buttonWidth = self.background.contentWidth - (insetLeft + insetRight)
-  local buttonHeight = self.background.contentHeight - (insetTop + insetBottom)
-  local rectNormal = display.newRoundedRect(self.bounds, 0, 0, buttonWidth, buttonHeight, 6)
-  rectNormal.strokeWidth = 2
-  rectNormal:setStrokeColor(unpack(self.tintColor))
-  self.rectNormal = rectNormal
+  local buttonWidth = self.background.contentWidth
+  local buttonHeight = self.background.contentHeight
 
   api.cornerRadius = api.cornerRadius or buttonHeight*.2
   api.strokeWidth = api.strokeWidth or 2
+  local strokeColor = api.strokeColor or self.tintColor
+
+  -- switch background rect
+  background:removeSelf()
+  local rect = display.newRoundedRect(bounds, 0, 0, buttonWidth, buttonHeight, api.cornerRadius)
+  rect.strokeWidth = api.strokeWidth
+  rect:setStrokeColor(unpack(self.tintColor))
+  self.background = rect
+
   -- ...
 
   -- text label
   local labelText = api.labelText or api.name
   local label = display.newText {
-    parent = self.bounds,
+    parent = bounds,
     x = rectNormal.contentWidth*.5, y = rectNormal.contentHeight*.5,
     text = labelText,
     font = native.systemFontBold,

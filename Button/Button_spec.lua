@@ -33,15 +33,15 @@ ts.regist(0, function()
 end, "create a new button instance")
 
 ts.regist(1, function()
-    ts.button:setStateDisabled()
+    --ts.button:setStateDisabled()
 end)
 
 ts.regist(2, function()
-    ts.button:setStateNormal()
+    --ts.button:setStateNormal()
 end)
 
 ts.regist(2, function()
-    ts.button:setStatePressed()
+    --ts.button:setStatePressed()
 end)
 
 ts.desc("#control state")
