@@ -30,8 +30,6 @@ local SOY = display.screenOriginY
 -- VARIABLES
 -- ======
 
--- Internal identifier
-
 -- ======
 -- FUNCTIONS
 -- ======
@@ -41,10 +39,10 @@ local SOY = display.screenOriginY
 -- ------
 
 --- Instance constructor
--- @param opt Intent table for construct new instance.
-function View:initialize(opt)
+-- @param api Intent table for construct new instance.
+function View:initialize(api)
   -- Identifer
-  local name = opt.name
+  local name = api.name
   assert(type(name) == "string" or type(name) == "number", "name should be specified.")
   assert(string.find(name, "_", 1) ~= 1, "can't resolve '_' prefixed subview.")
   assert(not string.find(name, "-", 1), "can't resolve '-' contained subview.")
@@ -52,9 +50,9 @@ function View:initialize(opt)
   
   -- Visual Appearance
   -- implement paramters
-  local x, y, width, height = opt.x or 0, opt.y or 0, opt.width or ACW, opt.height or CH
-  --local xOffset, yOffset = opt.xOffset or 0, opt.yOffset or 0
-  local padding = opt.padding or {left = 0, right = 0, top = 0, bottom = 0}
+  local x, y, width, height = api.x or 0, api.y or 0, api.width or ACW, api.height or CH
+  --local xOffset, yOffset = api.xOffset or 0, api.yOffset or 0
+  local padding = api.padding or {left = 0, right = 0, top = 0, bottom = 0}
   local xOffset, yOffset = padding.left, padding.top
   
   -- frame group
@@ -64,9 +62,17 @@ function View:initialize(opt)
   
   -- background rect is used for event handling.
   -- background is still used for compute frame's dimension.
-  self.background = display.newRect(frame, 0, 0, width, height) -- insert background rect in frame group
-  self.backgroundColor = opt.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent  
-  self.background:setFillColor(unpack(self.backgroundColor))
+  --local background = display.newRect(frame, 0, 0, width, height) -- insert background rect in frame group
+  --self.backgroundColor = api.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent  
+
+  local background
+  self.radius = api.radius or 0
+  background = display.newRoundedRect(frame, 0, 0, width, height, self.radius)
+  background.strokeWidth = api.strokeWidth or 0
+  self.backgroundColor = api.backgroundColor or {255, 255, 255, 0}  -- color table, default is transparent  
+  background:setFillColor(unpack(self.backgroundColor))
+  background:setStrokeColor(unpack(self:getTintColor()))
+  self.background = background
   
   -- The bounds group, which describes the view's location and size in its own coordinate system.
   local bounds = display.newGroup()
@@ -74,6 +80,7 @@ function View:initialize(opt)
   bounds.x, bounds.y = xOffset, yOffset
 
   self.frame = frame -- commonly used during layout to adjust the size or position of the view.
+  frame.view = self -- back reference
   self.bounds = bounds
   
   -- View Hierarchy
@@ -82,8 +89,8 @@ function View:initialize(opt)
   self.window = nil -- not exist before insert into a window view.
   
   -- Layout and Constraints
-  self.clipToBounds = opt.clipToBounds or false
-  self.layout = {
+  self.clipToBounds = api.clipToBounds or false
+  self._layout = {
     -- relative to super view or sibling views
     margin = { -- Specifies extra space of this view. The space are outside this view's bounds.
       left = 0, right = 0,
@@ -151,7 +158,7 @@ function View:addSubview(view, zIndex)
   bounds:insert(zIndex, view.frame)
   view.superview = self
   self[view.name] = view -- view reference
-  --table.insert(self.subviews, view) -- add subview
+  table.insert(self.subviews, view) -- add subview
   view.window = self.window --view:getWindow()
 
   self:didAddSubview(view)
@@ -170,7 +177,6 @@ function View:removeFromSuperview(view)
     self.superview = nil
   end
   self.window = nil
-  --frame:removeSelf()
 end
 
 function View:didAddSubview(view)
@@ -221,6 +227,16 @@ function View:getWindow()
     else
       super = super.superview
     end
+  end
+end
+
+function View:getTintColor()
+  if self.tintColor then return self.tintColor end
+
+  if self.superview then
+    return self.superview:getTintColor()
+  else
+    return {0, 122, 255, 255} -- View.getDefault("tintColor")
   end
 end
 

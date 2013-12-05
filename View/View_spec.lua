@@ -86,6 +86,7 @@ ts.regist(1, function()
       backgroundColor = {88, 86, 214},
     }
     ts.shade_1 = shade_1
+    ts.shade_2 = shade_2
     bar:addSubview(shade_1)
     bar:addSubview(shade_2)
     print("only purple subview should be see")
@@ -107,7 +108,9 @@ ts.regist(1, function()
       name = "rect",
       width = 128, height = 128,
       --verticalAlign = View.Algin.ALIGN_CENTER
-      backgroundColor = {76, 217, 100}
+      backgroundColor = {76, 217, 100},
+      radius = 5,
+      strokeWidth = 1,
     }
     util.center(rect.frame)
     local window = ts.window
@@ -130,6 +133,13 @@ ts.regist(2, function()
     window.bar.purple:removeFromSuperview()
     assert(type(window.bar.purple) == "nil", "reference is not removed")
 end, "remove subview from its superview")
+
+ts.regist(1, function()
+    local shade_2 = ts.shade_2
+    shade_2:finalize()
+    local window = ts.window
+    window.rect:finalize()
+end, "finalize view")
 
 ts.desc("#Animations")
 ts.regist(2, function() end, "create/modify/commit animation")
