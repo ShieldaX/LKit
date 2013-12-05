@@ -3,6 +3,7 @@
 -- @file Input.lua - v0.0.1 (2013-09)
 -- wrapper of native input field
 -- (Implement Reference)[http://www.coronalabs.com/blog/2013/12/03/tutorial-customizing-text-input]
+-- TODO: Validate input text, basic validate types like numbers(phone, post, fax), names(first, last) and so on.
 -----------------------------------------------
 
 -- ======
