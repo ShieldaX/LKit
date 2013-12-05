@@ -48,20 +48,21 @@ Button.static.State = {
 -- ------
 
 --- Instance constructor
--- @param opt Intent table for construct new instance.
-function Button:initialize(opt)
-  -- class custom opt:
-  opt.backgroundColor = {255, 255, 255, 0} -- hide background rect
-  --self.tintColor = opt.tintColor or {0, 122, 255, 255}
-  --self.buttonTintColor = opt.buttonTintColor or {255, 255, 255, 255}
-  self.tintColor = opt.tintColor or {255, 255, 255, 255}
-  self.buttonTintColor = opt.buttonTintColor or {0, 122, 255, 255}
+-- @param api Intent table for construct new instance.
+function Button:initialize(api)
+  -- class custom api:
+  api.backgroundColor = {255, 255, 255, 0} -- hide background rect
+  self.tintColor = api.tintColor or {0, 122, 255, 255}
+  api.height = api.height or 20
+  api.width = api.width or api.height*1.618
+  self.buttonTintColor = self.tintColor
+  self.buttonTintColor[4] = 128
 
   -- instantiation
-  View.initialize(self, opt)
+  View.initialize(self, api)
 
   -- rect with border
-  local insetTop, insetRight, insetBottom, insetLeft = opt.insetTop or 0, opt.insetRight or 0, opt.insetBottom or 0, opt.insetLeft or 0
+  local insetTop, insetRight, insetBottom, insetLeft = api.insetTop or 0, api.insetRight or 0, api.insetBottom or 0, api.insetLeft or 0
   local buttonWidth = self.background.contentWidth - (insetLeft + insetRight)
   local buttonHeight = self.background.contentHeight - (insetTop + insetBottom)
   local rectNormal = display.newRoundedRect(self.bounds, 0, 0, buttonWidth, buttonHeight, 6)
@@ -69,8 +70,12 @@ function Button:initialize(opt)
   rectNormal:setStrokeColor(unpack(self.tintColor))
   self.rectNormal = rectNormal
 
+  api.cornerRadius = api.cornerRadius or buttonHeight*.2
+  api.strokeWidth = api.strokeWidth or 2
+  -- ...
+
   -- text label
-  local labelText = opt.labelText or opt.name
+  local labelText = api.labelText or api.name
   local label = display.newText {
     parent = self.bounds,
     x = rectNormal.contentWidth*.5, y = rectNormal.contentHeight*.5,
@@ -92,7 +97,7 @@ function Button:initialize(opt)
 
   -- response to touch
   self.enabled = true
-  if opt.enabled == false then self.enabled = false end
+  if api.enabled == false then self.enabled = false end
   self.touchBounds = self.rectNormal.contentBounds
 
   self.highlighted = false -- button sets and clears this state automatically when a touch enters and exits during tracking and when there is a touch up.
