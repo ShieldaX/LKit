@@ -16,6 +16,7 @@ local scroller = require 'scroller'
 -- CLASS
 -- ======
 local Scroll = View:subclass('Scroll')
+Scroll:include(scroller)
 
 -- ======
 -- CONSTANTS
@@ -28,9 +29,10 @@ local ACH = display.actualContentHeight
 -- VARIABLES
 -- ======
 
-Scroll.static.friction = 0.94
+-- default class variable
+Scroll.static.decelerationRateNormal = 0.94
+Scroll.static.decelerationRateFast = 0.972
 Scroll.static.scrollStopThreshold = 250
--- Internal identifier
 
 -- ======
 -- FUNCTIONS
@@ -41,12 +43,116 @@ Scroll.static.scrollStopThreshold = 250
 -- ------
 
 --- Instance constructor
--- @param opt Intent table for construct new instance.
-function Scroll:initialize(opt)
-  View.initialize(self, opt)
-  self.class:include(scroller)  
+-- @param api Intent table for construct new instance.
+function Scroll:initialize(api)
+  View.initialize(self, api)
+
+  self.canCancelContentTouches = not (api.canCancelContentTouches == false) -- Default true
+  self.delaysContentTouches = not (api.delaysContentTouches == false) -- Delays handling the touch-began until it can determine if scrolling is the intent.
+  self.directionLockEnabled = not (api.directionLockEnabled == false)
+  self.bounces = not (api.bounces == false)
+  self.alwaysBounceVertical = api.alwaysBounceVertical == true -- Default false
+  self.alwaysBounceHorizontal = api.alwaysBounceHorizontal == true -- Default false
+
+  self.decelerationRate = api.decelerationRate or Scroll.decelerationRateNormal
+  self.scrollStopThreshold = api.scrollStopThreshold or Scroll.scrollStopThreshold
+
+  self.tracking = false -- touched but might not have yet have started dragging
+  self.dragging = false -- scrolling is the intent
+  self.decelerating = false -- scrolling is still occurring after dragging
+
   self.frame:addEventListener("touch", self)
   Runtime:addEventListener("enterFrame", self)
+end
+
+function Scroll:touch(event)
+  local contentView = self.bounds
+  local phase = event.phase
+  local time = event.time
+  local target = event.target
+  
+  if "began" == phase then
+    -- Reset values
+    self._prevYPos = event.y
+    self._prevY = 0
+    self._delta = 0
+    self.velocity = 0
+    self._prevTime = 0
+    self.dragging = false -- not dragging yet
+    self.tracking = true
+    self.decelerating = false -- not lift
+    
+    -- Set the limits now
+    self:updateLimitation()
+    
+    -- Cancel any active scrollTween on the content view
+    if self.scrollTween then
+      transition.cancel( self.scrollTween )
+      self.scrollTween = nil
+    end
+    
+    --self:willBeginDragging()
+    if type(self.willBeginDragging) == "function" then self:willBeginDragging() end
+    
+    -- Set focus
+    --display.getCurrentStage():setFocus( event.target, event.id )
+    --target.isFocus = true
+
+  elseif self.tracking then
+    if "moved" == phase then      
+      self._delta = event.y - self._prevYPos
+      self._prevYPos = event.y
+      if Abs(self._delta) > 1 then
+        self.dragging = true -- flag scrolling is the intent
+        if self.canCancelContentTouches then
+          -- cancel content touches
+          -- self:touchesShouldCancelInContentView(viewTouched)
+          --table.foreach(self:getTouchedViews(event), function(i, view)
+            -- body
+          --end)
+        else
+        end
+      end
+      -- If the view is more than the limits, handle overscroll
+      if contentView.y < self.upperLimit or contentView.y > self.bottomLimit then
+        contentView.y = contentView.y + ( self._delta * 0.5 )
+      else
+        contentView.y = contentView.y + self._delta 
+      end
+      
+      self:limitationReached( false )
+      
+      -- update the last held time
+      self._timeHeld = time
+            
+      --util.print_r(#(self:indexPathsForVisibleRows()))
+      --TODO: stuck section header
+      
+    elseif "ended" == phase or "cancelled" == phase then
+      self._lastTime = event.time
+      self.dragging = false
+      self.tracking = false
+      self.decelerating = true
+      
+      -- touch held
+      if event.time - self._timeHeld > self.class.scrollStopThreshold then
+        self.velocity = 0
+      end
+      self._timeHeld = 0
+      
+      if self._delta > 0 and self.velocity < 0 then
+        self.velocity = -self.velocity
+      end
+      if self._delta < 0 and self.velocity > 0 then
+        self.velocity = -self.velocity
+      end
+      
+      display.getCurrentStage():setFocus( event.target, nil )
+      --target.isFocus = false
+    end
+  end
+  
+  return true
 end
 
 function Scroll:scrollTo(offsetOrPosition, animated)
@@ -60,8 +166,8 @@ function Scroll:scrollTo(offsetOrPosition, animated)
   if type(target) ~= "number" then return end
   print("will scroll to " .. target)
   -- close tracking and dragging listener
-  self.decelerating = false
-  self.dragging = false
+  self._decelerating = false
+  self._dragging = false
   -- Reset velocity back to 0
   self.velocity = 0
   if animated then
@@ -75,11 +181,11 @@ function Scroll:scrollBoundsTo(bounds, position, animated)
   position = position or "top"
 end
 
-function Scroll:removeFromSuperView()
+function Scroll:finalize()
   -- remove event listeners if any.
   Runtime:removeEventListener("enterFrame", self)
   self.frame:removeEventListener("touch", self)
-  View.removeFromSuperView(self) -- super call
+  View.finalize(self)
 end
 
 return Scroll
