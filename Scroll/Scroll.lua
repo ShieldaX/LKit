@@ -79,8 +79,8 @@ function Scroll:touch(event)
     self.velocity = 0
     self._prevTime = 0
     self.dragging = false -- not dragging yet
-    self.tracking = true
     self.decelerating = false -- not lift
+    self.tracking = true
     
     -- Set the limits now
     self:updateLimitation()
@@ -117,16 +117,13 @@ function Scroll:touch(event)
       if contentView.y < self.upperLimit or contentView.y > self.bottomLimit then
         contentView.y = contentView.y + ( self._delta * 0.5 )
       else
-        contentView.y = contentView.y + self._delta 
+        contentView.y = contentView.y + self._delta
       end
       
       self:limitationReached( false )
       
       -- update the last held time
       self._timeHeld = time
-            
-      --util.print_r(#(self:indexPathsForVisibleRows()))
-      --TODO: stuck section header
       
     elseif "ended" == phase or "cancelled" == phase then
       self._lastTime = event.time
@@ -153,6 +150,17 @@ function Scroll:touch(event)
   end
   
   return true
+end
+
+-- @param event Touch event
+-- @param view Subview that the touches occur in.
+function Scroll:touchesShouldBegin(event, view)
+  -- body
+end
+
+function Scroll:touchesShouldCancelInContentView(view)
+  local notAControl = not view:isInstanceOf(require("Control"))
+  return notAControl
 end
 
 function Scroll:scrollTo(offsetOrPosition, animated)
