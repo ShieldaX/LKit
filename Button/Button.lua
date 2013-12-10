@@ -1,6 +1,6 @@
 -----------------------------------------------
 -- @class: Button
--- @file Button.lua - v0.0.1 (2013-09)
+-- @file Button.lua - v0.0.2 (2013-09)
 -- Most used control widget class, stateful
 -----------------------------------------------
 -- created at: 2013-11-11 10:50:13
@@ -34,10 +34,10 @@ local SOY = display.screenOriginY
 
 -- Control state
 Button.static.State = {
-  Normal = 1,
-  Highlighted = 2,
-  Disabled = 3,
-  Selected = 4
+  Normal = "normal",
+  Highlighted = "highlighted",
+  Disabled = "disabled",
+  Selected = "selected"
 }
 
 -- ======
@@ -51,13 +51,14 @@ Button.static.State = {
 --- Instance constructor
 -- @param api Intent table for construct new instance.
 function Button:initialize(api)
+  -- button type
+  self.buttonType = api.buttonType or "default"
+
   -- class custom api:
   api.backgroundColor = {255, 255, 255, 0} -- hide background rect
   self.tintColor = api.tintColor or {0, 122, 255, 255}
   api.height = api.height or 20
   api.width = api.width or api.height*1.618
-  self.buttonTintColor = self.tintColor
-  self.buttonTintColor[4] = 128 -- translucent tint color
 
   -- instantiation
   View.initialize(self, api)
@@ -70,102 +71,91 @@ function Button:initialize(api)
 
   api.cornerRadius = api.cornerRadius or buttonHeight*.2
   api.strokeWidth = api.strokeWidth or 2
-  local strokeColor = api.strokeColor or self.tintColor
 
   -- switch background rect
   background:removeSelf()
   local rect = display.newRoundedRect(bounds, 0, 0, buttonWidth, buttonHeight, api.cornerRadius)
   rect.strokeWidth = api.strokeWidth
-  rect:setStrokeColor(unpack(self.tintColor))
+  --rect:setStrokeColor(unpack(self.tintColor))
   self.background = rect
-
-  -- ...
 
   -- text label
   local labelText = api.labelText or api.name
   local label = display.newText {
     parent = bounds,
-    x = rectNormal.contentWidth*.5, y = rectNormal.contentHeight*.5,
+    x = rect.contentWidth*.5, y = rect.contentHeight*.5,
     text = labelText,
     font = native.systemFontBold,
     fontSize = 20,
     align = "center"
   }
-  self.textLabel = label
-
-  -- or --
-
-  -- image label
-  -- TODO
+  self.titleLabel = label
 
   -- button state
-  self.status = Button.State.Normal
-  self:setStateNormal()
+  self.states = {
+    normal = {
+      title = api.title or "Button",
+      titleColor = self.tintColor,
+      titleShadowColor = api.shadowColor or {0, 122, 255, 0}, -- fill the background
+      image = api.image,
+      strokeColor = self.tintColor,
+    },
+    highlighted = {
+      titleColor = self.tintColor,
+    },
+    disabled = {
+      titleColor = {142, 142, 147},
+      strokeColor = {142, 142, 147},
+      titleShadowColor = {142, 142, 147, 128},
+    },
+  }
 
   -- response to touch
-  self.enabled = true
-  if api.enabled == false then self.enabled = false end
-  self.touchBounds = self.rectNormal.contentBounds
+  self.enabled = not (api.enabled == false)
 
+  if self.enabled then
+    self:setState(Button.State.Normal)
+    self.frame:addEventListener("touch", self)
+  else
+    self:setState(Button.State.Disabled)
+  end
+
+  self.touchBounds = self.background.contentBounds
   self.highlighted = false -- button sets and clears this state automatically when a touch enters and exits during tracking and when there is a touch up.
   self.tracking = false -- is tracking a touch event
   self.touchInside = false -- is there a touch event happen in touchBounds
-
-  if self.enabled then
-    self.frame:addEventListener("touch", self)
-  else
-    self:setStateDisabled()
-  end
   
 end
 
-function Button:setLabelForState(state)
-  local status = Button.State
-  state = state or status.Normal
-  if state == status.Normal then
-    print("set label for state normal")
-  elseif state == status.Highlighted then
-  elseif state == status.Disabled then
-  elseif state == status.Selected then
-  end
-end
+function Button:setState(state)
+  if (not state) or state == self.status then return end
+  local status = self.states[state]
+  local default = self.states.normal
+  -- map state config
+  self.currentTitle = status.title or default.title
+  self.currentTitleColor = status.titleColor or default.titleColor
+  self.currentTitleShadowColor = status.titleShadowColor or default.titleShadowColor
+  self.currentBorderColor = status.strokeColor or default.strokeColor
 
-function Button:setStatePressed() -- setHighlighted(highlighted)
-  local highlightedColor = self.tintColor
-  self.rectNormal:setFillColor(unpack(highlightedColor))
-  self.textLabel:setTextColor(unpack(self.buttonTintColor))
-  self.status = Button.State.Highlighted
-end
-
-function Button:setStateNormal()
-  local normalColor = self.buttonTintColor
-  self.rectNormal:setFillColor(unpack(normalColor))
-  self.textLabel:setTextColor(unpack(self.tintColor))
-  if self.status == Button.State.Disabled then self.rectNormal:setStrokeColor(unpack(normalColor)) end
-  self.status = Button.State.Normal
-end
-
-function Button:setStateDisabled()
-  local disabledColor = {142, 142, 147, 255}
-  self.rectNormal:setFillColor(unpack(disabledColor))
-  self.textLabel:setTextColor(unpack(self.tintColor))
-  self.rectNormal:setStrokeColor(unpack(disabledColor))
-  self.status = Button.State.Disabled
+  -- apply config
+  -- set title
+  local titleLabel = self.titleLabel
+  titleLabel.text = self.currentTitle
+  titleLabel:setTextColor(unpack(self.currentTitleColor))
+  -- set rect stroke
+  self.background:setStrokeColor(unpack(self.currentBorderColor))
+  -- set backgroundColor
+  self:setBackgroundColor(self.currentTitleShadowColor)
+  self.status = state
 end
 
 function Button:touch(event)
   if self.status ~= Button.State.Disabled then
     local phase = event.phase
     if phase == "began" then
-      self:setStatePressed()
+      self:setState(Button.State.Highlighted)
     elseif phase == "ended" then
-      local action = {
-        name = "release",
-        target = self,
-        time = os.time()
-      }
-      self.frame:dispatchEvent(action)
-      self:setStateNormal()
+      self:setState(Button.State.Normal)
     end
   end
 end

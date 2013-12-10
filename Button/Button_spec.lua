@@ -25,23 +25,31 @@ ts.regist(0, function()
     local simpleButton = Button {
       name = "simple",
       width = 100, height = 40,
+      tintColor = {255, 45, 85},
+      title = "Delete"
+      --enabled = false,
       --x = display.contentCenterX,
       --y = display.contentCenterY
     }
+
+    simpleButton.states.highlighted.titleShadowColor = {255, 45, 85, 128}
     bg:addSubview(simpleButton)
     ts.button = simpleButton
 end, "create a new button instance")
 
 ts.regist(1, function()
-    --ts.button:setStateDisabled()
+    ts.button:setState(Button.State.Disabled)
+    print(ts.button.currentTitle)
 end)
 
 ts.regist(2, function()
-    --ts.button:setStateNormal()
+    ts.button:setState(Button.State.Highlighted)
+    --print(ts.button.currentTitle)
 end)
 
 ts.regist(2, function()
-    --ts.button:setStatePressed()
+    ts.button:setState(Button.State.Normal)
+    print(ts.button.currentTitle)
 end)
 
 ts.desc("#control state")
