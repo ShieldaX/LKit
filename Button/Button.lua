@@ -123,8 +123,7 @@ function Button:initialize(api)
   self.touchBounds = self.background.contentBounds
   self.highlighted = false -- button sets and clears this state automatically when a touch enters and exits during tracking and when there is a touch up.
   self.tracking = false -- is tracking a touch event
-  self.touchInside = false -- is there a touch event happen in touchBounds
-  
+  self.touchInside = false -- is there a touch event happen in touchBounds  
 end
 
 function Button:setState(state)
@@ -149,15 +148,50 @@ function Button:setState(state)
   self.status = state
 end
 
+local function touchInside(bounds, point)
+  return point.x => bounds.xMin and point.x <= bounds.xMax and point.y => bounds.yMin and point.y <= bounds.yMax
+end
+
+-- ------
+-- Tracking Touches and Redrawing Controls
+-- ------
+
 function Button:touch(event)
   if self.status ~= Button.State.Disabled then
+    self.touchInside = touchInside(self.touchBounds, event)
+    local target = event.target
     local phase = event.phase
     if phase == "began" then
       self:setState(Button.State.Highlighted)
-    elseif phase == "ended" then
+
+      display.getCurrentStage():setFocus(target, event.id)
+      self.tracking = true
+    elseif self.tracking then
+      if phase == "moved" then
+
+      elseif phase == "ended" or phase == "cancelled" then
+        display.getCurrentStage():setFocus(target, nil)
+      end
+    elseif phase == "ended" or phase == "cancelled" then
       self:setState(Button.State.Normal)
+      self.tracking = false
     end
   end
+end
+
+function Button:shouldBeginTracking(event)
+end
+
+-- ...
+
+-- ------
+-- Preparing and Sending Action Messages
+-- ------
+
+function Button:sendAction(action)
+  assert(action and type(action.name) == "string", "ERROR: Try to send invalid action.")
+  action.sender = self.name
+  self.frame:dispatchEvent(action)
 end
 
 function Button:addTarget(obj, action)

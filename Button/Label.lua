@@ -69,61 +69,85 @@ end
 --- Instance constructor
 -- @param api Intent table for construct new instance.
 function Label:initialize(api)
-  assert(type(api.text) == "string", "text is undefined on label creation")
+  assert(type(api.text) == "string", "ERROR: Text is undefined on label creation")
   -- class custom api:
   --api.backgroundColor = {255, 255, 255, 0} -- hide background rect
-  api.backgroundColor = {0, 0, 0, 120} -- hide background rect
+  api.backgroundColor = {0, 0, 0, 128} -- hide background rect
   self.textColor = api.textColor or {0, 0, 0, 255} -- [default] dark black
-  self.highlightedTextColor = api.hightlightedColor -- [default] nil
+  self.highlightedTextColor = api.hightlightedColor or {255, 255, 255, 255} -- [default] white
 
   -- text label
   self.font = api.font or native.systemFontBold
-  self.align = api.align or "left"
+  self.alignment = api.alignment or "left"
   self.text = api.text
-  self.fontSize = api.fontSize or 16
-  self.numberOfLines = api.numberOfLines
+  self.fontSize = api.fontSize or 16 -- system default 16
+  self.numberOfLines = api.numberOfLines or 1
   self.maxLayoutWidth = api.width
+  self.maxLayoutHeight = api.height
 
   -- render text under special context
   local context = {
     --parent = self.bounds,
-    --x = width*.5, y = height*.5,
     width = self.maxLayoutWidth,
-    -- height = height,
+    height = self.maxLayoutHeight,
     text = self.text,
     font = self.font,
-    fontSize = self.fontSize, -- system default 16
+    fontSize = self.fontSize,
     align = self.align,
   }
   local label = display.newText(context)
   label:setTextColor(unpack(self.textColor))
   self.textObject = label
 
-  -- update background bounds
+  -- resize view bounds
   api.width, api.height = label.width, label.height
   label.x = label.width * .5
   label.y = label.height * .5
 
-  -- instantiation now
   View.initialize(self, api)
-
   local bounds = self.bounds
   bounds:insert(label)
 
   --self.lineBreakMode = 
-  self.shadowColor = {0, 0, 0}
-  self.attributedText = nil
+  self.shadowColor = api.shadowColor
+  self.shadowOffset = api.shadowOffset or {x = 0, y = -1}
+  if self.shadowColor then
+    --context.parent = bounds
+    shadow = display.newText(context)
+    shadow:setTextColor(unpack(self.shadowColor))
+    bounds:insert(shadow)
+    shadow:toBack()
+    self.shadow = shadow
+    shadow.x = label.x + self.shadowOffset.x
+    shadow.y = label.y + self.shadowOffset.y
+  end
+
   self.highlighted = false
+
+  self.userInteractionEnabled = false
 end
 
 function Label:setText(text)
   local label = self.textObject
-  if label then
-    label.text = text
-    local width, height = label.width, label.height
-    stretchBounds(label, width, height)
-    stretchBounds(self.background, width, height)
+  label.text = text
+  local width, height = label.width, label.height
+  label.x = label.width * .5
+  label.y = label.height * .5
+  if self.shadowColor then
+    local shadow = self.shadow
+    shadow.text = text
+    shadow.x = label.x + self.shadowOffset.x
+    shadow.y = label.y + self.shadowOffset.y
   end
+  stretchBounds(self.background, width, height)
+end
+
+function Label:align()
+  local textWidth = self.textObject.width
+end
+
+function Label:setSize(size)
+  self.textObject.size = size
 end
 
 function Label:sizeFitsWidth(width)
@@ -146,8 +170,15 @@ function Label:drawText(rect)
   return textObject
 end
 
-function Label:sizeThatFits()
-  -- body
+function Label:setHighlighted(highlighted)
+  highlighted = not (highlighted == false)
+  if self.highlighted == highlighted then return end
+  if highlighted then
+    self.textObject:setTextColor(unpack(self.highlightedTextColor))
+  else
+    self.textObject:setTextColor(unpack(self.textColor))
+  end
+  self.highlighted = highlighted
 end
 
 return Label

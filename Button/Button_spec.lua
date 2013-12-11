@@ -58,7 +58,8 @@ ts.regist(0, function()
       name = "sample",
       text = "Control State",
       align = "left",
-      width = 200,
+      --width = 200,
+      --shadowColor = {255},
     }
 
     function sampleLabel:release(action)
@@ -66,7 +67,7 @@ ts.regist(0, function()
       self:setText("State "..action.name)
     end
 
-    ts.label = sampleLabel    
+    ts.label = sampleLabel
 end, "create sample label")
 
 ts.regist(1, function()
