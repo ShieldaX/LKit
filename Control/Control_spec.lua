@@ -8,6 +8,7 @@ local util = require 'util'
 local ts = require 'spec_runner'
 local View = require 'View'
 local ProgressBar = require 'ProgressBar'
+local Control = require 'Control'
 
 local ACW = display.actualContentWidth
 local ACH = display.actualContentHeight
@@ -48,5 +49,15 @@ end, "update progress")
 ts.regist(1, function()
     ts.pr:update(2)
 end, "update progress complete")
+
+ts.desc("abstrct class for control")
+ts.regist(1, function()
+    local ctrl = Control {
+      name = "myCtrl",
+      width = 100, height = 40,
+      backgroundColor = {142},
+      x = 100, y = 100,
+    }
+end)
 
 return ts

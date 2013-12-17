@@ -32,7 +32,7 @@ local Gesture = class('Gesture')
 -- Initializing a Gesture Recongnizer
 -- ------
 
-function Gesture:initialize(opt)  
+function Gesture:initialize(opt)
 end
 
 -- ------
@@ -51,5 +51,7 @@ end
 -- ------
 -- Getting the Recognizer’s State and View
 -- ------
+
+
 
 return Gesture

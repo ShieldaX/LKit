@@ -149,7 +149,7 @@ function Button:setState(state)
 end
 
 local function touchInside(bounds, point)
-  return point.x => bounds.xMin and point.x <= bounds.xMax and point.y => bounds.yMin and point.y <= bounds.yMax
+  return (point.x >= bounds.xMin) and (point.x <= bounds.xMax) and (point.y >= bounds.yMin) and (point.y <= bounds.yMax)
 end
 
 -- ------
