@@ -11,12 +11,11 @@
 local util = require 'util'
 local class = require 'middleclass'
 local View = require 'View'
-local Control = require 'Control'
 
 -- ======
 -- CLASS
 -- ======
-local Button = Control:subclass('Button')
+local Button = View:subclass('Button')
 
 -- ======
 -- CONSTANTS
@@ -62,8 +61,7 @@ function Button:initialize(api)
   api.width = api.width or api.height*1.618
 
   -- instantiation
-  --View.initialize(self, api)
-  Control.initialize(self, api)
+  View.initialize(self, api)
   local bounds = self.bounds
   local background = self.background
 
@@ -112,7 +110,7 @@ function Button:initialize(api)
     },
   }
 
-  --[[ response to touch
+  -- response to touch
   self.enabled = not (api.enabled == false)
 
   if self.enabled then
@@ -121,11 +119,11 @@ function Button:initialize(api)
   else
     self:setState(Button.State.Disabled)
   end
-  ]]
-  --self.touchBounds = self.background.contentBounds
-  --self.highlighted = false -- button sets and clears this state automatically when a touch enters and exits during tracking and when there is a touch up.
-  --self.tracking = false -- is tracking a touch event
-  --self.touchInside = false -- is there a touch event happen in touchBounds  
+
+  self.touchBounds = self.background.contentBounds
+  self.highlighted = false -- button sets and clears this state automatically when a touch enters and exits during tracking and when there is a touch up.
+  self.tracking = false -- is tracking a touch event
+  self.touchInside = false -- is there a touch event happen in touchBounds  
 end
 
 function Button:setState(state)
@@ -150,13 +148,13 @@ function Button:setState(state)
   self.status = state
 end
 
--- ------
--- Tracking Touches and Redrawing Controls
--- ------
---[[
 local function touchInside(bounds, point)
   return (point.x >= bounds.xMin) and (point.x <= bounds.xMax) and (point.y >= bounds.yMin) and (point.y <= bounds.yMax)
 end
+
+-- ------
+-- Tracking Touches and Redrawing Controls
+-- ------
 
 function Button:touch(event)
   if self.status ~= Button.State.Disabled then
@@ -204,5 +202,5 @@ end
 function Button:removeTarget(obj, action)
   self.frame:removeEventListener(action, obj)
 end
-]]
+
 return Button

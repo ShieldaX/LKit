@@ -62,8 +62,7 @@ ts.regist(0, function()
       --shadowColor = {255},
     }
 
-    function sampleLabel:release(action)
-      print("perform action")
+    function sampleLabel:touchUpInside(action)
       self:setText("State "..action.name)
     end
 
@@ -78,11 +77,15 @@ end, "set label's content")
 ts.regist(1, function()
     local sampleObj = {type = "object"}
 
-    function sampleObj:release(action)
+    function sampleObj:touchUpInside(action)
       print(self.type .. " perform " .. action.name)
     end
-    ts.button:addTarget(ts.label, "release")
-    ts.button:addTarget(sampleObj, "release")
+    ts.button:addTarget(ts.label, "touchUpInside")
+    ts.button:addTarget(ts.label, "touchDown")
+    function ts.label:touchDown(action)
+      self:setText("State "..action.name)
+    end
+    ts.button:addTarget(sampleObj, "touchUpInside")
 end, "button add target")
 
 ts.regist(1, function()

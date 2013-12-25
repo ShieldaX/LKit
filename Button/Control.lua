@@ -68,14 +68,19 @@ function Control:setEnabled(enable)
   self.enabled = enable
 end
 
+-- @subclass
+-- @return boolean
 function Control:beginTracking(event)
   return true
 end
 
+-- @subclass
+-- @return boolean
 function Control:continueTracking(event)
   return true
 end
 
+-- @return boolean True if the point user touched is inside the special bounds, fasle for not inside.
 local function isTouchInside(bounds, point)
   return (point.x >= bounds.xMin) and (point.x <= bounds.xMax) and (point.y >= bounds.yMin) and (point.y <= bounds.yMax)
 end
