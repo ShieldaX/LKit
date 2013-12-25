@@ -112,9 +112,7 @@ function Button:initialize(api)
     },
   }
 
-  --[[ response to touch
-  self.enabled = not (api.enabled == false)
-
+  --[[
   if self.enabled then
     self:setState(Button.State.Normal)
     self.frame:addEventListener("touch", self)
@@ -130,6 +128,7 @@ end
 
 function Button:setState(state)
   if (not state) or state == self.status then return end
+  if state ~= "disabled" and not self.enabled then return end
   local status = self.states[state]
   local default = self.states.normal
   -- map state config
@@ -153,6 +152,21 @@ end
 -- ------
 -- Tracking Touches and Redrawing Controls
 -- ------
+
+function Button:willSendEvent(event)
+  if event == "touchDown" then
+    self:setState("highlighted")
+  elseif event == "touchDragExit" then
+    self:setState("normal")
+  elseif event == "touchDragEnter" then
+    self:setState("highlighted")
+  elseif event == "touchUpInside" then
+    self:setState("normal")
+  end
+end
+
+
+
 --[[
 local function touchInside(bounds, point)
   return (point.x >= bounds.xMin) and (point.x <= bounds.xMax) and (point.y >= bounds.yMin) and (point.y <= bounds.yMax)

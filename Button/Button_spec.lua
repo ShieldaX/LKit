@@ -26,7 +26,7 @@ ts.regist(0, function()
       name = "simple",
       width = 100, height = 40,
       tintColor = {255, 45, 85},
-      title = "Delete"
+      title = "Delete",
       --enabled = false,
       --x = display.contentCenterX,
       --y = display.contentCenterY

@@ -54,7 +54,9 @@ function Control:initialize(opt)
   self.selected = false
   self.status = Control.State.Normal
   self.tracking = false
-  self:setEnabled(true)
+
+  local isEnabled = not (opt.enabled == false)
+  self:setEnabled(isEnabled)
 end
 
 function Control:setEnabled(enable)
@@ -153,15 +155,6 @@ function Control:sendEvent(event)
 end
 
 function Control:willSendEvent(event)
-  if event == "touchDown" then
-    self:setState("highlighted")
-  elseif event == "touchDragExit" then
-    self:setState("normal")
-  elseif event == "touchDragEnter" then
-    self:setState("highlighted")
-  elseif event == "touchUpInside" then
-    self:setState("normal")
-  end
 end
 
 function Control:addTarget(obj, action)
