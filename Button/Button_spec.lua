@@ -10,6 +10,17 @@ local View = require 'View'
 local Button = require 'Button'
 local Label = require 'Label'
 local Input = require 'Input'
+local BarButtonItem = require 'BarButtonItem'
+
+local iconInfo = {
+  width = 40,
+  height = 40,
+  numFrames = 20,
+  sheetContentWidth = 200,
+  sheetContentHeight = 160
+}
+
+local icons = graphics.newImageSheet("assets/ios7icons.png", iconInfo)
 
 --local VCW = display.viewableContentWidth
 --local VCH = display.viewableContentHeight
@@ -106,5 +117,21 @@ ts.regist(1, function()
     local inputFrame = ts.input.frame
     transition.to(inputFrame, {time = 400, delta = false, y = 40, transition = easing.outQuad})
 end, "translate input view")
+
+ts.desc("#Bar button item")
+ts.regist(1, function()
+    -- create image first
+    local backButtonImage = display.newImageRect(icons, 14, 40, 40)
+    local back = BarButtonItem {
+      image = backButtonImage,
+      name = "back",
+      width = 100,
+      height = 50,
+    }
+    -- make it a button
+    back.states.highlighted.titleShadowColor = {255, 45, 85, 128}
+    --bg:addSubview(simpleButton)
+    back:addTarget(ts.label, "touchDown")
+end, "create bar button")
 
 return ts

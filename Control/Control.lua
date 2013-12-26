@@ -54,7 +54,9 @@ function Control:initialize(opt)
   self.selected = false
   self.status = Control.State.Normal
   self.tracking = false
-  self:setEnabled(true)
+
+  local isEnabled = not (opt.enabled == false)
+  self:setEnabled(isEnabled)
 end
 
 function Control:setEnabled(enable)
@@ -68,14 +70,19 @@ function Control:setEnabled(enable)
   self.enabled = enable
 end
 
+-- @subclass
+-- @return boolean
 function Control:beginTracking(event)
   return true
 end
 
+-- @subclass
+-- @return boolean
 function Control:continueTracking(event)
   return true
 end
 
+-- @return boolean True if the point user touched is inside the special bounds, fasle for not inside.
 local function isTouchInside(bounds, point)
   return (point.x >= bounds.xMin) and (point.x <= bounds.xMax) and (point.y >= bounds.yMin) and (point.y <= bounds.yMax)
 end
@@ -148,15 +155,6 @@ function Control:sendEvent(event)
 end
 
 function Control:willSendEvent(event)
-  if event == "touchDown" then
-    self:setState("highlighted")
-  elseif event == "touchDragExit" then
-    self:setState("normal")
-  elseif event == "touchDragEnter" then
-    self:setState("highlighted")
-  elseif event == "touchUpInside" then
-    self:setState("normal")
-  end
 end
 
 function Control:addTarget(obj, action)
