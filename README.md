@@ -1,3 +1,11 @@
+IMPORTANT NOTICE:
+(Project.status = frozen.)
+
+I am busy on another project( my startup project ), At the same time, i have no idea about that if this complicated meaningful project could woke up or not.
+
+However, PLZ contact me if U R interest in corona and lua programming. That's would be great!
+
+
 LKit
 -----
 
